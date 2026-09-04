@@ -94,6 +94,7 @@
     .scoreline { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
     .metric { padding:12px; background:rgba(255,255,255,.035); border:1px solid #2a3a4f; border-radius:11px; }
     .metric b,.metric span { display:block; }.metric b { font-size:1.42rem; }.metric span { color:var(--muted); font-size:.78rem; font-weight:750; }
+    #scenarioHud { color:#d8e7f5; font-size:.94rem; line-height:1.25; }
     .team-metric { margin-top:10px; border-color:rgba(66,207,145,.38); }.team-metric b { color:var(--green); font-size:1.05rem; }
     .progress-track { height:9px; overflow:hidden; background:#09111b; border-radius:99px; }
     .progress-fill { width:0; height:100%; background:linear-gradient(90deg,var(--red),var(--yellow),var(--green)); border-radius:inherit; transition:width .28s ease; }
@@ -143,7 +144,9 @@
     .floor-plan.isometric::before { display:none; }.floor-plan.isometric::after { content:"ISOMETRIC TRAINING MODEL · FICTIONAL"; z-index:7; }
     .iso-visual { position:absolute; inset:0; z-index:1; display:block; width:100%; height:100%; }
     .iso-visual text { font-family:Inter,ui-sans-serif,system-ui,sans-serif; }.iso-visual .scene-label { fill:#d5e8f7; font-size:13px; font-weight:800; letter-spacing:.05em; }.iso-visual .scene-small { fill:#9db9cd; font-size:10px; font-weight:750; letter-spacing:.06em; }
+    .iso-visual .scene-alert { filter:drop-shadow(0 0 10px rgba(255,99,92,.94)); }
     .iso-visual .scene-alert .alert-top { fill:#d84843; }.iso-visual .scene-alert .alert-side { fill:#922a31; }.iso-visual .scene-alert .alert-front { fill:#b63339; }.iso-visual .scene-alert .alert-light { fill:#ff7069; filter:drop-shadow(0 0 6px #ff7069); }
+    .isometric.recovered .scene-alert { filter:drop-shadow(0 0 10px rgba(88,239,168,.94)); }
     .isometric.recovered .scene-alert .alert-top { fill:#2aa66b; }.isometric.recovered .scene-alert .alert-side { fill:#176843; }.isometric.recovered .scene-alert .alert-front { fill:#218956; }.isometric.recovered .scene-alert .alert-light { fill:#58efa8; filter:drop-shadow(0 0 6px #58efa8); }
     .iso-zone.zone { position:absolute; z-index:5; display:flex; min-height:48px; align-items:center; gap:7px; padding:8px 9px; color:#eff8ff; text-align:left; background:rgba(7,18,29,.91); border:1px solid #54718c; border-radius:9px; box-shadow:0 8px 18px rgba(0,0,0,.32); }
     .iso-zone.zone:hover:not(:disabled) { background:#193652; border-color:var(--blue); }.iso-zone.zone:disabled { cursor:not-allowed; opacity:.53; }
@@ -151,7 +154,7 @@
     .iso-zone .dot { width:9px; height:9px; flex:0 0 auto; background:#516b84; border-radius:50%; }.iso-zone.active .dot { background:var(--blue); box-shadow:0 0 9px var(--blue); }.iso-zone.done .dot { background:var(--green); box-shadow:0 0 9px var(--green); }
     .isometric .noc-zone { top:10%; left:6%; width:146px; }.isometric .diagnose-zone { top:10%; right:6%; width:148px; }.isometric .recovery-zone { bottom:10%; left:8%; width:157px; }.isometric .exit-zone { right:6%; bottom:16%; width:145px; }
     .isometric .rack-target { top:48%; left:50%; min-width:105px; transform:translate(-50%,-50%); border-color:var(--red); }.isometric .rack-target:not(:disabled) { background:#421c23; }.isometric .rack-target.done { background:#153d31; border-color:var(--green); }
-    .isometric[data-active-zone="noc"] #scene-noc,.isometric[data-active-zone="diagnose"] #scene-diagnose,.isometric[data-active-zone="aisle"] #scene-c14,.isometric[data-active-zone="recovery"] #scene-recovery,.isometric[data-active-zone="exit"] #scene-exit { filter:drop-shadow(0 0 12px rgba(110,185,255,.9)); }
+    .isometric[data-active-zone="noc"] #scene-noc,.isometric[data-active-zone="diagnose"] #scene-diagnose,.isometric[data-active-zone="aisle"] .map-focus,.isometric[data-active-zone="recovery"] #scene-recovery,.isometric[data-active-zone="exit"] #scene-exit { filter:drop-shadow(0 0 12px rgba(110,185,255,.9)); }
     .map-caption { margin:12px 0 0; color:#aabbd0; font-size:.81rem; }
     .event-log { margin-top:15px; padding-top:14px; border-top:1px solid #2b3a4c; }
     .event-log h3 { margin-bottom:8px; }.event-log ul { display:grid; gap:7px; max-height:180px; margin:0; padding:0; overflow:auto; list-style:none; }
@@ -232,9 +235,9 @@
 
     <section class="hero">
       <section class="card">
-        <p class="eyebrow">Scenario DC-01 · Training simulation</p>
-        <h1>Restore the room before the clock runs out.</h1>
-        <p class="mission-copy">A critical alert is affecting a simulated data hall. Correlate the evidence, rebuild the incident timeline, identify the virtual dependency failure, then verify the safe recovery before you unlock the exit.</p>
+        <p id="scenarioEyebrow" class="eyebrow">Scenario library · Training simulation</p>
+        <h1 id="scenarioTitle">Restore the room before the clock runs out.</h1>
+        <p id="missionCopy" class="mission-copy">A critical alert is affecting a simulated data hall. Correlate the evidence, rebuild the incident timeline, identify the virtual dependency failure, then verify the safe recovery before you unlock the exit.</p>
         <ul class="brief-list">
           <li><b>1</b><span>Inspect every alert before you decide what failed.</span></li>
           <li><b>2</b><span>Rebuild the incident sequence and trace the matching virtual equipment clues.</span></li>
@@ -262,6 +265,7 @@
             <button class="difficulty-option" data-difficulty="hard" type="button" aria-pressed="false"><b>Hard</b><span>Deep trace · strict penalties</span></button>
           </div>
           <p id="difficultyMessage" class="difficulty-note" aria-live="polite"></p>
+          <p id="scenarioPreview" class="difficulty-note" aria-live="polite">The host start randomly selects one shared fictional incident from the scenario library.</p>
         </section>
         <div class="mission-actions">
           <button id="startButton" type="button" disabled>Host starts the escape</button>
@@ -278,6 +282,7 @@
         </div>
         <div id="teamMetric" class="metric team-metric hidden"><b id="teamHud">—</b><span>Your team</span></div>
         <div class="metric"><b id="difficultyHud">Medium</b><span>Scenario level</span></div>
+        <div class="metric"><b id="scenarioHud">Rotating</b><span>Incident domain</span></div>
         <div><div class="progress-track" aria-label="Progress"><div id="progressFill" class="progress-fill"></div></div></div>
         <p id="hudMessage" class="muted">Join a team, then begin the simulation.</p>
       </aside>
@@ -286,7 +291,7 @@
     <section id="game" class="game-grid hidden">
       <aside class="card room-map" aria-label="Fictional data center floor plan">
         <div class="map-heading">
-          <div><p class="eyebrow">Interactive floor plan</p><h2>Fictional Data Hall A</h2><p>Use the highlighted locations to move through the simulation.</p></div>
+          <div><p class="eyebrow">Interactive floor plan</p><h2 id="mapTitle">Fictional Data Hall A</h2><p id="mapSubtitle">Use the highlighted locations to move through the simulation.</p></div>
           <div class="map-legend"><span><i class="normal"></i> Normal</span><span><i class="alert"></i> Alert</span></div>
         </div>
         <div class="floor-scroll">
@@ -314,14 +319,14 @@
               <text x="476" y="136" class="scene-small">COLD AISLE</text>
               <text x="505" y="286" class="scene-small">HOT AISLE</text>
 
-              <g id="scene-noc" filter="url(#isoShadow)">
+              <g id="scene-noc" data-map-asset="noc" filter="url(#isoShadow)">
                 <polygon points="180,173 251,143 312,165 241,196" fill="#3a5973"/>
                 <polygon points="180,173 241,196 241,246 180,221" fill="#1a3042"/>
                 <polygon points="241,196 312,165 312,216 241,246" fill="#28475f"/>
                 <rect x="208" y="187" width="20" height="11" rx="2" fill="#6eb9ff"/><rect x="233" y="179" width="20" height="11" rx="2" fill="#6eb9ff"/><rect x="258" y="172" width="20" height="11" rx="2" fill="#6eb9ff"/>
                 <text x="181" y="157" class="scene-label">NOC</text>
               </g>
-              <g id="scene-diagnose" filter="url(#isoShadow)">
+              <g id="scene-diagnose" data-map-asset="incident" filter="url(#isoShadow)">
                 <polygon points="780,155 848,128 904,149 837,177" fill="#465f75"/>
                 <polygon points="780,155 837,177 837,225 780,204" fill="#20384b"/>
                 <polygon points="837,177 904,149 904,197 837,225" fill="#304b61"/>
@@ -333,7 +338,7 @@
                 <use href="#rackNormal" transform="translate(345 176)"/><use href="#rackNormal" transform="translate(427 144)"/><use href="#rackNormal" transform="translate(509 112)"/><use href="#rackNormal" transform="translate(591 144)"/><use href="#rackNormal" transform="translate(673 176)"/>
                 <use href="#rackNormal" transform="translate(287 270)"/><use href="#rackNormal" transform="translate(369 238)"/><use href="#rackNormal" transform="translate(451 206)"/><use href="#rackNormal" transform="translate(533 238)"/><use href="#rackNormal" transform="translate(615 270)"/>
                 <use href="#rackNormal" transform="translate(229 364)"/><use href="#rackNormal" transform="translate(311 332)"/><use href="#rackNormal" transform="translate(393 300)"/>
-                <g id="scene-c14" class="scene-alert" transform="translate(475 332)">
+                <g id="scene-c14" data-map-asset="rack" transform="translate(475 332)">
                   <polygon class="alert-top" points="0,17 65,0 98,15 32,33"/>
                   <polygon class="alert-side" points="0,17 32,33 32,84 0,68"/>
                   <polygon class="alert-front" points="32,33 98,15 98,67 32,84"/>
@@ -345,18 +350,18 @@
               </g>
 
               <g filter="url(#isoShadow)">
-                <g id="scene-crac-one">
+                <g id="scene-crac-one" data-map-asset="cooling">
                   <polygon points="158,306 210,285 247,298 193,320" fill="#5887a5"/><polygon points="158,306 193,320 193,385 158,367" fill="#20435c"/><polygon points="193,320 247,298 247,362 193,385" fill="#32627d"/>
                   <path d="M205 330L230 320M205 340L230 330M205 350L230 340" stroke="#76dcff" stroke-width="3"/><text x="151" y="284" class="scene-small">CRAC-1</text>
                 </g>
-                <g id="scene-crac-two">
+                <g id="scene-crac-two" data-map-asset="cooling-secondary">
                   <polygon points="847,278 899,257 936,270 882,292" fill="#5887a5"/><polygon points="847,278 882,292 882,357 847,339" fill="#20435c"/><polygon points="882,292 936,270 936,334 882,357" fill="#32627d"/>
                   <path d="M894 302L919 292M894 312L919 302M894 322L919 312" stroke="#76dcff" stroke-width="3"/><text x="854" y="255" class="scene-small">CRAC-2</text>
                 </g>
-                <g id="scene-pdu-a">
+                <g id="scene-pdu-a" data-map-asset="power-a">
                   <polygon points="177,432 226,413 259,425 209,446" fill="#415f77"/><polygon points="177,432 209,446 209,505 177,488" fill="#1c3448"/><polygon points="209,446 259,425 259,484 209,505" fill="#2c4a61"/><circle cx="242" cy="469" r="4" fill="#4be39b"/><text x="169" y="411" class="scene-small">PDU-A</text>
                 </g>
-                <g id="scene-pdu-b" class="scene-alert">
+                <g id="scene-pdu-b" data-map-asset="power-b">
                   <polygon class="alert-top" points="819,407 868,388 901,400 851,421"/><polygon class="alert-side" points="819,407 851,421 851,480 819,463"/><polygon class="alert-front" points="851,421 901,400 901,459 851,480"/><circle class="alert-light" cx="884" cy="444" r="4"/><text x="812" y="386" class="scene-small">PDU-B</text>
                 </g>
               </g>
@@ -372,12 +377,12 @@
             </svg>
             <button class="iso-zone zone noc-zone" data-zone="noc" type="button" disabled aria-label="Go to NOC console"><span class="dot"></span><span class="zone-copy"><b>NOC console</b><span>Alarm wall</span></span></button>
             <button class="iso-zone zone diagnose-zone" data-zone="diagnose" type="button" disabled aria-label="Go to incident board"><span class="dot"></span><span class="zone-copy"><b>Incident board</b><span>Diagnosis</span></span></button>
-            <button class="iso-zone zone rack-target" data-zone="aisle" type="button" disabled aria-label="Go to Rack C14"><span class="dot"></span><span class="zone-copy"><b>Rack C14</b><span>Virtual alert</span></span></button>
+            <button id="aisleZoneTarget" class="iso-zone zone rack-target" data-zone="aisle" type="button" disabled aria-label="Go to the virtual alert"><span class="dot"></span><span class="zone-copy"><b>Virtual alert</b><span>Inspect evidence</span></span></button>
             <button class="iso-zone zone recovery-zone" data-zone="recovery" type="button" disabled aria-label="Go to recovery console"><span class="dot"></span><span class="zone-copy"><b>Recovery console</b><span>Virtual runbook</span></span></button>
             <button class="iso-zone zone exit-zone" data-zone="exit" type="button" disabled aria-label="Go to exit interlock"><span class="dot"></span><span class="zone-copy"><b>Exit interlock</b><span>Mantrap</span></span></button>
           </div>
         </div>
-        <p class="map-caption">This is a 3D-style, fictional data-hall model. The lit locations are the game controls; Rack C14 and PDU-B turn green after the virtual recovery is complete.</p>
+        <p id="mapCaption" class="map-caption">This is a 3D-style, fictional data-hall model. The lit locations are game controls only; no real equipment is connected.</p>
         <section class="event-log">
           <h3>Event log</h3>
           <ul id="eventLog"><li>Simulation initialized.</li></ul>
@@ -567,6 +572,317 @@
         runbook:['notify','migrate','protect','validate'], validations:['power','thermal','workload'], description:'Deep trace · 26 minutes · strict penalties and one hint.'
       }
     };
+    const SCENARIO_SEEDS = [
+      {
+        key:'power_branch', title:'A-Side Telemetry Disagreement', category:'Power distribution and sensing', location:'PDU-B / Rack C14', icon:'⚡',
+        rootTitle:'Power distribution telemetry fault', rootSummary:'The fictional PDU-B branch signal is the failed virtual dependency.',
+        primaryTitle:'PDU-B branch telemetry', primaryDetail:'PDU-B reports a contradictory simulated branch condition while modeled upstream redundancy remains stable.',
+        impact:'The Rack C14 virtual load shows a localized alert after the branch signal diverges.',
+        decoys:[
+          {key:'cooling_airflow', title:'Cooling airflow issue', detail:'CRAC telemetry is normal in the simulation and does not explain the localized virtual impact.'},
+          {key:'network_path', title:'Network path interruption', detail:'The simulated network fabric remains healthy with no modeled packet loss.'}
+        ],
+        change:'A simulated maintenance note narrows the time of the signal disagreement but does not change the approved virtual response.',
+        map:'The virtual dependency map links PDU-B to the affected Rack C14 load.',
+        assets:[
+          ['PDU-B','Branch signal is amber. Inspect its virtual label.','The simulated PDU-B record anchors the incident.'],
+          ['Rack C14','Localized virtual impact is displayed.','The virtual rack is the modeled impact zone.'],
+          ['CRAC-1','Independent thermal signal is normal.','The virtual cooling view rules out room-wide thermal loss.'],
+          ['UPS-A','Resiliency model remains stable.','The virtual UPS view confirms upstream modeled protection.'],
+          ['ToR-07','Alternate virtual path is healthy.','The virtual route view confirms the network is a decoy.']
+        ],
+        codeParts:['BLUE','14','42','GREEN','7'], mapConfig:{alertAssets:['power-b','rack'],focus:'rack'}
+      },
+      {
+        key:'ups_resilience', title:'UPS Runtime Confidence Drop', category:'UPS and battery resilience', location:'UPS-A / Row B', icon:'▣',
+        rootTitle:'UPS runtime-confidence drop', rootSummary:'The fictional UPS runtime estimate has lost confidence even though the modeled load remains protected.',
+        primaryTitle:'UPS-A runtime model', primaryDetail:'The virtual UPS-A dashboard shows a degraded runtime-confidence estimate and a battery-health warning.',
+        impact:'Row B shows a simulated resiliency alert without a modeled service outage.',
+        decoys:[
+          {key:'power_branch', title:'Branch distribution fault', detail:'The modeled branch feeds remain stable and do not explain the runtime-confidence signal.'},
+          {key:'network_path', title:'Network fabric issue', detail:'The virtual fabric is healthy; application-path telemetry is a decoy.'}
+        ],
+        change:'The simulated history shows the confidence drop began before the current virtual alert burst.',
+        map:'The virtual resiliency view links UPS-A status to the modeled Row B protection posture.',
+        assets:[
+          ['UPS-A','Runtime confidence has fallen.','The virtual runtime model contains the primary evidence.'],
+          ['Row B load view','Protected virtual load is stable.','The impact remains a resiliency warning, not a simulated outage.'],
+          ['Input-quality view','Independent input model is normal.','The virtual input view removes an upstream power decoy.'],
+          ['Battery trend','Battery-health confidence is amber.','The virtual trend confirms the same simulated domain.'],
+          ['Alternate path','Virtual service path remains available.','The modeled alternate path is healthy.']
+        ],
+        codeParts:['AMBER','72','91','READY','5'], mapConfig:{alertAssets:['power-b'],focus:'power-b'}
+      },
+      {
+        key:'generator_readiness', title:'Standby Generator Readiness Alert', category:'Backup generation readiness', location:'Generator model / Transfer bay', icon:'◫',
+        rootTitle:'Standby generator readiness alert', rootSummary:'A fictional standby-readiness signal needs virtual facilities escalation before the next modeled test window.',
+        primaryTitle:'Generator readiness console', primaryDetail:'The virtual generator console reports an amber readiness state while the modeled fuel display remains normal.',
+        impact:'The transfer-bay model displays a readiness warning with no simulated loss of protected load.',
+        decoys:[
+          {key:'ups_resilience', title:'UPS runtime problem', detail:'The virtual UPS confidence view is stable and is not the source of the readiness alert.'},
+          {key:'monitoring_data', title:'Monitoring data problem', detail:'Independent virtual timestamps agree, so the readiness event is not stale data.'}
+        ],
+        change:'An outdated simulated maintenance note is the correlation clue; it does not authorize any real action.',
+        map:'The fictional readiness map connects the generator model to the transfer-bay verification view.',
+        assets:[
+          ['Readiness console','The modeled standby state is amber.','The virtual console identifies the affected readiness signal.'],
+          ['Transfer bay','Protected modeled load remains available.','The virtual bay shows no active transfer or live control.'],
+          ['UPS-A','Upstream virtual resiliency is stable.','The virtual UPS reading removes the battery decoy.'],
+          ['Maintenance record','A simulated record needs review.','The fictional record supports the readiness classification.'],
+          ['Dependency view','Virtual alternate protection is present.','The modeled trace confirms the escalation path.']
+        ],
+        codeParts:['GOLD','19','OK','READY','4'], mapConfig:{alertAssets:['power-a'],focus:'power-a'}
+      },
+      {
+        key:'cooling_airflow', title:'Hot-Aisle Temperature Drift', category:'Cooling and environmental control', location:'Hot aisle / CRAC-1', icon:'❄',
+        rootTitle:'Cooling airflow drift', rootSummary:'The fictional cooling zone is slowly losing modeled airflow, creating a localized thermal trend.',
+        primaryTitle:'CRAC-1 airflow telemetry', primaryDetail:'The virtual CRAC-1 view shows weakening airflow while adjacent modeled environmental sensors agree.',
+        impact:'The hot-aisle model reports a gradual temperature rise near the affected virtual cooling zone.',
+        decoys:[
+          {key:'power_branch', title:'Power distribution event', detail:'The virtual branch-feed values are normal and do not explain the modeled thermal trend.'},
+          {key:'network_path', title:'Network latency event', detail:'A simulated latency notice is unrelated to the physical-environment model.'}
+        ],
+        change:'The fictional trend begins before the decoy network notice, which helps reconstruct the incident order.',
+        map:'The virtual environmental map connects CRAC-1 to the affected hot-aisle zone.',
+        assets:[
+          ['CRAC-1','Airflow indicator is amber.','The virtual CRAC view contains the primary cooling evidence.'],
+          ['Hot aisle zone','Thermal trend is rising.','The simulated aisle is the modeled impact zone.'],
+          ['PDU-B','Virtual power telemetry is normal.','The independent power view removes a distribution decoy.'],
+          ['Sensor cluster','Adjacent simulated sensors agree.','The virtual sensor correlation confirms the localized trend.'],
+          ['ToR-07','Network route is healthy.','The virtual fabric view removes the connectivity decoy.']
+        ],
+        codeParts:['COOL','27','FLOW','CLEAR','2'], mapConfig:{alertAssets:['cooling','rack'],focus:'cooling'}
+      },
+      {
+        key:'leak_detection', title:'Condensate Sensor Alarm', category:'Water and leak detection', location:'Cooling perimeter / Sensor W-3', icon:'◌',
+        rootTitle:'Condensate sensor alarm', rootSummary:'A fictional moisture signal requires a virtual safety cordon and facilities escalation; nothing is reset or bypassed.',
+        primaryTitle:'Sensor W-3 moisture alert', primaryDetail:'The virtual water-detection panel reports a moisture alert near the cooling perimeter and a modeled humidity rise.',
+        impact:'The cooling-perimeter model shows a simulated safety alert around Sensor W-3.',
+        decoys:[
+          {key:'cooling_airflow', title:'Cooling airflow fault', detail:'The virtual airflow view is stable and does not explain the moisture signal.'},
+          {key:'access_control', title:'Access-control event', detail:'A simulated nearby access event is unrelated to the water-detection alert.'}
+        ],
+        change:'A fictional cleaning-cart record is a decoy; the independent virtual sensor view is the reliable evidence.',
+        map:'The virtual facility map places Sensor W-3 at the cooling perimeter and routes the incident to facilities.',
+        assets:[
+          ['Sensor W-3','Moisture indicator is red.','The virtual sensor is the primary fictional alert.'],
+          ['Cooling perimeter','A simulated cordon is required.','The game represents a safety boundary only, not a real control.'],
+          ['CRAC-1','Virtual airflow is stable.','The independent cooling view removes an airflow decoy.'],
+          ['Humidity trend','Modeled humidity rises near W-3.','The virtual trend supports the sensor alarm.'],
+          ['Facilities route','Virtual escalation path is available.','The fictional route confirms qualified-response escalation.']
+        ],
+        codeParts:['SAFE','W3','DRY','CLEAR','6'], mapConfig:{alertAssets:['cooling'],focus:'cooling'}
+      },
+      {
+        key:'network_path', title:'Fabric Path Asymmetry', category:'Network and path resiliency', location:'Fabric path / ToR-07', icon:'⌁',
+        rootTitle:'Network path asymmetry', rootSummary:'One fictional network path is degraded while the alternate modeled path remains healthy.',
+        primaryTitle:'Fabric path telemetry', primaryDetail:'The virtual topology view shows one asymmetric path with intermittent modeled application access.',
+        impact:'The ToR-07 model reports a virtual service-path alert while an alternate route remains available.',
+        decoys:[
+          {key:'cooling_airflow', title:'Cooling zone event', detail:'The virtual thermal view is stable and unrelated to the modeled access issue.'},
+          {key:'power_branch', title:'Power branch event', detail:'The modeled feed remains stable; the apparent power warning is a decoy.'}
+        ],
+        change:'The fictional path history shows the asymmetry before the modeled application-impact alert.',
+        map:'The virtual dependency trace highlights ToR-07 and its alternate modeled path.',
+        assets:[
+          ['ToR-07','One virtual path is degraded.','The topology view contains the primary evidence.'],
+          ['Application path','Modeled service access is intermittent.','The virtual impact appears only on the affected path.'],
+          ['CRAC-1','Virtual thermal status is normal.','The cooling signal is an independent decoy.'],
+          ['Resiliency view','Alternate modeled path is healthy.','The virtual redundancy view supports the diagnosis.'],
+          ['Route trace','The asymmetric branch is highlighted.','The fictional trace confirms the affected dependency.']
+        ],
+        codeParts:['PATH','07','DUAL','GREEN','9'], mapConfig:{alertAssets:['rack'],focus:'rack'}
+      },
+      {
+        key:'compute_cluster', title:'Compute Cluster Imbalance', category:'Compute and orchestration', location:'Compute cluster / Row C', icon:'▤',
+        rootTitle:'Compute cluster imbalance', rootSummary:'The fictional compute pool has an uneven modeled workload distribution, causing a service-pressure alert.',
+        primaryTitle:'Compute pool status', primaryDetail:'The virtual cluster view shows several modeled nodes carrying disproportionately high utilization.',
+        impact:'The Row C simulation reports degraded response time without a modeled storage or network failure.',
+        decoys:[
+          {key:'storage_replication', title:'Storage latency event', detail:'The virtual storage latency reading is incidental and not the root of the modeled pressure.'},
+          {key:'network_path', title:'Network path fault', detail:'The simulated network paths remain healthy across the cluster.'}
+        ],
+        change:'The fictional orchestration timeline links the imbalance to the virtual service-pressure pattern.',
+        map:'The virtual compute dependency view maps the affected pool to Row C.',
+        assets:[
+          ['Compute pool','Modeled utilization is uneven.','The virtual pool dashboard contains the primary evidence.'],
+          ['Row C','Virtual response time is degraded.','The fictional row represents the modeled service impact.'],
+          ['Storage view','Replication latency is normal.','The independent storage signal removes a decoy.'],
+          ['Capacity model','Alternate virtual capacity is available.','The game uses this only as a simulated resiliency clue.'],
+          ['Service trace','The affected virtual pool is highlighted.','The modeled trace confirms the compute dependency.']
+        ],
+        codeParts:['NODE','24','POOL','READY','3'], mapConfig:{alertAssets:['rack'],focus:'rack'}
+      },
+      {
+        key:'storage_replication', title:'Replication Queue Stall', category:'Storage and data protection', location:'Storage replication / Pod S-2', icon:'▥',
+        rootTitle:'Storage replication queue stall', rootSummary:'A fictional data-protection queue has stopped advancing and needs virtual storage escalation.',
+        primaryTitle:'Replication queue monitor', primaryDetail:'The virtual storage panel shows a stalled replication queue while modeled compute utilization stays normal.',
+        impact:'Pod S-2 reports slower modeled reads and a data-protection warning.',
+        decoys:[
+          {key:'compute_cluster', title:'Compute capacity problem', detail:'The virtual compute pool is balanced and does not explain the replication queue.'},
+          {key:'network_path', title:'Network fabric problem', detail:'The modeled storage path is reachable; the network indicator is a decoy.'}
+        ],
+        change:'The fictional queue timestamp precedes the simulated application-read slowdown.',
+        map:'The virtual protection map connects the stalled queue to Pod S-2 service health.',
+        assets:[
+          ['Replication queue','Virtual queue advancement is stalled.','The fictional queue is the primary evidence source.'],
+          ['Pod S-2','Modeled reads are slower.','The virtual pod shows the simulated impact.'],
+          ['Compute pool','Virtual utilization is balanced.','The independent compute view removes a capacity decoy.'],
+          ['Protection status','Virtual data health is amber.','The simulated protection dashboard supports the diagnosis.'],
+          ['Path monitor','Storage route is available.','The fictional path view removes the network decoy.']
+        ],
+        codeParts:['SYNC','S2','QUEUE','CLEAR','8'], mapConfig:{alertAssets:['rack'],focus:'rack'}
+      },
+      {
+        key:'cabling_map', title:'Cross-Connect Map Mismatch', category:'Cabling and documentation', location:'Cross-connect / Row D', icon:'⌘',
+        rootTitle:'Cross-connect map mismatch', rootSummary:'A fictional path label points to the wrong modeled endpoint, creating a documentation-and-trace incident.',
+        primaryTitle:'Cross-connect trace', primaryDetail:'The virtual cable trace conflicts with the modeled endpoint label even though the display looks connected.',
+        impact:'Row D reports a simulated path-validation warning with no physical work required in the game.',
+        decoys:[
+          {key:'network_path', title:'Network fabric outage', detail:'The virtual fabric stays healthy; the issue is the modeled trace relationship.'},
+          {key:'monitoring_data', title:'Monitoring-data issue', detail:'Independent virtual labels agree that the map mismatch is real.'}
+        ],
+        change:'The fictional change history reveals the label conflict after a simulated documentation update.',
+        map:'The virtual cross-connect map highlights the inconsistent Row D endpoint relationship.',
+        assets:[
+          ['Cross-connect trace','Endpoint labels disagree.','The fictional trace is the primary evidence.'],
+          ['Row D','Virtual path validation is amber.','The modeled row represents the documentation impact.'],
+          ['Fabric view','Network health remains normal.','The virtual topology removes the outage decoy.'],
+          ['Label record','Map version is inconsistent.','The fictional record confirms a documentation mismatch.'],
+          ['Dependency trace','Expected endpoint is shown.','The virtual trace supports the correct modeled mapping.']
+        ],
+        codeParts:['MAP','D4','TRACE','VALID','1'], mapConfig:{alertAssets:['rack'],focus:'rack'}
+      },
+      {
+        key:'monitoring_data', title:'Alert Storm With Stale Data', category:'Monitoring and observability', location:'Monitoring wall / NOC', icon:'◉',
+        rootTitle:'Monitoring data-confidence failure', rootSummary:'The fictional alert stream contains stale data, so teams must identify the trusted virtual evidence source.',
+        primaryTitle:'Alert-stream confidence', primaryDetail:'The virtual monitoring wall shows hundreds of alerts with conflicting timestamps across the modeled views.',
+        impact:'The NOC simulation is flooded with stale virtual alarms while independent status views disagree.',
+        decoys:[
+          {key:'network_path', title:'Network path fault', detail:'A simulated network alert is present but the independent virtual path view is healthy.'},
+          {key:'power_branch', title:'Power distribution event', detail:'The modeled power reading is current and stable, so it is not the primary virtual failure.'}
+        ],
+        change:'The fictional event history shows the data timestamp drift before the alert storm began.',
+        map:'The virtual observability map identifies the NOC wall as the affected confidence source.',
+        assets:[
+          ['Alert stream','Timestamps conflict.','The virtual alert stream is the primary evidence.'],
+          ['NOC wall','Modeled alarm volume is high.','The game represents alert overload only, not a live system.'],
+          ['Independent status','Trusted virtual view is current.','The independent view helps identify the stale source.'],
+          ['Timestamp audit','Virtual clock drift is visible.','The modeled audit supports the confidence diagnosis.'],
+          ['Correlation map','Signals are grouped by source.','The fictional map helps separate decoys from the trusted view.']
+        ],
+        codeParts:['TRUST','88','TIME','FRESH','4'], mapConfig:{alertAssets:['noc'],focus:'noc'}
+      },
+      {
+        key:'access_control', title:'Access-Control Availability Event', category:'Physical security and access control', location:'Access-control console / Data Hall entry', icon:'▧',
+        rootTitle:'Access-control availability event', rootSummary:'A fictional badge-reader availability alert requires authorized virtual security escalation; the game never bypasses controls.',
+        primaryTitle:'Access-control console', primaryDetail:'The virtual security console shows badge-reader availability warnings while the nearby equipment view is a decoy.',
+        impact:'The simulated data-hall entry reports a virtual access-status interruption.',
+        decoys:[
+          {key:'power_branch', title:'Rack power event', detail:'The modeled rack signal is stable and unrelated to the access-control condition.'},
+          {key:'monitoring_data', title:'Stale alert stream', detail:'The virtual security console timestamps are current, so this is not an observability issue.'}
+        ],
+        change:'The fictional security-console record contains the correlation clue and routes the approved virtual escalation.',
+        map:'The virtual facility view maps the alert to the data-hall entry and security-console response path.',
+        assets:[
+          ['Security console','Virtual badge-reader state is amber.','The fictional console is the primary evidence source.'],
+          ['Data Hall entry','Access status is interrupted.','The game represents an availability condition, never a bypass.'],
+          ['Rack C14','Nearby virtual equipment is stable.','The independent rack view removes a power decoy.'],
+          ['Audit view','Virtual security timestamps are current.','The model confirms the alert is not stale data.'],
+          ['Escalation route','Authorized virtual response is shown.','The fictional route reinforces security-first handling.']
+        ],
+        codeParts:['ACCESS','A1','ESCALATE','CLEAR','2'], mapConfig:{alertAssets:['incident'],focus:'incident'}
+      },
+      {
+        key:'life_safety', title:'Life-Safety Supervisory Fault', category:'Fire and life-safety supervisory response', location:'Life-safety panel / Hall perimeter', icon:'✦',
+        rootTitle:'Life-safety supervisory fault', rootSummary:'This fictional supervisory signal is an immediate qualified-response escalation; the game never silences, resets, or bypasses life-safety systems.',
+        primaryTitle:'Life-safety supervisory panel', primaryDetail:'The virtual panel shows a supervisory trouble signal with no simulated fire condition.',
+        impact:'The hall-perimeter simulation displays an urgent virtual notification state.',
+        decoys:[
+          {key:'cooling_airflow', title:'Cooling alarm', detail:'The modeled cooling alert is a distraction and does not replace the life-safety escalation.'},
+          {key:'monitoring_data', title:'Monitoring-data problem', detail:'Independent virtual timestamps are current, so the supervisory signal must be treated as valid.'}
+        ],
+        change:'The fictional incident record confirms the required virtual notification and qualified-response route.',
+        map:'The virtual safety map highlights the supervisory panel and the authorized escalation path.',
+        assets:[
+          ['Supervisory panel','Virtual trouble signal is active.','The game treats this as immediate escalation evidence only.'],
+          ['Hall perimeter','Urgent virtual notification is shown.','No physical device control exists in this simulation.'],
+          ['CRAC-1','Cooling decoy is stable.','The independent cooling view removes the distraction.'],
+          ['Timestamp audit','Virtual signal is current.','The modeled audit confirms the supervisory status is not stale.'],
+          ['Qualified-response route','Virtual escalation is available.','The fictional route requires qualified responders, never player intervention.']
+        ],
+        codeParts:['SAFETY','LS','NOTIFY','READY','1'], mapConfig:{alertAssets:['incident'],focus:'incident'}
+      }
+    ];
+    function createScenario(seed) {
+      const decoyOne = seed.decoys[0];
+      const decoyTwo = seed.decoys[1];
+      const clueKeys = ['power','cooling','network','change','inventory'];
+      const scanKeys = ['pdu','rack','crac','ups','tor'];
+      const cards = {};
+      scanKeys.forEach((slot, index) => {
+        const asset = seed.assets[index];
+        cards[slot] = {
+          title:asset[0],
+          summary:asset[1],
+          detail:asset[2] + ' Recovery-key fragment: ' + seed.codeParts[index] + '.',
+          fragment:seed.codeParts[index],
+          alert:index < 2
+        };
+      });
+      return {
+        key:seed.key,
+        title:seed.title,
+        category:seed.category,
+        location:seed.location,
+        incident:'A fictional ' + seed.category.toLowerCase() + ' incident is affecting ' + seed.location + '. Correlate the virtual evidence, identify the modeled dependency failure, and complete the safe simulation response.',
+        rootCause:seed.key,
+        rootTitle:seed.rootTitle,
+        rootSummary:seed.rootSummary,
+        map:seed.mapConfig,
+        clues:{
+          power:{icon:seed.icon, title:seed.primaryTitle, summary:'Open the primary virtual evidence.', detail:seed.primaryDetail},
+          cooling:{icon:'◌', title:decoyOne.title, summary:'Inspect an independent virtual signal.', detail:decoyOne.detail},
+          network:{icon:'⌁', title:decoyTwo.title, summary:'Inspect a second independent virtual signal.', detail:decoyTwo.detail},
+          change:{icon:'↻', title:'Virtual change record', summary:'Review the fictional incident history.', detail:seed.change},
+          inventory:{icon:'⌘', title:'Virtual dependency map', summary:'Inspect the simulated relationship map.', detail:seed.map}
+        },
+        timelineCards:{
+          power:{title:seed.primaryTitle + ' becomes anomalous', summary:'The fictional record captures the first reliable warning.'},
+          impact:{title:seed.location + ' impact appears', summary:seed.impact},
+          scope:{title:'Independent signals are scoped', summary:decoyOne.title + ' and ' + decoyTwo.title + ' do not explain the modeled impact.'},
+          change:{title:'Virtual history is correlated', summary:seed.change},
+          inventory:{title:'Dependency map is confirmed', summary:seed.map}
+        },
+        diagnoses:[
+          {key:seed.key, title:seed.rootTitle, summary:seed.rootSummary},
+          {key:decoyOne.key, title:decoyOne.title, summary:decoyOne.detail},
+          {key:decoyTwo.key, title:decoyTwo.title, summary:decoyTwo.detail}
+        ],
+        scans:cards,
+        validations:{
+          power:{title:seed.category + ' signal', summary:'Confirm the primary virtual signal is stable.', detail:'The simulated ' + seed.rootTitle.toLowerCase() + ' signal is stable after the approved virtual response.'},
+          thermal:{title:seed.location + ' impact trend', summary:'Confirm the modeled impact is no longer escalating.', detail:'The fictional impact at ' + seed.location + ' is within its normal training range.'},
+          workload:{title:'Dependent virtual service health', summary:'Confirm dependent modeled services are healthy.', detail:'Dependent virtual services report a healthy modeled status.'}
+        },
+        hints:[
+          'Compare ' + seed.primaryTitle + ' with the independent virtual signals before choosing a cause.',
+          'Rebuild the fictional timeline from the primary warning to the modeled impact, then scope the decoys.',
+          'The correct virtual root cause is ' + seed.rootTitle + ', not the surrounding decoy alerts.',
+          'Read every required virtual asset label to assemble the recovery key.',
+          'Use the virtual escalation path and validate every modeled signal before exiting.'
+        ],
+        recoveryResult:'The fictional ' + seed.category.toLowerCase() + ' scenario is stable after the approved virtual response. No real equipment, system, or control was changed.'
+      };
+    }
+    const SCENARIOS = Object.fromEntries(SCENARIO_SEEDS.map(seed => [seed.key, createScenario(seed)]));
+    const VIRTUAL_RUNBOOK = {
+      notify:{title:'Record the virtual incident', summary:'Acknowledge the simulation and preserve the fictional incident timeline.'},
+      migrate:{title:'Protect simulated service impact', summary:'Keep the modeled service impact protected before the virtual recovery choice.'},
+      protect:{title:'Route the virtual escalation', summary:'Use the approved fictional escalation path; no physical action is involved.'},
+      validate:{title:'Confirm virtual response window', summary:'Confirm the simulation is ready for the final virtual response.'},
+      restart:{title:'Take an unapproved shortcut', summary:'Skip the safe fictional sequence and attempt a broad virtual restart.'}
+    };
     const difficultyRank = { easy:1, medium:2, hard:3 };
     const panels = ['noc','timeline','diagnose','aisle','recovery','validation','summary','exit','win'];
     const panelRequirements = { noc:0, timeline:1, diagnose:2, aisle:3, recovery:4, validation:5, summary:6, exit:6, win:Infinity };
@@ -581,7 +897,9 @@
       started:false, finished:false, difficulty:'medium', config:DIFFICULTIES.medium, seconds:DIFFICULTIES.medium.seconds, score:100, stage:0,
       clues:new Set(), scans:new Set(), timelineIndex:0, runbookIndex:0, validations:new Set(), hintsUsed:0, localPenaltySeconds:0, timer:null, log:['Simulation initialized.'],
       db:window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY) : null,
-      joined:false, player:null, sessionCode:'', lobbyTimer:null, isHost:false, hostName:'', sharedRunNumber:0, sharedStartedAt:null, lobbyRequestInFlight:false
+      joined:false, player:null, sessionCode:'', lobbyTimer:null, isHost:false, hostName:'', sharedRunNumber:0, sharedStartedAt:null, lobbyRequestInFlight:false,
+      pendingStartTimer:null, pendingCountdownTimer:null, pendingStartAt:null, pendingStartLocalMs:null,
+      scenarioKey:null, scenario:null
     };
     const $ = selector => document.querySelector(selector);
     const $$ = selector => [...document.querySelectorAll(selector)];
@@ -596,6 +914,105 @@
     const escapeHtml = value => String(value).replace(/[&<>'"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
     const completed = (set, required) => required.every(item => set.has(item));
     const panelRequirement = panel => panel === 'exit' ? state.config.exitStage : panelRequirements[panel];
+    const recoveryCodeFor = (scenario, level) => {
+      const config = DIFFICULTIES[level] || DIFFICULTIES.medium;
+      return (config.scans || []).map(slot => scenario.scans[slot].fragment).join('-');
+    };
+    function setGameConfiguration(level, scenarioKey) {
+      const nextLevel = DIFFICULTIES[level] ? level : 'medium';
+      const nextScenario = SCENARIOS[scenarioKey] || null;
+      state.difficulty = nextLevel;
+      state.scenarioKey = nextScenario ? nextScenario.key : null;
+      state.scenario = nextScenario;
+      state.config = Object.assign({}, DIFFICULTIES[nextLevel], {
+        code:nextScenario ? recoveryCodeFor(nextScenario, nextLevel) : '',
+        recoveryCorrect:'runbook',
+        summaryCorrect:nextScenario ? nextScenario.rootCause : ''
+      });
+    }
+    function writeCard(button, card) {
+      if (!button || !card) return;
+      const icon = button.querySelector('.icon');
+      if (icon && card.icon) icon.textContent = card.icon;
+      const title = button.querySelector('b');
+      const summary = button.querySelector('b + span');
+      if (title) title.textContent = card.title;
+      if (summary) summary.textContent = card.summary;
+    }
+    function writeChoiceCards(selector, choices, property) {
+      const ordered = state.difficulty === 'easy' ? choices : choices.slice().sort(() => Math.random() - .5);
+      $$(selector).forEach((button, index) => {
+        const choice = ordered[index] || choices[index];
+        if (!choice) return;
+        button.dataset[property] = choice.key;
+        writeCard(button, choice);
+      });
+    }
+    function renderMapScenario(scenario) {
+      const plan = $('#floorPlan');
+      $$('[data-map-asset]').forEach(asset => asset.classList.remove('scene-alert','map-focus'));
+      if (!scenario) {
+        $('#aisleZoneTarget').setAttribute('aria-label','Go to the virtual alert');
+        return;
+      }
+      (scenario.map.alertAssets || []).forEach(key => {
+        const asset = document.querySelector('[data-map-asset="' + key + '"]');
+        if (asset) asset.classList.add('scene-alert');
+      });
+      const focus = document.querySelector('[data-map-asset="' + scenario.map.focus + '"]');
+      if (focus) focus.classList.add('map-focus');
+      const target = $('#aisleZoneTarget');
+      target.querySelector('b').textContent = scenario.location;
+      target.querySelector('span').textContent = 'Virtual alert';
+      target.setAttribute('aria-label','Go to ' + scenario.location);
+      if (plan) plan.classList.remove('recovered');
+    }
+    function renderScenario() {
+      const scenario = state.scenario;
+      if (!scenario) {
+        $('#scenarioEyebrow').textContent = 'Scenario library · Training simulation';
+        $('#scenarioTitle').textContent = 'Restore the room before the clock runs out.';
+        $('#missionCopy').textContent = 'A new shared fictional incident is selected when the host starts the room. Every team receives the same simulated evidence and timer.';
+        $('#scenarioPreview').textContent = '12 fictional domains rotate at host start: power, cooling, water detection, network, compute, storage, monitoring, access control, and life safety.';
+        $('#scenarioHud').textContent = 'Rotating';
+        $('#mapTitle').textContent = 'Fictional Data Hall A';
+        $('#mapSubtitle').textContent = 'The shared scenario highlights the relevant virtual area after the host starts.';
+        $('#mapCaption').textContent = 'This is a 3D-style fictional data-hall model. The lit locations are game controls only; no real equipment is connected.';
+        renderMapScenario(null);
+        return;
+      }
+
+      $('#scenarioEyebrow').textContent = scenario.category + ' · Training simulation';
+      $('#scenarioTitle').textContent = scenario.title;
+      $('#missionCopy').textContent = scenario.incident;
+      $('#scenarioPreview').textContent = 'Shared incident: ' + scenario.title + '. Every team sees the same fictional fault this round.';
+      $('#scenarioHud').textContent = scenario.category;
+      $('#mapTitle').textContent = 'Fictional Data Hall A · ' + scenario.category;
+      $('#mapSubtitle').textContent = 'Highlighted: ' + scenario.location + '. Inspect only virtual game evidence.';
+      $('#mapCaption').textContent = 'Scenario focus: ' + scenario.location + '. This is a fictional training model with no connection to real systems or equipment.';
+      $('#nocPanel .notice').innerHTML = '<strong>Incoming incident:</strong> ' + escapeHtml(scenario.incident);
+      $('#aislePanel .notice').textContent = 'This is a fictional floor view. Inspect the simulated assets only—no physical switching, reset, bypass, or live operational action is part of this game.';
+      $('#recoveryResult p').textContent = scenario.recoveryResult;
+
+      Object.entries(scenario.clues).forEach(([key, card]) => writeCard(document.querySelector('[data-clue="' + key + '"]'), card));
+      Object.entries(scenario.timelineCards).forEach(([key, card]) => writeCard(document.querySelector('[data-timeline-step="' + key + '"]'), card));
+      writeChoiceCards('[data-diagnosis]', scenario.diagnoses, 'diagnosis');
+      writeChoiceCards('[data-summary]', scenario.diagnoses, 'summary');
+      Object.entries(scenario.scans).forEach(([key, card]) => {
+        const button = document.querySelector('[data-scan="' + key + '"]');
+        writeCard(button, card);
+        if (button) button.classList.toggle('warning', Boolean(card.alert));
+      });
+      Object.entries(VIRTUAL_RUNBOOK).forEach(([key, card]) => writeCard(document.querySelector('[data-runbook-step="' + key + '"]'), card));
+      Object.entries(scenario.validations).forEach(([key, card]) => writeCard(document.querySelector('[data-validation="' + key + '"]'), card));
+      const recoveryCards = {
+        reset:{title:'Take a virtual shortcut', summary:'Skip the approved fictional safeguards and force an unsupported simulated action.'},
+        runbook:{title:'Use the virtual runbook', summary:'Use the approved fictional escalation path, then validate the modeled outcome.'},
+        restart:{title:'Restart every virtual system', summary:'Attempt a broad simulated restart without evidence or approved containment.'}
+      };
+      Object.entries(recoveryCards).forEach(([key, card]) => writeCard(document.querySelector('[data-recovery="' + key + '"]'), card));
+      renderMapScenario(scenario);
+    }
     function updateDifficultyUi() {
       const config = state.config;
       $$('.difficulty-option').forEach(button => {
@@ -628,8 +1045,7 @@
     }
     function selectDifficulty(level) {
       if (!DIFFICULTIES[level] || state.started || (state.joined && !state.isHost)) return;
-      state.difficulty = level;
-      state.config = DIFFICULTIES[level];
+      setGameConfiguration(level, state.scenarioKey);
       resetGame();
     }
     function setHostStatus(text, type) {
@@ -637,6 +1053,46 @@
       target.textContent = text;
       target.className = 'lobby-status ' + (type || '');
       target.classList.toggle('hidden', !text);
+    }
+    function clearPendingStart() {
+      if (state.pendingStartTimer) clearTimeout(state.pendingStartTimer);
+      if (state.pendingCountdownTimer) clearInterval(state.pendingCountdownTimer);
+      state.pendingStartTimer = null;
+      state.pendingCountdownTimer = null;
+      state.pendingStartAt = null;
+      state.pendingStartLocalMs = null;
+    }
+    function renderPendingStart(startAt, localStartMs) {
+      const startMs = Number.isFinite(localStartMs) ? localStartMs : Date.parse(startAt);
+      const seconds = Number.isFinite(startMs) ? Math.max(0, Math.ceil((startMs - Date.now()) / 1000)) : 0;
+      const message = seconds > 0 ? 'Shared scenario starts for every team in ' + seconds + ' second' + (seconds === 1 ? '' : 's') + '…' : 'Launching the shared scenario for every team…';
+      $('#startMessage').textContent = message;
+      $('#hudMessage').textContent = message;
+    }
+    function queueSharedStart(startAt, localStartMs) {
+      const startMs = Number.isFinite(localStartMs) ? localStartMs : Date.parse(startAt);
+      if (!Number.isFinite(startMs) || startMs <= Date.now()) {
+        const elapsed = Number.isFinite(startMs) ? Math.max(0, Math.floor((Date.now() - startMs) / 1000)) : 0;
+        beginLocalGame(Math.max(0, state.config.seconds - elapsed));
+        return;
+      }
+      if (state.pendingStartAt === startAt && state.pendingStartTimer) {
+        renderPendingStart(startAt, state.pendingStartLocalMs);
+        return;
+      }
+      clearPendingStart();
+      state.pendingStartAt = startAt;
+      state.pendingStartLocalMs = startMs;
+      renderPendingStart(startAt, startMs);
+      state.pendingCountdownTimer = setInterval(() => renderPendingStart(startAt, startMs), 250);
+      state.pendingStartTimer = setTimeout(() => {
+        const shouldBegin = state.sharedStartedAt === startAt && !state.started && !state.finished;
+        clearPendingStart();
+        if (shouldBegin) {
+          const elapsed = Math.max(0, Math.floor((Date.now() - startMs) / 1000));
+          beginLocalGame(Math.max(0, state.config.seconds - elapsed));
+        }
+      }, Math.max(0, startMs - Date.now()) + 25);
     }
     function updateSessionControls() {
       const inSharedRun = Boolean(state.sharedStartedAt) || state.started;
@@ -660,7 +1116,7 @@
       if (state.isHost) {
         setHostStatus('You are the host. Your difficulty selection and Start button control everyone in this session.', 'good');
         $('#startMessage').textContent = inSharedRun ? 'Shared scenario is running for every joined player.' : 'Choose a difficulty, then start the scenario for everyone.';
-        $('#resetButton').textContent = inSharedRun ? 'Restart for everyone' : 'Reset selection';
+        $('#resetButton').textContent = inSharedRun ? 'Restart for everyone' : 'Reset screen';
         $('#resetButton').disabled = false;
       } else {
         const host = state.hostName || 'the host';
@@ -676,27 +1132,62 @@
       const incomingDifficulty = DIFFICULTIES[game.difficulty] ? game.difficulty : 'medium';
       const incomingRun = Number(game.run_number || 0);
       const incomingStartedAt = game.started_at || null;
+      const providedScenarioKey = typeof game.scenario_key === 'string' ? game.scenario_key : null;
+      const incomingScenarioKey = SCENARIOS[providedScenarioKey] ? providedScenarioKey : null;
       const priorRun = state.sharedRunNumber;
       const priorStartedAt = state.sharedStartedAt;
+      const incomingStartMs = Date.parse(incomingStartedAt || '');
+      const priorStartMs = Date.parse(priorStartedAt || '');
+      const serverNowMs = Date.parse(game.server_now || '');
+      const localStartMs = Number.isFinite(incomingStartMs) && Number.isFinite(serverNowMs)
+        ? incomingStartMs - (serverNowMs - Date.now())
+        : incomingStartMs;
+      if (
+        incomingRun < priorRun ||
+        (priorStartedAt && !incomingStartedAt && incomingRun <= priorRun) ||
+        (priorStartedAt && incomingStartedAt && incomingRun === priorRun && Number.isFinite(incomingStartMs) && Number.isFinite(priorStartMs) && incomingStartMs < priorStartMs)
+      ) return;
+
+      const scenarioOrDifficultyChanged = incomingScenarioKey !== state.scenarioKey || incomingDifficulty !== state.difficulty;
       state.isHost = Boolean(data.is_host);
       state.hostName = data.host_name || '';
       state.sharedRunNumber = incomingRun;
       state.sharedStartedAt = incomingStartedAt;
 
-      if (incomingStartedAt || !state.isHost) {
-        state.difficulty = incomingDifficulty;
-        state.config = DIFFICULTIES[incomingDifficulty];
+      if (incomingStartedAt && !incomingScenarioKey) {
+        clearPendingStart();
+        updateSessionControls();
+        const message = 'The shared scenario library setup is incomplete. Run the newest Data Center Escape team SQL file once, then refresh.';
+        setLobbyStatus(message, 'bad');
+        $('#startMessage').textContent = message;
+        $('#hudMessage').textContent = message;
+        return;
+      }
+
+      if (scenarioOrDifficultyChanged) {
+        setGameConfiguration(incomingDifficulty, incomingScenarioKey);
         updateDifficultyUi();
+        renderScenario();
         arrangeTimelineCards();
       }
 
       updateSessionControls();
       const remaining = Number(game.seconds_remaining);
       if (incomingStartedAt) {
-        const newRun = incomingRun !== priorRun || incomingStartedAt !== priorStartedAt;
+        const newRun = incomingRun !== priorRun || incomingStartedAt !== priorStartedAt || scenarioOrDifficultyChanged;
+        const isScheduledStart = Number.isFinite(localStartMs) && localStartMs > Date.now() + 50;
+        if (isScheduledStart) {
+          if (newRun || state.pendingStartAt !== incomingStartedAt) resetGame({ refresh:false });
+          queueSharedStart(incomingStartedAt, localStartMs);
+          return;
+        }
+        const derivedRemaining = Number.isFinite(localStartMs)
+          ? Math.max(0, state.config.seconds - Math.floor(Math.max(0, Date.now() - localStartMs) / 1000))
+          : state.config.seconds;
+        const initialRemaining = Number.isFinite(remaining) ? Math.min(remaining, derivedRemaining) : derivedRemaining;
         if (!state.started || newRun) {
           resetGame({ refresh:false });
-          beginLocalGame(Number.isFinite(remaining) ? remaining : state.config.seconds);
+          beginLocalGame(initialRemaining);
         } else if (Number.isFinite(remaining) && !state.finished) {
           const syncedSeconds = Math.max(0, Math.min(state.config.seconds, remaining - state.localPenaltySeconds));
           if (syncedSeconds === 0) {
@@ -708,6 +1199,7 @@
           }
         }
       } else if (state.started || priorStartedAt || incomingRun !== priorRun) {
+        setGameConfiguration(incomingDifficulty, null);
         resetGame({ refresh:false });
       }
     }
@@ -742,12 +1234,33 @@
         return '<article class="team-card' + current + '"><h3>' + info.label + '</h3><p>' + info.specialty + ' · ' + members.length + ' player' + (members.length === 1 ? '' : 's') + '</p><ul>' + list + '</ul></article>';
       }).join('');
     }
+    function releaseExpiredSession() {
+      clearInterval(state.lobbyTimer);
+      state.lobbyTimer = null;
+      clearPendingStart();
+      state.joined = false;
+      state.player = null;
+      state.sessionCode = '';
+      state.isHost = false;
+      state.hostName = '';
+      state.sharedRunNumber = 0;
+      state.sharedStartedAt = null;
+      $('#teamAssignment').classList.add('hidden');
+      $('#teamMetric').classList.add('hidden');
+      $('#teamHud').textContent = '—';
+      resetGame({ refresh:false });
+      setLobbyStatus('Your previous session reservation expired. Join the session again to continue.', 'bad');
+    }
     async function refreshLobby(silent) {
       if (!state.db || !state.sessionCode || state.lobbyRequestInFlight) return;
       state.lobbyRequestInFlight = true;
       try {
         const { data, error } = await state.db.rpc('get_dc_escape_lobby', { p_session_code:state.sessionCode, p_client_token:playerToken() });
         if (error) throw error;
+        if (state.joined && (!data || !data.team_number)) {
+          releaseExpiredSession();
+          return;
+        }
         renderTeamRoster((data && data.players) || []);
         applySharedSession(data);
       } catch (error) {
@@ -868,13 +1381,14 @@
       }
     }
     function beginLocalGame(secondsRemaining) {
+      clearPendingStart();
       clearInterval(state.timer);
       state.seconds = Math.max(0, Math.min(state.config.seconds, Math.floor(secondsRemaining) - state.localPenaltySeconds));
       state.started = true;
       state.finished = false;
       $('#game').classList.remove('hidden');
       updateSessionControls();
-      logEvent(state.config.label + ' shared timer started. NOC console unlocked.');
+      logEvent((state.scenario ? state.scenario.title : state.config.label) + ' shared timer started. NOC console unlocked.');
       updateHud();
       showPanel('noc');
       if (state.seconds === 0) {
@@ -909,16 +1423,11 @@
     }
     function inspectClue(type, button) {
       if (!state.started || state.finished || state.stage !== 0) return;
-      const details = {
-        power:'PDU-B: simulated branch protection opened at 09:42. Rack C14 is the only affected load. Utility and UPS telemetry are normal.',
-        cooling:'CRAC-1: supply temperature and fan speed are within normal operating range. The elevated rack inlet is localized, not room-wide.',
-        network:'Fabric: upstream links and application routes are healthy. No simulated network packet loss is present.',
-        change:'Virtual change record: a simulated change window opened at 09:39. Correlation marker: 42. The record narrows the timeline but does not replace the approved recovery path.',
-        inventory:'Virtual dependency map: PDU-B is the simulated feed for Rack C14. The dependency is direct; cooling and network are unaffected.'
-      };
+      const details = state.scenario && state.scenario.clues ? state.scenario.clues : {};
+      const detail = details[type] ? details[type].detail : 'No virtual evidence is available for that card.';
       state.clues.add(type);
       button.classList.add('inspected');
-      $('#nocDetails').innerHTML = '<strong>Evidence found:</strong> ' + escapeHtml(details[type]);
+      $('#nocDetails').innerHTML = '<strong>Evidence found:</strong> ' + escapeHtml(detail);
       logEvent('Inspected ' + button.querySelector('b').textContent + '.');
       const inspected = state.config.clues.filter(item => state.clues.has(item)).length;
       if (completed(state.clues, state.config.clues)) {
@@ -962,11 +1471,11 @@
     function diagnose(answer, button) {
       if (state.finished || state.stage !== 2) return;
       $$('.choice[data-diagnosis]').forEach(item => item.disabled = true);
-      if (answer === 'power') {
+      if (answer === state.config.summaryCorrect) {
         button.classList.add('correct');
         state.stage = 3;
-        setFeedback('diagnoseFeedback','Correct. Cooling and network are healthy; PDU-B protection interrupted the virtual feed to Rack C14.','good');
-        logEvent('Root cause identified: simulated PDU-B protection event.');
+        setFeedback('diagnoseFeedback','Correct. ' + (state.scenario ? state.scenario.rootSummary : 'The fictional root cause is confirmed.') + '','good');
+        logEvent('Root cause identified: ' + (state.scenario ? state.scenario.rootTitle : 'fictional incident') + '.');
         updateHud();
         setTimeout(() => showPanel('aisle'), 650);
       } else {
@@ -981,16 +1490,11 @@
     }
     function inspectScan(type, button) {
       if (state.finished || state.stage !== 3) return;
-      const details = {
-        pdu:'PDU-B virtual label: protection event recorded. Recovery key color fragment: BLUE. Approved path: use the recovery console after workload migration.',
-        rack:'Rack C14 cabinet tag: virtual recovery key number fragment: 14. Its inlet temperature is elevated because its simulated feed was removed.',
-        crac:'CRAC-1 virtual display: normal supply air and normal fan speed. Correlation marker: 42. This confirms cooling is not the failed virtual dependency.',
-        ups:'UPS-A virtual display: output is stable and unaffected. Recovery marker: GREEN.',
-        tor:'ToR-07 virtual display: alternate workload path is healthy. Route marker: 7.'
-      };
+      const details = state.scenario && state.scenario.scans ? state.scenario.scans : {};
+      const detail = details[type] ? details[type].detail : 'No virtual asset detail is available for that card.';
       state.scans.add(type);
       button.classList.add('inspected');
-      $('#aisleDetails').innerHTML = '<strong>Asset read:</strong> ' + escapeHtml(details[type]);
+      $('#aisleDetails').innerHTML = '<strong>Asset read:</strong> ' + escapeHtml(detail);
       logEvent('Scanned ' + button.querySelector('b').textContent + '.');
       const inspected = state.config.scans.filter(item => state.scans.has(item)).length;
       if (completed(state.scans, state.config.scans)) {
@@ -1042,14 +1546,14 @@
     }
     function recover(choice, button) {
       if (state.finished || state.stage !== 4 || state.runbookIndex !== state.config.runbook.length) return;
-      if (choice === 'runbook') {
+      if (choice === state.config.recoveryCorrect) {
         $$('.choice[data-recovery]').forEach(item => item.disabled = true);
         button.classList.add('correct');
         state.stage = 5;
         state.score += 10;
         $('#recoveryResult').classList.remove('hidden');
         setFeedback('recoveryFeedback','Approved virtual runbook selected. Continue to the validation gate. +10 points','good');
-        logEvent('Approved virtual runbook completed. System stable.');
+        logEvent('Approved virtual response completed. Fictional system stable.');
         updateHud();
         updateMap('recovery');
       } else {
@@ -1066,15 +1570,12 @@
     }
     function inspectValidation(type, button) {
       if (state.finished || state.stage !== 5) return;
-      const details = {
-        power:'PDU-B virtual state is stable and the simulated protection event is cleared.',
-        thermal:'Rack C14 virtual inlet trend is returning to its normal range.',
-        workload:'The migrated simulated workload is healthy on its alternate virtual path.'
-      };
+      const details = state.scenario && state.scenario.validations ? state.scenario.validations : {};
+      const detail = details[type] ? details[type].detail : 'No virtual validation detail is available for that card.';
       state.validations.add(type);
       button.classList.add('correct');
       button.disabled = true;
-      $('#validationDetails').innerHTML = '<strong>Validation found:</strong> ' + escapeHtml(details[type]);
+      $('#validationDetails').innerHTML = '<strong>Validation found:</strong> ' + escapeHtml(detail);
       logEvent('Validated ' + button.querySelector('b').textContent + '.');
       const inspected = state.config.validations.filter(item => state.validations.has(item)).length;
       if (completed(state.validations, state.config.validations)) {
@@ -1097,11 +1598,11 @@
     }
     function selectSummary(answer, button) {
       if (state.finished || state.difficulty !== 'hard' || state.stage !== 6) return;
-      if (answer === 'power') {
+      if (answer === state.config.summaryCorrect) {
         $$('.choice[data-summary]').forEach(item => item.disabled = true);
         button.classList.add('correct');
         state.stage = state.config.exitStage;
-        setFeedback('summaryFeedback','Correct. The fictional PDU-B protection event caused the simulated Rack C14 impact. Exit unlocked.','good');
+        setFeedback('summaryFeedback','Correct. ' + (state.scenario ? state.scenario.rootTitle : 'The fictional root cause') + ' caused the modeled impact. Exit unlocked.','good');
         logEvent('Hard-mode incident summary confirmed. Exit interlock ready.');
         updateHud();
         setTimeout(() => showPanel('exit'), 500);
@@ -1123,10 +1624,13 @@
       clearInterval(state.timer);
       $('#resultTime').textContent = clock(state.seconds);
       $('#resultScore').textContent = state.score;
-      $('#resultTitle').textContent = state.score >= 100 ? state.config.label + ' mode: perfect recovery path' : state.config.label + ' mode: critical incident resolved';
+      const scenarioLabel = state.scenario ? state.scenario.title : 'Critical incident';
+      $('#resultTitle').textContent = state.score >= 100 ? scenarioLabel + ': perfect virtual recovery path' : scenarioLabel + ': fictional incident resolved';
       panels.forEach(name => $('#'+name+'Panel').classList.toggle('hidden', name !== 'win'));
       $$('.zone').forEach(button => { button.disabled = true; button.classList.remove('active'); });
       $('#hudMessage').textContent = 'Simulation complete.';
+      $('#playAgain').textContent = state.joined && !state.isHost ? 'Waiting for host' : 'Restart for everyone';
+      $('#playAgain').disabled = state.joined && !state.isHost;
       updateHud();
       logEvent('Escape completed with ' + state.score + ' points.');
     }
@@ -1134,27 +1638,27 @@
       if (state.finished) return;
       state.finished = true;
       clearInterval(state.timer);
-      $('#hudMessage').textContent = 'Time expired. Restart the simulation to try again.';
-      $('#startMessage').textContent = 'Time expired — restart to reset the room.';
+      const hostCanRestart = !state.joined || state.isHost;
+      $('#hudMessage').textContent = hostCanRestart ? 'Time expired. Restart the shared simulation to try again.' : 'Time expired. Waiting for the host to restart the shared simulation.';
+      $('#startMessage').textContent = hostCanRestart ? 'Time expired — use Restart for everyone to reset the room.' : 'Time expired — waiting for the host to restart everyone.';
       $$('.zone').forEach(button => button.disabled = true);
       $$('.clue,.scan,.choice,#analyzeButton,#verifyCode,#openValidation,#escapeButton').forEach(button => { button.disabled = true; });
       $('#recoveryCode').disabled = true;
       const current = document.querySelector('.challenge:not(.hidden)');
       if (current) {
-        current.insertAdjacentHTML('afterbegin','<p class="notice timeout-notice" style="border-color:rgba(226,60,54,.6);color:#ffd1ce"><strong>Simulation paused:</strong> time expired. Use Restart to begin again.</p>');
+        const resetCopy = hostCanRestart ? 'Use Restart for everyone to begin again.' : 'Wait for the host to restart the shared scenario.';
+        current.insertAdjacentHTML('afterbegin','<p class="notice timeout-notice" style="border-color:rgba(226,60,54,.6);color:#ffd1ce"><strong>Simulation paused:</strong> time expired. ' + resetCopy + '</p>');
       }
       updateHud();
       logEvent('Simulation timed out.');
     }
     function giveHint() {
       if (!state.started || state.finished || state.hintsUsed >= state.config.maxHints) return;
-      const hints = [
-        'Open all NOC alerts. The localized heat signal is an effect, not the failed system.',
-        'Build the virtual timeline from cause, to rack impact, to scope confirmation, then any added correlation checks.',
-        'The normal cooling and network telemetry eliminate two possible virtual root causes.',
-        'The recovery key follows the fragments found in the required virtual assets.',
-        'Complete the virtual runbook in sequence before selecting its final recovery path.',
-        'A simulated recovery is only complete after every required validation signal is stable.'
+      const hints = state.scenario ? state.scenario.hints : [
+        'Open all virtual NOC alerts before deciding what failed.',
+        'Build the fictional timeline from cause to impact, then scope the decoys.',
+        'Use the virtual recovery key fragments in the order shown.',
+        'A simulation is complete only after all required validation signals are stable.'
       ];
       state.hintsUsed += 1;
       state.score = Math.max(0, state.score - state.config.hintCost);
@@ -1193,6 +1697,7 @@
     }
     function resetGame(options) {
       const refresh = !options || options.refresh !== false;
+      clearPendingStart();
       clearInterval(state.timer);
       state.started = false;
       state.finished = false;
@@ -1206,9 +1711,10 @@
       state.validations = new Set();
       state.hintsUsed = 0;
       state.localPenaltySeconds = 0;
-      state.log = ['Simulation reset.'];
+      state.log = [state.scenario ? 'Simulation reset. Scenario ready: ' + state.scenario.title + '.' : 'Simulation reset.'];
       $$('.timeout-notice').forEach(notice => notice.remove());
       $('#game').classList.add('hidden');
+      renderScenario();
       updateDifficultyUi();
       arrangeTimelineCards();
       updateSessionControls();
@@ -1223,6 +1729,8 @@
       $('#recoveryResult').classList.add('hidden');
       $('#recoveryChoices').classList.add('hidden');
       $('#runbookStatus').textContent = 'Complete the virtual runbook in the approved order.';
+      $('#playAgain').textContent = 'Play again';
+      $('#playAgain').disabled = false;
       $('#validationDetails').innerHTML = '<strong>Validation ready.</strong> Inspect the required virtual signals.';
       $$('.clue,.scan,.choice').forEach(item => { item.disabled = false; item.classList.remove('inspected','correct','wrong'); });
       ['nocFeedback','timelineFeedback','diagnoseFeedback','aisleFeedback','runbookFeedback','recoveryFeedback','validationFeedback','summaryFeedback'].forEach(id => setFeedback(id,'',''));
