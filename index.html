@@ -1,0 +1,840 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#070a10">
+  <title>Data Center Escape: Critical Path</title>
+  <style>
+    :root {
+      --bg:#070a10; --panel:#101722; --panel-2:#172131; --line:#2b3a4c;
+      --ink:#f4f7fb; --muted:#a7b4c5; --red:#e23c36; --red-dark:#bb2f2a;
+      --green:#42cf91; --yellow:#f6bd4d; --blue:#6eb9ff; --shadow:0 22px 55px rgba(0,0,0,.34);
+    }
+    * { box-sizing:border-box; }
+    html { background:var(--bg); }
+    body {
+      min-height:100vh; margin:0; color:var(--ink);
+      font:16px/1.48 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+      background:
+        radial-gradient(circle at 12% 0%,rgba(63,107,148,.23),transparent 31rem),
+        radial-gradient(circle at 94% 18%,rgba(224,60,54,.14),transparent 29rem),
+        linear-gradient(145deg,#070a10 0%,#0a0f18 100%);
+    }
+    button,input { font:inherit; }
+    button {
+      min-height:43px; padding:10px 14px; color:#fff; background:var(--red); border:0;
+      border-radius:10px; font-weight:800; cursor:pointer; transition:transform .16s ease,background .16s ease,opacity .16s ease;
+    }
+    button:hover:not(:disabled) { background:var(--red-dark); transform:translateY(-1px); }
+    button:focus-visible,input:focus-visible { outline:3px solid rgba(110,185,255,.8); outline-offset:3px; }
+    button:disabled { cursor:not-allowed; opacity:.45; }
+    button.secondary { background:#33465c; }
+    button.secondary:hover:not(:disabled) { background:#40566f; }
+    button.ghost { color:#dbe7f3; background:transparent; border:1px solid #4a5d71; }
+    button.ghost:hover:not(:disabled) { background:#1a2838; }
+    .app { width:min(1240px,calc(100% - 32px)); margin:0 auto; padding:24px 0 38px; }
+    .topbar {
+      display:flex; align-items:center; justify-content:space-between; gap:18px; padding-bottom:19px;
+      border-bottom:1px solid rgba(167,180,197,.22);
+    }
+    .brand { display:flex; align-items:center; gap:13px; min-width:0; }
+    .brand-mark {
+      display:grid; place-items:center; width:48px; height:48px; flex:0 0 auto; color:#fff;
+      border:2px solid var(--red); border-radius:13px; background:linear-gradient(145deg,#281014,#151b28);
+      box-shadow:inset 0 0 18px rgba(226,60,54,.2);
+      font:900 1rem/1 ui-monospace,SFMono-Regular,Menlo,monospace; letter-spacing:.04em;
+    }
+    .brand strong,.brand span { display:block; }
+    .brand strong { font-size:1.05rem; letter-spacing:.01em; }
+    .brand span { margin-top:2px; color:var(--muted); font-size:.82rem; }
+    .top-actions { display:flex; gap:9px; flex-wrap:wrap; justify-content:flex-end; }
+    .hero {
+      display:grid; grid-template-columns:minmax(0,1.2fr) minmax(330px,.8fr); gap:18px; margin-top:20px;
+    }
+    .card {
+      padding:22px; background:linear-gradient(145deg,rgba(23,33,49,.96),rgba(13,20,31,.96));
+      border:1px solid var(--line); border-radius:17px; box-shadow:var(--shadow);
+    }
+    h1,h2,h3,p { margin-top:0; }
+    h1 { margin-bottom:8px; font-size:clamp(1.75rem,4vw,2.65rem); line-height:1.05; letter-spacing:-.035em; }
+    h2 { margin-bottom:8px; font-size:1.24rem; }
+    h3 { margin-bottom:7px; font-size:1rem; }
+    .eyebrow { margin-bottom:8px; color:var(--blue); font-size:.76rem; font-weight:900; letter-spacing:.13em; text-transform:uppercase; }
+    .muted { color:var(--muted); }
+    .mission-copy { max-width:61ch; color:#d6dfeb; }
+    .safety { margin:17px 0 0; padding:12px 13px; color:#dce9f8; background:rgba(110,185,255,.08); border-left:3px solid var(--blue); border-radius:8px; font-size:.91rem; }
+    .brief-list { display:grid; gap:10px; margin:18px 0; padding:0; list-style:none; }
+    .brief-list li { display:flex; gap:10px; align-items:flex-start; color:#dce5ef; }
+    .brief-list b { display:grid; place-items:center; width:24px; height:24px; flex:0 0 auto; color:#06111d; background:var(--green); border-radius:50%; font-size:.78rem; }
+    .mission-actions { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .join-lobby { margin-top:18px; padding:15px; background:rgba(6,14,23,.52); border:1px solid #314861; border-radius:13px; }
+    .join-lobby h2 { margin:0; font-size:1.05rem; }.lobby-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }.lobby-head p { margin:4px 0 0; color:var(--muted); font-size:.84rem; }
+    .join-fields { display:grid; grid-template-columns:130px minmax(150px,1fr) auto; gap:10px; align-items:end; margin-top:13px; }
+    .join-fields label { display:grid; gap:5px; color:#b9c9d9; font-size:.76rem; font-weight:850; }.join-fields input { width:100%; min-height:42px; padding:9px 10px; color:#eef7ff; background:#09121c; border:1px solid #405a74; border-radius:9px; }
+    .lobby-status { min-height:22px; margin:10px 0 0; color:#aebfd0; font-size:.84rem; font-weight:700; }.lobby-status.good { color:var(--green); }.lobby-status.bad { color:#ff9a92; }
+    .team-assignment { display:flex; align-items:center; gap:9px; margin-top:11px; padding:10px; color:#dffbee; background:rgba(66,207,145,.1); border:1px solid rgba(66,207,145,.4); border-radius:10px; font-weight:800; }.team-assignment b { color:var(--green); }.team-assignment .team-dot { width:11px; height:11px; flex:0 0 auto; background:var(--green); border-radius:50%; box-shadow:0 0 10px var(--green); }
+    .team-roster { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin-top:13px; }
+    .team-card { min-width:0; padding:9px; background:rgba(255,255,255,.035); border:1px solid #30455b; border-radius:9px; }.team-card.current { border-color:var(--green); box-shadow:inset 3px 0 0 var(--green); }.team-card h3 { margin:0 0 4px; color:#deebf7; font-size:.78rem; }.team-card p { margin:0 0 5px; color:#8facbf; font-size:.69rem; }.team-card ul { display:grid; gap:3px; margin:0; padding:0; list-style:none; }.team-card li { overflow:hidden; color:#c6d5e2; font-size:.7rem; text-overflow:ellipsis; white-space:nowrap; }.team-card li.empty { color:#71879a; font-style:italic; }
+    .status-card { display:grid; gap:13px; }
+    .timer {
+      padding:16px; text-align:center; color:#fff; background:#090f17; border:1px solid #2b4058; border-radius:13px;
+      box-shadow:inset 0 0 28px rgba(110,185,255,.07);
+    }
+    .timer span { display:block; color:var(--muted); font-size:.73rem; font-weight:850; letter-spacing:.12em; text-transform:uppercase; }
+    .timer b { display:block; margin-top:2px; color:var(--green); font:900 clamp(2.2rem,6vw,3.6rem)/1 ui-monospace,SFMono-Regular,Menlo,monospace; letter-spacing:.06em; }
+    .timer.urgent b { color:var(--yellow); }.timer.failed b { color:var(--red); }
+    .scoreline { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .metric { padding:12px; background:rgba(255,255,255,.035); border:1px solid #2a3a4f; border-radius:11px; }
+    .metric b,.metric span { display:block; }.metric b { font-size:1.42rem; }.metric span { color:var(--muted); font-size:.78rem; font-weight:750; }
+    .team-metric { margin-top:10px; border-color:rgba(66,207,145,.38); }.team-metric b { color:var(--green); font-size:1.05rem; }
+    .progress-track { height:9px; overflow:hidden; background:#09111b; border-radius:99px; }
+    .progress-fill { width:0; height:100%; background:linear-gradient(90deg,var(--red),var(--yellow),var(--green)); border-radius:inherit; transition:width .28s ease; }
+    .game-grid { display:grid; grid-template-columns:1fr; gap:18px; margin-top:18px; }
+    .room-map { position:static; padding:18px; }
+    .map-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:18px; }
+    .map-heading h2 { margin:0 0 3px; }.map-heading p { margin:0; color:var(--muted); font-size:.88rem; }
+    .map-heading .eyebrow { margin-bottom:4px; }
+    .map-legend { display:flex; gap:10px; align-items:center; flex-wrap:wrap; color:var(--muted); font-size:.76rem; font-weight:750; }
+    .map-legend span { display:inline-flex; gap:5px; align-items:center; }.map-legend i { width:9px; height:9px; border-radius:50%; background:#4e6278; }.map-legend .alert { background:var(--red); box-shadow:0 0 8px var(--red); }.map-legend .normal { background:var(--green); box-shadow:0 0 8px var(--green); }
+    .floor-scroll { overflow-x:auto; padding-bottom:3px; }
+    .floor-plan {
+      position:relative; min-width:810px; min-height:440px; margin-top:15px; overflow:hidden;
+      background:linear-gradient(135deg,rgba(18,32,47,.97),rgba(8,15,24,.98));
+      border:1px solid #375069; border-radius:15px; box-shadow:inset 0 0 0 1px rgba(255,255,255,.025),inset 0 0 65px rgba(0,0,0,.28);
+    }
+    .floor-plan::before { content:""; position:absolute; inset:0; pointer-events:none; opacity:.32; background-image:linear-gradient(rgba(110,185,255,.075) 1px,transparent 1px),linear-gradient(90deg,rgba(110,185,255,.075) 1px,transparent 1px); background-size:25px 25px; }
+    .floor-plan::after { content:"FICTIONAL TRAINING FLOOR"; position:absolute; right:20px; bottom:13px; color:rgba(181,205,226,.28); font-size:.68rem; font-weight:900; letter-spacing:.14em; }
+    .plan-title { position:absolute; top:14px; left:50%; z-index:2; transform:translateX(-50%); color:#d8e7f5; font-size:.76rem; font-weight:900; letter-spacing:.14em; text-transform:uppercase; white-space:nowrap; }
+    .floor-zone.zone {
+      position:absolute; z-index:5; display:flex; min-height:54px; align-items:center; gap:8px; padding:9px 10px; color:#eff7ff; text-align:left;
+      background:rgba(11,23,35,.94); border:1px solid #48637e; border-radius:10px; box-shadow:0 10px 18px rgba(0,0,0,.18);
+    }
+    .floor-zone.zone:hover:not(:disabled) { background:#173049; border-color:var(--blue); }
+    .floor-zone.zone:disabled { cursor:not-allowed; opacity:.54; }
+    .floor-zone.zone.active { border-color:var(--blue); box-shadow:0 0 0 2px rgba(110,185,255,.2),0 0 20px rgba(110,185,255,.2); }
+    .floor-zone.zone.done { border-color:var(--green); box-shadow:0 0 0 2px rgba(66,207,145,.15); }
+    .floor-zone .dot { width:10px; height:10px; flex:0 0 auto; background:#546b82; border-radius:50%; }
+    .floor-zone.active .dot { background:var(--blue); box-shadow:0 0 10px var(--blue); }.floor-zone.done .dot { background:var(--green); box-shadow:0 0 10px var(--green); }
+    .zone-copy b,.zone-copy span { display:block; }.zone-copy b { font-size:.83rem; }.zone-copy span { color:#adbed0; font-size:.7rem; }
+    .noc-zone { top:36px; left:21px; width:146px; }.diagnose-zone { top:36px; right:21px; width:146px; }.recovery-zone { bottom:24px; left:21px; width:156px; }.exit-zone { right:21px; bottom:24px; width:146px; }
+    .support-room { position:absolute; top:30px; left:181px; right:181px; height:42px; display:flex; align-items:center; justify-content:center; color:#92a7bc; background:rgba(5,11,18,.48); border:1px solid rgba(108,137,165,.33); border-radius:8px; font-size:.72rem; font-weight:850; letter-spacing:.1em; text-transform:uppercase; }
+    .cooling,.power-unit { position:absolute; z-index:2; display:grid; place-content:center; width:78px; height:98px; padding:8px; color:#bdd0e2; text-align:center; background:rgba(11,27,39,.88); border:1px solid #3a5871; border-radius:9px; font-size:.73rem; font-weight:900; }
+    .cooling span,.power-unit span { display:block; margin-top:4px; color:var(--green); font-size:.65rem; }.cooling-one { top:107px; left:21px; }.cooling-two { top:107px; right:21px; }
+    .power-a { bottom:103px; left:21px; }.power-b { right:21px; bottom:103px; border-color:rgba(226,60,54,.75); }.power-b span { color:#ff928b; }
+    .aisle { position:absolute; left:135px; right:135px; z-index:1; height:28px; display:flex; align-items:center; justify-content:center; color:rgba(190,212,229,.62); border:1px dashed rgba(134,172,205,.28); font-size:.63rem; font-weight:900; letter-spacing:.11em; text-transform:uppercase; }
+    .cold-aisle { top:121px; background:rgba(72,157,237,.055); }.hot-aisle { top:251px; background:rgba(226,60,54,.06); }
+    .rack-matrix { position:absolute; top:158px; left:135px; right:135px; z-index:3; display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:10px; }
+    .rack-unit {
+      position:relative; display:grid; min-height:54px; place-content:center; padding:7px; color:#d8e5f0; text-align:center; background:repeating-linear-gradient(180deg,rgba(255,255,255,.05) 0 2px,transparent 2px 12px),#0a131d; border:1px solid #3a5268; border-radius:6px; font-size:.68rem; font-weight:850;
+    }
+    .rack-unit::after { content:""; position:absolute; right:7px; bottom:7px; width:6px; height:6px; background:var(--green); border-radius:50%; box-shadow:0 0 7px var(--green); }
+    .rack-unit b,.rack-unit span,.rack-unit em { display:block; font-style:normal; }.rack-unit span { color:#91a8bd; font-size:.6rem; }.rack-unit.zone { min-height:54px; padding:7px; color:#fff; background:repeating-linear-gradient(180deg,rgba(255,255,255,.08) 0 2px,transparent 2px 12px),#3a151a; border-color:var(--red); cursor:pointer; }
+    .rack-unit.zone::after { background:var(--red); box-shadow:0 0 8px var(--red); }.rack-unit.zone em { margin-top:2px; color:#ffb1ab; font-size:.61rem; }.rack-unit.zone:disabled { cursor:not-allowed; opacity:.62; }.rack-unit.zone:hover:not(:disabled) { background:#512128; transform:translateY(-1px); }.rack-unit.zone.active { outline:2px solid var(--blue); outline-offset:2px; }.rack-unit.zone.done { border-color:var(--green); background:#153c31; }.rack-unit.zone.done::after { background:var(--green); box-shadow:0 0 8px var(--green); }
+    /* Isometric, fictional data-center model. The SVG is visual only; the HTML buttons remain accessible controls. */
+    .floor-plan.isometric { min-width:0; min-height:0; aspect-ratio:1100 / 650; background:radial-gradient(circle at 53% 36%,#1c2c3c 0,rgba(20,34,48,.95) 38%,#08101a 100%); }
+    .floor-plan.isometric::before { display:none; }.floor-plan.isometric::after { content:"ISOMETRIC TRAINING MODEL · FICTIONAL"; z-index:7; }
+    .iso-visual { position:absolute; inset:0; z-index:1; display:block; width:100%; height:100%; }
+    .iso-visual text { font-family:Inter,ui-sans-serif,system-ui,sans-serif; }.iso-visual .scene-label { fill:#d5e8f7; font-size:13px; font-weight:800; letter-spacing:.05em; }.iso-visual .scene-small { fill:#9db9cd; font-size:10px; font-weight:750; letter-spacing:.06em; }
+    .iso-visual .scene-alert .alert-top { fill:#d84843; }.iso-visual .scene-alert .alert-side { fill:#922a31; }.iso-visual .scene-alert .alert-front { fill:#b63339; }.iso-visual .scene-alert .alert-light { fill:#ff7069; filter:drop-shadow(0 0 6px #ff7069); }
+    .isometric.recovered .scene-alert .alert-top { fill:#2aa66b; }.isometric.recovered .scene-alert .alert-side { fill:#176843; }.isometric.recovered .scene-alert .alert-front { fill:#218956; }.isometric.recovered .scene-alert .alert-light { fill:#58efa8; filter:drop-shadow(0 0 6px #58efa8); }
+    .iso-zone.zone { position:absolute; z-index:5; display:flex; min-height:48px; align-items:center; gap:7px; padding:8px 9px; color:#eff8ff; text-align:left; background:rgba(7,18,29,.91); border:1px solid #54718c; border-radius:9px; box-shadow:0 8px 18px rgba(0,0,0,.32); }
+    .iso-zone.zone:hover:not(:disabled) { background:#193652; border-color:var(--blue); }.iso-zone.zone:disabled { cursor:not-allowed; opacity:.53; }
+    .iso-zone.zone.active { border-color:var(--blue); box-shadow:0 0 0 2px rgba(110,185,255,.24),0 0 22px rgba(110,185,255,.36); }.iso-zone.zone.done { border-color:var(--green); box-shadow:0 0 0 2px rgba(66,207,145,.16),0 0 18px rgba(66,207,145,.2); }
+    .iso-zone .dot { width:9px; height:9px; flex:0 0 auto; background:#516b84; border-radius:50%; }.iso-zone.active .dot { background:var(--blue); box-shadow:0 0 9px var(--blue); }.iso-zone.done .dot { background:var(--green); box-shadow:0 0 9px var(--green); }
+    .isometric .noc-zone { top:10%; left:6%; width:146px; }.isometric .diagnose-zone { top:10%; right:6%; width:148px; }.isometric .recovery-zone { bottom:10%; left:8%; width:157px; }.isometric .exit-zone { right:6%; bottom:16%; width:145px; }
+    .isometric .rack-target { top:48%; left:50%; min-width:105px; transform:translate(-50%,-50%); border-color:var(--red); }.isometric .rack-target:not(:disabled) { background:#421c23; }.isometric .rack-target.done { background:#153d31; border-color:var(--green); }
+    .isometric[data-active-zone="noc"] #scene-noc,.isometric[data-active-zone="diagnose"] #scene-diagnose,.isometric[data-active-zone="aisle"] #scene-c14,.isometric[data-active-zone="recovery"] #scene-recovery,.isometric[data-active-zone="exit"] #scene-exit { filter:drop-shadow(0 0 12px rgba(110,185,255,.9)); }
+    .map-caption { margin:12px 0 0; color:#aabbd0; font-size:.81rem; }
+    .event-log { margin-top:15px; padding-top:14px; border-top:1px solid #2b3a4c; }
+    .event-log h3 { margin-bottom:8px; }.event-log ul { display:grid; gap:7px; max-height:180px; margin:0; padding:0; overflow:auto; list-style:none; }
+    .event-log li { color:#bac8d7; font-size:.78rem; }.event-log li::before { content:"›"; margin-right:6px; color:var(--green); font-weight:900; }
+    .stage { min-height:570px; }
+    .challenge { animation:fade .2s ease both; }.hidden { display:none!important; }
+    @keyframes fade { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
+    .challenge-head { display:flex; justify-content:space-between; align-items:flex-start; gap:14px; margin-bottom:18px; }
+    .stage-number { display:grid; place-items:center; width:32px; height:32px; flex:0 0 auto; color:#06131d; background:var(--blue); border-radius:50%; font-weight:950; }
+    .head-copy { display:flex; gap:10px; }.head-copy p { margin:4px 0 0; color:var(--muted); }
+    .badge { display:inline-flex; align-items:center; min-height:28px; padding:4px 9px; color:#fed58a; background:rgba(246,189,77,.12); border:1px solid rgba(246,189,77,.42); border-radius:99px; font-size:.74rem; font-weight:900; letter-spacing:.06em; text-transform:uppercase; }
+    .notice { margin:0 0 17px; padding:12px 13px; color:#cbd9e7; background:rgba(110,185,255,.07); border:1px solid rgba(110,185,255,.24); border-radius:10px; }
+    .alert-grid,.choice-grid,.scan-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+    .clue,.choice,.scan {
+      min-height:172px; padding:15px; text-align:left; color:#e9f2fa; background:linear-gradient(145deg,#182537,#101924);
+      border:1px solid #30445b; border-radius:13px;
+    }
+    .clue .icon,.scan .icon { display:grid; place-items:center; width:33px; height:33px; margin-bottom:13px; color:#fff; background:#2f4660; border-radius:9px; font-weight:950; }
+    .clue b,.choice b,.scan b { display:block; margin-bottom:5px; font-size:.98rem; }.clue span,.choice span,.scan span { display:block; color:#b5c5d5; font-size:.87rem; }
+    .clue.inspected,.scan.inspected { border-color:var(--green); background:linear-gradient(145deg,rgba(24,62,51,.94),rgba(13,37,32,.94)); }
+    .clue.inspected .icon,.scan.inspected .icon { color:#081b12; background:var(--green); }
+    .choice { min-height:142px; }.choice:hover:not(:disabled) { border-color:var(--blue); }
+    .choice.correct { border-color:var(--green); background:linear-gradient(145deg,rgba(24,62,51,.94),rgba(13,37,32,.94)); }
+    .choice.wrong { border-color:var(--red); background:linear-gradient(145deg,rgba(67,29,35,.94),rgba(38,19,26,.94)); }
+    .details {
+      min-height:84px; margin:17px 0; padding:13px 14px; color:#d5e5f3; background:#09111b; border:1px solid #2b4058; border-radius:10px;
+    }
+    .details strong { color:var(--blue); }.feedback { min-height:24px; margin:14px 0 0; font-weight:750; }
+    .feedback.good { color:var(--green); }.feedback.bad { color:#ff8f86; }.feedback.warn { color:#fed58a; }
+    .action-row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:16px; }
+    .rack-wall { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-top:8px; }
+    .rack {
+      position:relative; min-height:225px; padding:15px; overflow:hidden; text-align:left; color:#eaf2f8; background:
+        repeating-linear-gradient(180deg,rgba(255,255,255,.045) 0 2px,transparent 2px 21px),#0a111b;
+      border:1px solid #35485d; border-radius:12px;
+    }
+    .rack::after { content:""; position:absolute; inset:auto 12px 12px; height:7px; background:repeating-linear-gradient(90deg,#33cb8f 0 13px,transparent 13px 20px); opacity:.8; border-radius:4px; }
+    .rack.warning { border-color:var(--red); box-shadow:inset 0 0 26px rgba(226,60,54,.12); }.rack.warning::after { background:repeating-linear-gradient(90deg,var(--red) 0 13px,transparent 13px 20px); }
+    .rack b,.rack span { display:block; position:relative; z-index:1; }.rack b { margin-bottom:6px; }.rack span { color:#b5c4d2; font-size:.86rem; }
+    .rack .led { position:absolute; top:16px; right:15px; width:10px; height:10px; background:var(--green); border-radius:50%; box-shadow:0 0 10px var(--green); }.rack.warning .led { background:var(--red); box-shadow:0 0 10px var(--red); }
+    .code-box { display:flex; gap:10px; max-width:520px; margin-top:17px; }
+    .code-box input { min-width:0; flex:1; padding:10px 12px; color:#eef6fd; background:#08111b; border:1px solid #3a526b; border-radius:10px; text-transform:uppercase; }
+    .recovery-panel { padding:18px; background:linear-gradient(145deg,rgba(24,62,51,.62),rgba(12,29,28,.78)); border:1px solid rgba(66,207,145,.55); border-radius:14px; }
+    .exit-card { display:grid; place-items:center; min-height:410px; text-align:center; background:radial-gradient(circle,rgba(66,207,145,.16),transparent 50%),#0b1519; border:1px solid rgba(66,207,145,.46); border-radius:16px; }
+    .exit-icon { display:grid; place-items:center; width:86px; height:86px; margin-bottom:18px; color:#071a11; background:var(--green); border-radius:50%; box-shadow:0 0 0 11px rgba(66,207,145,.12),0 0 40px rgba(66,207,145,.36); font-size:2.4rem; font-weight:950; }
+    .result { max-width:440px; }.result h2 { font-size:2rem; }.result b { color:var(--green); font-size:1.2rem; }
+    .result-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:18px 0; text-align:left; }.result-grid div { padding:11px; background:rgba(255,255,255,.055); border-radius:9px; }.result-grid span,.result-grid b { display:block; }.result-grid span { color:var(--muted); font-size:.78rem; }.result-grid b { margin-top:2px; color:#fff; font-size:1.08rem; }
+    .footer { margin:20px 0 0; color:#8e9eaf; font-size:.78rem; text-align:center; }
+    @media (max-width:900px) {
+      .hero,.game-grid { grid-template-columns:1fr; }.room-map { position:static; }.event-log { display:none; }.stage { min-height:auto; }
+    }
+    @media (max-width:680px) {
+      .app { width:min(100% - 22px,1240px); padding-top:13px; }.topbar { align-items:flex-start; }.brand span { display:none; }.top-actions button { padding-inline:10px; }
+      .card { padding:16px; }.alert-grid,.choice-grid,.scan-grid,.rack-wall { grid-template-columns:1fr; }.challenge-head { align-items:flex-start; }.badge { display:none; }.code-box { flex-direction:column; }.code-box button { width:100%; }.result-grid,.team-roster,.join-fields { grid-template-columns:1fr; }.map-heading { display:block; }.map-legend { margin-top:11px; }
+      .floor-plan.isometric { min-width:0; }.iso-zone.zone { min-height:40px; padding:6px 7px; }.iso-zone .zone-copy b { font-size:.67rem; }.iso-zone .zone-copy span { display:none; }.isometric .noc-zone,.isometric .diagnose-zone { width:96px; }.isometric .recovery-zone { width:113px; }.isometric .exit-zone { width:94px; }.isometric .rack-target { min-width:84px; }
+    }
+    @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation:none!important; transition:none!important; } }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">DC</div>
+        <div><strong>Data Center Escape</strong><span>Critical Path · Interactive troubleshooting simulation</span></div>
+      </div>
+      <div class="top-actions">
+        <button id="hintButton" class="ghost" type="button" disabled>Hint <span id="hintCost">−10</span></button>
+        <button id="resetButton" class="secondary" type="button">Restart</button>
+      </div>
+    </header>
+
+    <section class="hero">
+      <section class="card">
+        <p class="eyebrow">Scenario DC-01 · Training simulation</p>
+        <h1>Restore the room before the clock runs out.</h1>
+        <p class="mission-copy">A critical alert is affecting a simulated data hall. Read the evidence, diagnose the fault, choose the approved virtual recovery path, and unlock the exit.</p>
+        <ul class="brief-list">
+          <li><b>1</b><span>Inspect every alert before you decide what failed.</span></li>
+          <li><b>2</b><span>Find the matching equipment clue in the simulated data hall.</span></li>
+          <li><b>3</b><span>Use the safe virtual recovery procedure to clear the incident.</span></li>
+        </ul>
+        <section class="join-lobby" aria-labelledby="lobbyTitle">
+          <div class="lobby-head">
+            <div><h2 id="lobbyTitle">Join a four-team session</h2><p>Everyone using the same session code is automatically placed on the least-filled team.</p></div>
+          </div>
+          <div class="join-fields">
+            <label>Session code<input id="sessionCode" value="DC-01" maxlength="24" autocomplete="off" aria-label="Session code"></label>
+            <label>Your name<input id="playerName" maxlength="64" autocomplete="name" placeholder="First and last name" aria-label="Your name"></label>
+            <button id="joinTeamButton" type="button">Join a team</button>
+          </div>
+          <p id="lobbyStatus" class="lobby-status">Enter your name, then join the session.</p>
+          <div id="teamAssignment" class="team-assignment hidden"><span class="team-dot"></span><span>Assigned to <b id="teamAssignmentName">Team</b></span></div>
+          <div id="teamRoster" class="team-roster" aria-live="polite"></div>
+        </section>
+        <div class="mission-actions">
+          <button id="startButton" type="button" disabled>Start the escape</button>
+          <span id="startMessage" class="muted">Join a team to unlock the escape room.</span>
+        </div>
+        <p class="safety"><strong>Simulation only:</strong> this game does not replace real site procedures. In a real data center, follow approved SOPs and use authorized, trained personnel.</p>
+      </section>
+
+      <aside class="card status-card" aria-label="Game status">
+        <div id="timerBox" class="timer"><span>Time remaining</span><b id="timer">12:00</b></div>
+        <div class="scoreline">
+          <div class="metric"><b id="score">100</b><span>Score</span></div>
+          <div class="metric"><b id="progress">0 / 4</b><span>Objectives</span></div>
+        </div>
+        <div id="teamMetric" class="metric team-metric hidden"><b id="teamHud">—</b><span>Your team</span></div>
+        <div><div class="progress-track" aria-label="Progress"><div id="progressFill" class="progress-fill"></div></div></div>
+        <p id="hudMessage" class="muted">Join a team, then begin the simulation.</p>
+      </aside>
+    </section>
+
+    <section id="game" class="game-grid hidden">
+      <aside class="card room-map" aria-label="Fictional data center floor plan">
+        <div class="map-heading">
+          <div><p class="eyebrow">Interactive floor plan</p><h2>Fictional Data Hall A</h2><p>Use the highlighted locations to move through the simulation.</p></div>
+          <div class="map-legend"><span><i class="normal"></i> Normal</span><span><i class="alert"></i> Alert</span></div>
+        </div>
+        <div class="floor-scroll">
+          <div id="floorPlan" class="floor-plan isometric">
+            <svg class="iso-visual" viewBox="0 0 1100 650" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+              <defs>
+                <linearGradient id="isoFloor" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#263e52"/><stop offset="1" stop-color="#132333"/></linearGradient>
+                <linearGradient id="isoCold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#2d96d5" stop-opacity=".55"/><stop offset="1" stop-color="#164f79" stop-opacity=".2"/></linearGradient>
+                <linearGradient id="isoHot" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#d76658" stop-opacity=".34"/><stop offset="1" stop-color="#6e272c" stop-opacity=".12"/></linearGradient>
+                <filter id="isoShadow" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="9" stdDeviation="7" flood-color="#02060a" flood-opacity=".55"/></filter>
+                <g id="rackNormal">
+                  <polygon points="0,17 65,0 98,15 32,33" fill="#395871"/>
+                  <polygon points="0,17 32,33 32,84 0,68" fill="#1a3042"/>
+                  <polygon points="32,33 98,15 98,67 32,84" fill="#29465d"/>
+                  <path d="M41 38L88 24M41 48L88 34M41 58L88 44M41 68L88 54" stroke="#5a7891" stroke-width="2" opacity=".8"/>
+                  <circle cx="87" cy="60" r="3" fill="#4be39b"/>
+                </g>
+              </defs>
+              <polygon points="135,225 562,49 1007,211 561,576" fill="url(#isoFloor)" stroke="#5a7790" stroke-width="3"/>
+              <polygon points="135,225 561,576 561,610 135,260" fill="#112334" opacity=".92"/>
+              <polygon points="561,576 1007,211 1007,247 561,610" fill="#0c1927" opacity=".95"/>
+              <polygon points="275,244 597,113 875,214 551,346" fill="url(#isoCold)" stroke="#4c9bc7" stroke-opacity=".48"/>
+              <polygon points="224,340 553,208 927,346 596,480" fill="url(#isoHot)" stroke="#ca6259" stroke-opacity=".32"/>
+              <text x="502" y="89" class="scene-label">DATA HALL A · ISOMETRIC TRAINING VIEW</text>
+              <text x="476" y="136" class="scene-small">COLD AISLE</text>
+              <text x="505" y="286" class="scene-small">HOT AISLE</text>
+
+              <g id="scene-noc" filter="url(#isoShadow)">
+                <polygon points="180,173 251,143 312,165 241,196" fill="#3a5973"/>
+                <polygon points="180,173 241,196 241,246 180,221" fill="#1a3042"/>
+                <polygon points="241,196 312,165 312,216 241,246" fill="#28475f"/>
+                <rect x="208" y="187" width="20" height="11" rx="2" fill="#6eb9ff"/><rect x="233" y="179" width="20" height="11" rx="2" fill="#6eb9ff"/><rect x="258" y="172" width="20" height="11" rx="2" fill="#6eb9ff"/>
+                <text x="181" y="157" class="scene-label">NOC</text>
+              </g>
+              <g id="scene-diagnose" filter="url(#isoShadow)">
+                <polygon points="780,155 848,128 904,149 837,177" fill="#465f75"/>
+                <polygon points="780,155 837,177 837,225 780,204" fill="#20384b"/>
+                <polygon points="837,177 904,149 904,197 837,225" fill="#304b61"/>
+                <path d="M807 165L858 145M815 175L866 155M824 185L875 165" stroke="#f6bd4d" stroke-width="3"/>
+                <text x="798" y="139" class="scene-label">INCIDENT</text>
+              </g>
+
+              <g filter="url(#isoShadow)">
+                <use href="#rackNormal" transform="translate(345 176)"/><use href="#rackNormal" transform="translate(427 144)"/><use href="#rackNormal" transform="translate(509 112)"/><use href="#rackNormal" transform="translate(591 144)"/><use href="#rackNormal" transform="translate(673 176)"/>
+                <use href="#rackNormal" transform="translate(287 270)"/><use href="#rackNormal" transform="translate(369 238)"/><use href="#rackNormal" transform="translate(451 206)"/><use href="#rackNormal" transform="translate(533 238)"/><use href="#rackNormal" transform="translate(615 270)"/>
+                <use href="#rackNormal" transform="translate(229 364)"/><use href="#rackNormal" transform="translate(311 332)"/><use href="#rackNormal" transform="translate(393 300)"/>
+                <g id="scene-c14" class="scene-alert" transform="translate(475 332)">
+                  <polygon class="alert-top" points="0,17 65,0 98,15 32,33"/>
+                  <polygon class="alert-side" points="0,17 32,33 32,84 0,68"/>
+                  <polygon class="alert-front" points="32,33 98,15 98,67 32,84"/>
+                  <path d="M41 38L88 24M41 48L88 34M41 58L88 44M41 68L88 54" stroke="#ffb3ad" stroke-width="2" opacity=".85"/>
+                  <circle class="alert-light" cx="87" cy="60" r="4"/>
+                  <text x="40" y="52" fill="#fff4f2" font-size="11" font-weight="900">C14</text>
+                </g>
+                <use href="#rackNormal" transform="translate(557 364)"/>
+              </g>
+
+              <g filter="url(#isoShadow)">
+                <g id="scene-crac-one">
+                  <polygon points="158,306 210,285 247,298 193,320" fill="#5887a5"/><polygon points="158,306 193,320 193,385 158,367" fill="#20435c"/><polygon points="193,320 247,298 247,362 193,385" fill="#32627d"/>
+                  <path d="M205 330L230 320M205 340L230 330M205 350L230 340" stroke="#76dcff" stroke-width="3"/><text x="151" y="284" class="scene-small">CRAC-1</text>
+                </g>
+                <g id="scene-crac-two">
+                  <polygon points="847,278 899,257 936,270 882,292" fill="#5887a5"/><polygon points="847,278 882,292 882,357 847,339" fill="#20435c"/><polygon points="882,292 936,270 936,334 882,357" fill="#32627d"/>
+                  <path d="M894 302L919 292M894 312L919 302M894 322L919 312" stroke="#76dcff" stroke-width="3"/><text x="854" y="255" class="scene-small">CRAC-2</text>
+                </g>
+                <g id="scene-pdu-a">
+                  <polygon points="177,432 226,413 259,425 209,446" fill="#415f77"/><polygon points="177,432 209,446 209,505 177,488" fill="#1c3448"/><polygon points="209,446 259,425 259,484 209,505" fill="#2c4a61"/><circle cx="242" cy="469" r="4" fill="#4be39b"/><text x="169" y="411" class="scene-small">PDU-A</text>
+                </g>
+                <g id="scene-pdu-b" class="scene-alert">
+                  <polygon class="alert-top" points="819,407 868,388 901,400 851,421"/><polygon class="alert-side" points="819,407 851,421 851,480 819,463"/><polygon class="alert-front" points="851,421 901,400 901,459 851,480"/><circle class="alert-light" cx="884" cy="444" r="4"/><text x="812" y="386" class="scene-small">PDU-B</text>
+                </g>
+              </g>
+
+              <g id="scene-recovery" filter="url(#isoShadow)">
+                <polygon points="230,475 300,447 358,468 287,498" fill="#3f7468"/><polygon points="230,475 287,498 287,550 230,520" fill="#1d4a42"/><polygon points="287,498 358,468 358,520 287,550" fill="#2d6259"/>
+                <rect x="273" y="487" width="29" height="14" rx="2" fill="#4be39b"/><text x="211" y="450" class="scene-label">RECOVERY</text>
+              </g>
+              <g id="scene-exit" filter="url(#isoShadow)">
+                <polygon points="790,485 857,457 916,479 848,510" fill="#557084"/><polygon points="790,485 848,510 848,566 790,534" fill="#263f52"/><polygon points="848,510 916,479 916,535 848,566" fill="#345267"/>
+                <path d="M856 516L856 553M884 503L884 541" stroke="#9ae7c2" stroke-width="3"/><text x="804" y="455" class="scene-label">EXIT</text>
+              </g>
+            </svg>
+            <button class="iso-zone zone noc-zone" data-zone="noc" type="button" disabled aria-label="Go to NOC console"><span class="dot"></span><span class="zone-copy"><b>NOC console</b><span>Alarm wall</span></span></button>
+            <button class="iso-zone zone diagnose-zone" data-zone="diagnose" type="button" disabled aria-label="Go to incident board"><span class="dot"></span><span class="zone-copy"><b>Incident board</b><span>Diagnosis</span></span></button>
+            <button class="iso-zone zone rack-target" data-zone="aisle" type="button" disabled aria-label="Go to Rack C14"><span class="dot"></span><span class="zone-copy"><b>Rack C14</b><span>Virtual alert</span></span></button>
+            <button class="iso-zone zone recovery-zone" data-zone="recovery" type="button" disabled aria-label="Go to recovery console"><span class="dot"></span><span class="zone-copy"><b>Recovery console</b><span>Virtual runbook</span></span></button>
+            <button class="iso-zone zone exit-zone" data-zone="exit" type="button" disabled aria-label="Go to exit interlock"><span class="dot"></span><span class="zone-copy"><b>Exit interlock</b><span>Mantrap</span></span></button>
+          </div>
+        </div>
+        <p class="map-caption">This is a 3D-style, fictional data-hall model. The lit locations are the game controls; Rack C14 and PDU-B turn green after the virtual recovery is complete.</p>
+        <section class="event-log">
+          <h3>Event log</h3>
+          <ul id="eventLog"><li>Simulation initialized.</li></ul>
+        </section>
+      </aside>
+
+      <section class="card stage">
+        <section id="nocPanel" class="challenge hidden" data-panel="noc">
+          <div class="challenge-head">
+            <div class="head-copy"><span class="stage-number">1</span><div><h2>NOC console</h2><p>Open all three alerts. The evidence is the key to the next room.</p></div></div>
+            <span class="badge">Investigate</span>
+          </div>
+          <p class="notice"><strong>Incoming incident:</strong> Temperature warning at Rack C14. No human injury is simulated; your goal is to identify the virtual dependency failure.</p>
+          <div class="alert-grid">
+            <button class="clue" data-clue="power" type="button"><span class="icon">⚡</span><b>PDU-B protection</b><span>Open the power alarm details.</span></button>
+            <button class="clue" data-clue="cooling" type="button"><span class="icon">❄</span><b>CRAC-1 telemetry</b><span>Open the cooling sensor details.</span></button>
+            <button class="clue" data-clue="network" type="button"><span class="icon">⌁</span><b>Network fabric</b><span>Open the connectivity details.</span></button>
+          </div>
+          <div id="nocDetails" class="details"><strong>Console ready.</strong> Select an alert to inspect its simulated telemetry.</div>
+          <button id="analyzeButton" type="button" disabled>Analyze the evidence</button>
+          <p id="nocFeedback" class="feedback"></p>
+        </section>
+
+        <section id="diagnosePanel" class="challenge hidden" data-panel="diagnose">
+          <div class="challenge-head">
+            <div class="head-copy"><span class="stage-number">2</span><div><h2>Incident board</h2><p>Choose the system that actually failed. Avoid guessing before evidence supports it.</p></div></div>
+            <span class="badge">Diagnose</span>
+          </div>
+          <div class="choice-grid">
+            <button class="choice" data-diagnosis="cooling" type="button"><b>Cooling failure</b><span>CRAC-1 lost control and is overheating the room.</span></button>
+            <button class="choice" data-diagnosis="power" type="button"><b>Power distribution fault</b><span>PDU-B protection opened, removing the simulated feed to Rack C14.</span></button>
+            <button class="choice" data-diagnosis="network" type="button"><b>Network fabric failure</b><span>The top-of-rack switch disconnected the applications.</span></button>
+          </div>
+          <p id="diagnoseFeedback" class="feedback"></p>
+        </section>
+
+        <section id="aislePanel" class="challenge hidden" data-panel="aisle">
+          <div class="challenge-head">
+            <div class="head-copy"><span class="stage-number">3</span><div><h2>Server aisle</h2><p>Trace the virtual equipment labels. You need both pieces of the recovery key.</p></div></div>
+            <span class="badge">Trace</span>
+          </div>
+          <p class="notice">This is a fictional floor view. Inspect the simulated assets only—no physical switching or real reset steps are part of this game.</p>
+          <div class="rack-wall">
+            <button class="rack warning scan" data-scan="pdu" type="button"><span class="led"></span><b>PDU-B</b><span>Protection indicator is red. Read the virtual label.</span></button>
+            <button class="rack warning scan" data-scan="rack" type="button"><span class="led"></span><b>Rack C14</b><span>Inlet temperature is high. Read the cabinet tag.</span></button>
+            <button class="rack scan" data-scan="crac" type="button"><span class="led"></span><b>CRAC-1</b><span>Cooling unit telemetry is within normal range.</span></button>
+          </div>
+          <div id="aisleDetails" class="details"><strong>Aisle access granted.</strong> Inspect PDU-B and Rack C14 to assemble the virtual recovery key.</div>
+          <div class="code-box">
+            <input id="recoveryCode" autocomplete="off" inputmode="text" placeholder="Enter recovery key" aria-label="Recovery key" disabled>
+            <button id="verifyCode" type="button" disabled>Verify key</button>
+          </div>
+          <p id="aisleFeedback" class="feedback"></p>
+        </section>
+
+        <section id="recoveryPanel" class="challenge hidden" data-panel="recovery">
+          <div class="challenge-head">
+            <div class="head-copy"><span class="stage-number">4</span><div><h2>Recovery console</h2><p>Choose the approved simulated path. The wrong action costs time.</p></div></div>
+            <span class="badge">Recover</span>
+          </div>
+          <div class="choice-grid">
+            <button class="choice" data-recovery="reset" type="button"><b>Force a breaker reset</b><span>Skip safeguards and reset the simulated PDU while the load is still present.</span></button>
+            <button class="choice" data-recovery="runbook" type="button"><b>Use the virtual runbook</b><span>Notify the simulated NOC, migrate virtual workload, then validate the thermal trend.</span></button>
+            <button class="choice" data-recovery="restart" type="button"><b>Restart all equipment</b><span>Cycle the entire simulated aisle and hope the alert clears.</span></button>
+          </div>
+          <div id="recoveryResult" class="recovery-panel hidden">
+            <h3>Virtual recovery complete</h3>
+            <p class="muted">The simulated workload has been moved, PDU-B protection is cleared through the approved virtual path, and Rack C14 is trending back to normal.</p>
+            <button id="openExit" type="button">Open the exit interlock</button>
+          </div>
+          <p id="recoveryFeedback" class="feedback"></p>
+        </section>
+
+        <section id="exitPanel" class="challenge hidden" data-panel="exit">
+          <div class="exit-card">
+            <div class="result">
+              <div class="exit-icon" aria-hidden="true">✓</div>
+              <p class="eyebrow">All virtual systems stable</p>
+              <h2>Exit interlock unlocked.</h2>
+              <p class="muted">You diagnosed the simulated fault and used the approved recovery path. Finish the scenario to record your result.</p>
+              <button id="escapeButton" type="button">Escape the data center</button>
+            </div>
+          </div>
+        </section>
+
+        <section id="winPanel" class="challenge hidden" data-panel="win">
+          <div class="exit-card">
+            <div class="result">
+              <div class="exit-icon" aria-hidden="true">★</div>
+              <p class="eyebrow">Simulation complete</p>
+              <h2>You escaped.</h2>
+              <b id="resultTitle">Critical incident resolved</b>
+              <div class="result-grid">
+                <div><span>Time remaining</span><b id="resultTime">--:--</b></div>
+                <div><span>Final score</span><b id="resultScore">0</b></div>
+              </div>
+              <p class="muted">Try again for a faster score, or use this as the base for more failure scenarios.</p>
+              <button id="playAgain" type="button">Play again</button>
+            </div>
+          </div>
+        </section>
+      </section>
+    </section>
+    <p class="footer">Data Center Escape is a fictional training game. It contains no connection to real systems, equipment, or operational controls.</p>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = 'https://dbaiwdatialqkywacxok.supabase.co';
+    const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_a2CkKxXlGpZhcaj8OCL-yg_2qAeEhvf';
+    const TOTAL_SECONDS = 12 * 60;
+    const panels = ['noc','diagnose','aisle','recovery','exit','win'];
+    const zoneRequirements = { noc:0, diagnose:1, aisle:2, recovery:3, exit:4 };
+    const TEAM_INFO = {
+      1:{ label:'Team 1', specialty:'Power' },
+      2:{ label:'Team 2', specialty:'Cooling' },
+      3:{ label:'Team 3', specialty:'Network' },
+      4:{ label:'Team 4', specialty:'Operations' }
+    };
+    const state = {
+      started:false, finished:false, seconds:TOTAL_SECONDS, score:100, stage:0,
+      clues:new Set(), scans:new Set(), timer:null, log:['Simulation initialized.'],
+      db:window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY) : null,
+      joined:false, player:null, sessionCode:'', lobbyTimer:null
+    };
+    const $ = selector => document.querySelector(selector);
+    const $$ = selector => [...document.querySelectorAll(selector)];
+    const clock = seconds => {
+      const safe = Math.max(0, seconds);
+      return String(Math.floor(safe / 60)).padStart(2,'0') + ':' + String(safe % 60).padStart(2,'0');
+    };
+    const logEvent = text => {
+      state.log.unshift(text);
+      $('#eventLog').innerHTML = state.log.slice(0,7).map(item => '<li>' + escapeHtml(item) + '</li>').join('');
+    };
+    const escapeHtml = value => String(value).replace(/[&<>'"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
+    function setLobbyStatus(text, type) {
+      const target = $('#lobbyStatus');
+      target.textContent = text;
+      target.className = 'lobby-status ' + (type || '');
+    }
+    function playerToken() {
+      const key = 'dc-escape-player-token';
+      let token = localStorage.getItem(key);
+      if (token) return token;
+      if (window.crypto && window.crypto.randomUUID) token = window.crypto.randomUUID();
+      else token = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, char => {
+        const number = Math.floor(Math.random() * 16);
+        return (char === 'x' ? number : (number & 3) | 8).toString(16);
+      });
+      localStorage.setItem(key, token);
+      return token;
+    }
+    function renderTeamRoster(players) {
+      const groups = { 1:[], 2:[], 3:[], 4:[] };
+      (players || []).forEach(player => {
+        const team = Number(player.team_number);
+        if (groups[team]) groups[team].push(player);
+      });
+      $('#teamRoster').innerHTML = [1,2,3,4].map(team => {
+        const members = groups[team].sort((a,b) => String(a.display_name).localeCompare(String(b.display_name)));
+        const info = TEAM_INFO[team];
+        const list = members.length ? members.map(member => '<li>' + escapeHtml(member.display_name) + '</li>').join('') : '<li class="empty">Open slot</li>';
+        const current = state.player && Number(state.player.team_number) === team ? ' current' : '';
+        return '<article class="team-card' + current + '"><h3>' + info.label + '</h3><p>' + info.specialty + ' · ' + members.length + ' player' + (members.length === 1 ? '' : 's') + '</p><ul>' + list + '</ul></article>';
+      }).join('');
+    }
+    async function refreshLobby(silent) {
+      if (!state.db || !state.sessionCode) return;
+      const { data, error } = await state.db.rpc('get_dc_escape_lobby', { p_session_code:state.sessionCode, p_client_token:playerToken() });
+      if (error) {
+        if (!silent) setLobbyStatus('Could not refresh the team lobby: ' + error.message, 'bad');
+        return;
+      }
+      renderTeamRoster((data && data.players) || []);
+    }
+    async function joinTeam() {
+      const sessionCode = $('#sessionCode').value.trim();
+      const playerName = $('#playerName').value.trim();
+      if (!sessionCode || !playerName) return setLobbyStatus('Enter a session code and your name first.', 'bad');
+      if (!state.db) return setLobbyStatus('The shared game lobby could not load. Refresh the page and try again.', 'bad');
+      const button = $('#joinTeamButton');
+      const original = button.textContent;
+      button.disabled = true;
+      button.textContent = 'Joining…';
+      setLobbyStatus('Finding the least-filled team…');
+      try {
+        const { data, error } = await state.db.rpc('join_dc_escape_session', {
+          p_session_code:sessionCode,
+          p_display_name:playerName,
+          p_client_token:playerToken()
+        });
+        if (error) throw error;
+        if (!data || !data.team_number) throw new Error('The team lobby did not return an assignment.');
+        state.joined = true;
+        state.player = data;
+        state.sessionCode = data.session_code;
+        const info = TEAM_INFO[Number(data.team_number)];
+        $('#teamAssignmentName').textContent = info.label + ' · ' + info.specialty;
+        $('#teamAssignment').classList.remove('hidden');
+        $('#teamMetric').classList.remove('hidden');
+        $('#teamHud').textContent = info.label + ' · ' + info.specialty;
+        $('#startButton').disabled = false;
+        $('#startMessage').textContent = 'You are ready to enter the room with ' + info.label + '.';
+        setLobbyStatus('Assigned automatically to ' + info.label + '.', 'good');
+        logEvent(playerName + ' joined ' + info.label + '.');
+        await refreshLobby(true);
+        clearInterval(state.lobbyTimer);
+        state.lobbyTimer = setInterval(() => refreshLobby(true), 12000);
+      } catch (error) {
+        const setupMissing = /join_dc_escape_session|function|schema cache/i.test(error.message || '');
+        setLobbyStatus(setupMissing ? 'The game lobby setup is missing. Run the Data Center Escape team SQL file once, then refresh.' : 'Could not join: ' + (error.message || 'Unknown error'), 'bad');
+      } finally {
+        button.disabled = false;
+        button.textContent = original;
+      }
+    }
+    function updateHud() {
+      $('#timer').textContent = clock(state.seconds);
+      $('#score').textContent = state.score;
+      const objectives = Math.min(4, state.stage);
+      $('#progress').textContent = objectives + ' / 4';
+      $('#progressFill').style.width = (objectives * 25) + '%';
+      const timerBox = $('#timerBox');
+      timerBox.classList.toggle('urgent', state.seconds <= 120 && state.seconds > 0);
+      timerBox.classList.toggle('failed', state.seconds === 0);
+      $('#hintButton').disabled = !state.started || state.finished;
+      $('#hintCost').textContent = state.score <= 10 ? 'free' : '−10';
+      $('#teamMetric').classList.toggle('hidden', !state.joined);
+    }
+    function updateMap(current) {
+      $$('.zone').forEach(button => {
+        const zone = button.dataset.zone;
+        const requirement = zoneRequirements[zone];
+        const unlocked = state.started && state.stage >= requirement && !state.finished;
+        button.disabled = !unlocked;
+        button.classList.toggle('active', zone === current);
+        button.classList.toggle('done', state.stage > requirement);
+      });
+      const plan = $('#floorPlan');
+      if (plan) {
+        plan.dataset.activeZone = current || '';
+        plan.dataset.stage = String(state.stage);
+        plan.classList.toggle('recovered', state.stage >= 4);
+      }
+    }
+    function showPanel(panel) {
+      if (!state.started || state.finished) return;
+      if (state.stage < zoneRequirements[panel]) return;
+      panels.forEach(name => $('#'+name+'Panel').classList.toggle('hidden', name !== panel));
+      updateMap(panel);
+      const labels = { noc:'Reviewing NOC evidence.', diagnose:'Analyzing the incident.', aisle:'Tracing the virtual power path.', recovery:'Selecting the virtual recovery plan.', exit:'Exit interlock ready.' };
+      $('#hudMessage').textContent = labels[panel] || '';
+    }
+    function startGame() {
+      if (state.started) return;
+      if (!state.joined) {
+        setLobbyStatus('Join a four-team session before starting the escape room.', 'bad');
+        $('#playerName').focus();
+        return;
+      }
+      state.started = true;
+      $('#game').classList.remove('hidden');
+      $('#startButton').textContent = 'Simulation running';
+      $('#startButton').disabled = true;
+      $('#startMessage').textContent = 'Find the root cause before the timer reaches zero.';
+      logEvent('Timer started. NOC console unlocked.');
+      updateHud();
+      showPanel('noc');
+      state.timer = setInterval(() => {
+        if (!state.started || state.finished) return;
+        state.seconds -= 1;
+        if (state.seconds <= 0) {
+          state.seconds = 0;
+          finishFailure();
+        }
+        updateHud();
+      }, 1000);
+    }
+    function penalty(message) {
+      state.seconds = Math.max(0, state.seconds - 20);
+      state.score = Math.max(0, state.score - 5);
+      logEvent('Time penalty: ' + message);
+      updateHud();
+    }
+    function setFeedback(id, text, type) {
+      const target = $('#'+id);
+      target.textContent = text;
+      target.className = 'feedback ' + (type || '');
+    }
+    function inspectClue(type, button) {
+      if (!state.started || state.stage !== 0) return;
+      const details = {
+        power:'PDU-B: simulated branch protection opened at 09:42. Rack C14 is the only affected load. Utility and UPS telemetry are normal.',
+        cooling:'CRAC-1: supply temperature and fan speed are within normal operating range. The elevated rack inlet is localized, not room-wide.',
+        network:'Fabric: upstream links and application routes are healthy. No simulated network packet loss is present.'
+      };
+      state.clues.add(type);
+      button.classList.add('inspected');
+      $('#nocDetails').innerHTML = '<strong>Evidence found:</strong> ' + escapeHtml(details[type]);
+      logEvent('Inspected ' + button.querySelector('b').textContent + '.');
+      if (state.clues.size === 3) {
+        $('#analyzeButton').disabled = false;
+        setFeedback('nocFeedback','All alert evidence is collected. You can now analyze the incident.','good');
+      } else {
+        setFeedback('nocFeedback', state.clues.size + ' of 3 alerts inspected.','warn');
+      }
+    }
+    function analyzeEvidence() {
+      if (state.clues.size !== 3) return;
+      state.stage = 1;
+      logEvent('Evidence complete. Incident board unlocked.');
+      updateHud();
+      showPanel('diagnose');
+    }
+    function diagnose(answer, button) {
+      if (state.stage !== 1) return;
+      $$('.choice[data-diagnosis]').forEach(item => item.disabled = true);
+      if (answer === 'power') {
+        button.classList.add('correct');
+        state.stage = 2;
+        setFeedback('diagnoseFeedback','Correct. Cooling and network are healthy; PDU-B protection interrupted the virtual feed to Rack C14.','good');
+        logEvent('Root cause identified: simulated PDU-B protection event.');
+        updateHud();
+        setTimeout(() => showPanel('aisle'), 650);
+      } else {
+        button.classList.add('wrong');
+        penalty('Incorrect diagnosis');
+        setFeedback('diagnoseFeedback','That evidence does not match the alerts. Review the NOC console and try again.','bad');
+        setTimeout(() => {
+          $$('.choice[data-diagnosis]').forEach(item => { item.disabled = false; item.classList.remove('wrong'); });
+        }, 750);
+      }
+    }
+    function inspectScan(type, button) {
+      if (state.stage !== 2) return;
+      const details = {
+        pdu:'PDU-B virtual label: protection event recorded. Recovery key color fragment: BLUE. Approved path: use the recovery console after workload migration.',
+        rack:'Rack C14 cabinet tag: virtual recovery key number fragment: 14. Its inlet temperature is elevated because its simulated feed was removed.',
+        crac:'CRAC-1 virtual display: normal supply air and normal fan speed. This confirms the data hall cooling simulation is not the failed dependency.'
+      };
+      state.scans.add(type);
+      button.classList.add('inspected');
+      $('#aisleDetails').innerHTML = '<strong>Asset read:</strong> ' + escapeHtml(details[type]);
+      logEvent('Scanned ' + button.querySelector('b').textContent + '.');
+      if (state.scans.has('pdu') && state.scans.has('rack')) {
+        $('#recoveryCode').disabled = false;
+        $('#verifyCode').disabled = false;
+        setFeedback('aisleFeedback','Both recovery-key fragments found. Combine the color and number with a hyphen.','good');
+      } else {
+        setFeedback('aisleFeedback','Find the virtual labels on PDU-B and Rack C14.','warn');
+      }
+    }
+    function verifyCode() {
+      if (state.stage !== 2) return;
+      const code = $('#recoveryCode').value.trim().toUpperCase().replace(/\s+/g,'');
+      if (code === 'BLUE-14') {
+        state.stage = 3;
+        $('#recoveryCode').disabled = true;
+        $('#verifyCode').disabled = true;
+        setFeedback('aisleFeedback','Recovery key accepted. The recovery console is unlocked.','good');
+        logEvent('Virtual recovery key accepted.');
+        updateHud();
+        setTimeout(() => showPanel('recovery'), 650);
+      } else {
+        penalty('Invalid recovery key');
+        setFeedback('aisleFeedback','That key did not match the simulated equipment labels. Check the color and cabinet number again.','bad');
+      }
+    }
+    function recover(choice, button) {
+      if (state.stage !== 3) return;
+      if (choice === 'runbook') {
+        $$('.choice[data-recovery]').forEach(item => item.disabled = true);
+        button.classList.add('correct');
+        state.stage = 4;
+        state.score += 10;
+        $('#recoveryResult').classList.remove('hidden');
+        setFeedback('recoveryFeedback','Approved virtual runbook selected. Incident containment is complete. +10 points','good');
+        logEvent('Approved virtual runbook completed. System stable.');
+        updateHud();
+        updateMap('recovery');
+      } else {
+        button.classList.add('wrong');
+        penalty('Unsafe virtual recovery choice');
+        setFeedback('recoveryFeedback','That bypasses the safe simulation path. Use the approved virtual runbook instead.','bad');
+        setTimeout(() => button.classList.remove('wrong'), 700);
+      }
+    }
+    function openExit() {
+      if (state.stage !== 4) return;
+      logEvent('Exit interlock unlocked.');
+      showPanel('exit');
+    }
+    function finishSuccess() {
+      if (state.finished) return;
+      state.finished = true;
+      clearInterval(state.timer);
+      $('#resultTime').textContent = clock(state.seconds);
+      $('#resultScore').textContent = state.score;
+      $('#resultTitle').textContent = state.score >= 100 ? 'Perfect recovery path' : 'Critical incident resolved';
+      panels.forEach(name => $('#'+name+'Panel').classList.toggle('hidden', name !== 'win'));
+      $$('.zone').forEach(button => { button.disabled = true; button.classList.remove('active'); });
+      $('#hudMessage').textContent = 'Simulation complete.';
+      updateHud();
+      logEvent('Escape completed with ' + state.score + ' points.');
+    }
+    function finishFailure() {
+      if (state.finished) return;
+      state.finished = true;
+      clearInterval(state.timer);
+      $('#hudMessage').textContent = 'Time expired. Restart the simulation to try again.';
+      $('#startMessage').textContent = 'Time expired — restart to reset the room.';
+      $$('.zone').forEach(button => button.disabled = true);
+      const current = document.querySelector('.challenge:not(.hidden)');
+      if (current) {
+        current.insertAdjacentHTML('afterbegin','<p class="notice" style="border-color:rgba(226,60,54,.6);color:#ffd1ce"><strong>Simulation paused:</strong> time expired. Use Restart to begin again.</p>');
+      }
+      updateHud();
+      logEvent('Simulation timed out.');
+    }
+    function giveHint() {
+      if (!state.started || state.finished) return;
+      const hints = [
+        'Open all NOC alerts. The localized heat signal is an effect, not the failed system.',
+        'The normal cooling and network telemetry eliminate two possible root causes.',
+        'The virtual recovery key combines a color from PDU-B and a number from Rack C14.',
+        'Choose the option that protects workload and follows the approved virtual runbook.'
+      ];
+      if (state.score > 10) state.score -= 10;
+      $('#hudMessage').textContent = 'Hint: ' + hints[Math.min(state.stage,3)];
+      logEvent('Hint requested.');
+      updateHud();
+    }
+    function resetGame() {
+      clearInterval(state.timer);
+      state.started = false;
+      state.finished = false;
+      state.seconds = TOTAL_SECONDS;
+      state.score = 100;
+      state.stage = 0;
+      state.clues = new Set();
+      state.scans = new Set();
+      state.log = ['Simulation reset.'];
+      $('#game').classList.add('hidden');
+      $('#startButton').textContent = 'Start the escape';
+      $('#startButton').disabled = !state.joined;
+      $('#startMessage').textContent = state.joined ? 'Ready to enter with ' + TEAM_INFO[Number(state.player.team_number)].label + '.' : 'Join a team to unlock the escape room.';
+      $('#hudMessage').textContent = state.joined ? 'Team assigned. Start when you are ready.' : 'Join a team, then begin the simulation.';
+      $('#nocDetails').innerHTML = '<strong>Console ready.</strong> Select an alert to inspect its simulated telemetry.';
+      $('#aisleDetails').innerHTML = '<strong>Aisle access granted.</strong> Inspect PDU-B and Rack C14 to assemble the virtual recovery key.';
+      $('#recoveryCode').value = '';
+      $('#recoveryCode').disabled = true;
+      $('#verifyCode').disabled = true;
+      $('#analyzeButton').disabled = true;
+      $('#recoveryResult').classList.add('hidden');
+      $$('.clue,.scan,.choice').forEach(item => { item.disabled = false; item.classList.remove('inspected','correct','wrong'); });
+      ['nocFeedback','diagnoseFeedback','aisleFeedback','recoveryFeedback'].forEach(id => setFeedback(id,'',''));
+      $('#eventLog').innerHTML = '<li>Simulation reset.</li>';
+      panels.forEach(name => $('#'+name+'Panel').classList.add('hidden'));
+      if (state.sessionCode) refreshLobby(true);
+      else renderTeamRoster([]);
+      updateHud();
+      updateMap('');
+    }
+    $('#startButton').addEventListener('click', startGame);
+    $('#joinTeamButton').addEventListener('click', joinTeam);
+    $('#playerName').addEventListener('keydown', event => { if (event.key === 'Enter') joinTeam(); });
+    $('#resetButton').addEventListener('click', resetGame);
+    $('#playAgain').addEventListener('click', resetGame);
+    $('#hintButton').addEventListener('click', giveHint);
+    $$('.zone').forEach(button => button.addEventListener('click', () => showPanel(button.dataset.zone)));
+    $$('.clue').forEach(button => button.addEventListener('click', () => inspectClue(button.dataset.clue, button)));
+    $('#analyzeButton').addEventListener('click', analyzeEvidence);
+    $$('.choice[data-diagnosis]').forEach(button => button.addEventListener('click', () => diagnose(button.dataset.diagnosis, button)));
+    $$('.scan').forEach(button => button.addEventListener('click', () => inspectScan(button.dataset.scan, button)));
+    $('#verifyCode').addEventListener('click', verifyCode);
+    $('#recoveryCode').addEventListener('keydown', event => { if (event.key === 'Enter') verifyCode(); });
+    $$('.choice[data-recovery]').forEach(button => button.addEventListener('click', () => recover(button.dataset.recovery, button)));
+    $('#openExit').addEventListener('click', openExit);
+    $('#escapeButton').addEventListener('click', finishSuccess);
+    resetGame();
+  </script>
+</body>
+</html>
