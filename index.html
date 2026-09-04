@@ -3,724 +3,151 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Critical Path, a data center campus strategy RPG prototype.">
-  <title>Critical Path — Data Center RPG</title>
+  <meta name="description" content="A room-code online 2D mini-golf game for up to four players.">
+  <title>Putt Putt: Neon Garden — Online</title>
   <style>
-    :root {
-      --bg: #08111d;
-      --panel: #101d2c;
-      --panel-2: #14263a;
-      --line: #24445d;
-      --ink: #eaf5ff;
-      --muted: #95aec2;
-      --cyan: #50d9e8;
-      --green: #74d99d;
-      --amber: #ffc35c;
-      --red: #ff7c79;
-      --purple: #c396ff;
-      --shadow: 0 16px 44px rgba(0, 0, 0, .28);
-    }
-
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      min-width: 320px;
-      color: var(--ink);
-      background:
-        radial-gradient(circle at 15% 0%, rgba(42, 129, 157, .20), transparent 32rem),
-        radial-gradient(circle at 88% 30%, rgba(83, 85, 175, .17), transparent 28rem),
-        var(--bg);
-      font: 15px/1.45 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
-    button { font: inherit; }
-    button:focus-visible { outline: 3px solid white; outline-offset: 2px; }
-    .shell { width: min(1500px, calc(100% - 32px)); margin: 0 auto; padding: 24px 0 40px; }
-    .topbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 18px; }
-    .eyebrow { color: var(--cyan); text-transform: uppercase; letter-spacing: .16em; font-size: 11px; font-weight: 800; }
-    h1 { margin: 2px 0 2px; font-size: clamp(30px, 5vw, 46px); line-height: 1; letter-spacing: -.045em; }
-    .subhead { margin: 8px 0 0; color: var(--muted); max-width: 700px; }
-    .shift { display: grid; gap: 2px; align-content: center; min-width: 145px; text-align: right; }
-    .shift strong { font-size: 23px; }
-    .shift span { color: var(--muted); font-size: 12px; }
-    .status { display: inline-flex; align-items: center; gap: 7px; justify-content: flex-end; color: var(--green); font-weight: 750; font-size: 12px; text-transform: uppercase; letter-spacing: .08em; }
-    .status::before { content: ""; width: 8px; height: 8px; border-radius: 100%; background: currentColor; box-shadow: 0 0 12px currentColor; }
-    .status.warning { color: var(--amber); }
-    .status.critical { color: var(--red); }
-
-    .metrics { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; margin-bottom: 16px; }
-    .metric, .panel { border: 1px solid var(--line); background: linear-gradient(145deg, rgba(20, 38, 58, .92), rgba(11, 25, 40, .92)); box-shadow: var(--shadow); }
-    .metric { padding: 12px 14px; border-radius: 12px; min-height: 84px; }
-    .metric-label { display: block; color: var(--muted); font-weight: 700; font-size: 10px; text-transform: uppercase; letter-spacing: .1em; }
-    .metric-value { display: block; margin-top: 4px; font-weight: 850; font-size: 24px; letter-spacing: -.04em; }
-    .metric-note { display: block; color: var(--muted); font-size: 11px; }
-    .value-good { color: var(--green); }
-    .value-warn { color: var(--amber); }
-    .value-bad { color: var(--red); }
-
-    .layout { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(340px, .95fr); gap: 16px; }
-    .column { display: grid; gap: 16px; align-content: start; }
-    .panel { border-radius: 16px; overflow: hidden; }
-    .panel-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 18px 12px; }
-    .panel-header h2 { margin: 0; font-size: 16px; letter-spacing: -.01em; }
-    .panel-header p { margin: 3px 0 0; color: var(--muted); font-size: 12px; }
-    .panel-body { padding: 0 18px 18px; }
-    .badge { display: inline-flex; align-items: center; border: 1px solid var(--line); color: var(--cyan); background: rgba(31, 71, 95, .4); padding: 4px 8px; border-radius: 99px; font-size: 11px; font-weight: 800; white-space: nowrap; }
-    .badge.amber { color: var(--amber); }
-    .badge.green { color: var(--green); }
-    .badge.purple { color: var(--purple); }
-
-    .campus { display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 14px; }
-    .campus-legend { display: grid; gap: 8px; align-content: start; }
-    .legend-card { padding: 10px; border-left: 3px solid var(--cyan); background: rgba(9, 21, 33, .65); border-radius: 0 9px 9px 0; }
-    .legend-card.power { border-color: var(--amber); }
-    .legend-card.cooling { border-color: var(--green); }
-    .legend-card span { display: block; color: var(--muted); font-size: 11px; }
-    .legend-card strong { display: block; font-size: 13px; margin-top: 2px; }
-    .hall { position: relative; min-height: 280px; padding: 20px; border: 1px solid #326280; border-radius: 12px; overflow: hidden; background: linear-gradient(125deg, rgba(22, 59, 80, .65), rgba(11, 29, 47, .9)); }
-    .hall::before { content: ""; position: absolute; inset: 0; opacity: .22; background-image: linear-gradient(rgba(119, 214, 232, .35) 1px, transparent 1px), linear-gradient(90deg, rgba(119, 214, 232, .35) 1px, transparent 1px); background-size: 24px 24px; pointer-events: none; }
-    .hall-label { position: relative; display: flex; justify-content: space-between; color: #c2eff8; font-weight: 800; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
-    .racks { position: relative; display: grid; grid-template-columns: repeat(4, minmax(46px, 1fr)); gap: 8px; margin: 28px 18px 0; }
-    .rack { height: 86px; padding: 7px; display: grid; align-content: space-between; border: 1px solid #3d7c99; background: linear-gradient(90deg, #162d42, #0d1d2e); border-radius: 5px; color: #bde9f2; font-size: 11px; }
-    .rack.used { border-color: #61b4cb; box-shadow: inset 0 0 0 1px rgba(80, 217, 232, .14); }
-    .rack.hot { border-color: var(--red); background: linear-gradient(90deg, rgba(115, 37, 49, .86), rgba(50, 25, 39, .92)); box-shadow: 0 0 20px rgba(255, 90, 99, .22); }
-    .rack.empty { opacity: .48; border-style: dashed; }
-    .rack .kw { color: var(--cyan); font-weight: 800; }
-    .rack.hot .kw { color: var(--amber); }
-    .aisle { position: relative; height: 18px; margin: 8px 4px 0; color: rgba(191, 239, 248, .78); text-align: center; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; }
-    .equipment-row { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 20px; }
-    .equipment { padding: 7px; border: 1px solid rgba(116, 217, 157, .5); background: rgba(23, 68, 63, .52); border-radius: 7px; color: #c8f8da; font-size: 10px; text-align: center; }
-    .equipment.amber { border-color: rgba(255, 195, 92, .55); background: rgba(81, 58, 24, .48); color: #ffe0a2; }
-
-    .meter-row { display: grid; gap: 12px; }
-    .meter { display: grid; grid-template-columns: 130px minmax(0, 1fr) 72px; gap: 10px; align-items: center; font-size: 12px; }
-    .meter strong { text-align: right; font-size: 12px; }
-    .track { height: 9px; overflow: hidden; border-radius: 99px; background: #07131f; box-shadow: inset 0 0 0 1px rgba(118, 172, 198, .22); }
-    .fill { height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--cyan), #69baf0); transition: width .3s ease; }
-    .fill.green { background: linear-gradient(90deg, #63ca90, #b0e285); }
-    .fill.amber { background: linear-gradient(90deg, #f7a95e, #ffd167); }
-    .fill.red { background: linear-gradient(90deg, #f16e70, #ff9d85); }
-    .mini-note { color: var(--muted); font-size: 11px; margin: 13px 0 0; }
-
-    .actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
-    .action { position: relative; min-height: 128px; display: grid; align-content: space-between; gap: 12px; padding: 13px; border: 1px solid var(--line); background: rgba(8, 21, 33, .58); border-radius: 10px; color: var(--ink); text-align: left; cursor: pointer; transition: transform .16s ease, border-color .16s ease, background .16s ease; }
-    .action:hover { transform: translateY(-2px); border-color: #4d91b4; background: rgba(14, 35, 53, .92); }
-    .action:disabled { opacity: .45; cursor: not-allowed; transform: none; }
-    .action .title { display: block; font-weight: 820; font-size: 13px; }
-    .action .desc { display: block; color: var(--muted); font-size: 11px; line-height: 1.38; }
-    .action .cost { color: var(--green); font-size: 11px; font-weight: 800; }
-    .action .cost.warning { color: var(--amber); }
-    .action .tag { color: var(--purple); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; }
-
-    .staff-list, .log { display: grid; gap: 8px; }
-    .staff { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 10px; border: 1px solid rgba(57, 95, 120, .75); background: rgba(8, 20, 32, .5); border-radius: 10px; }
-    .avatar { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, #38597a, #1b314c); color: var(--cyan); font-size: 12px; font-weight: 900; }
-    .staff .name { display: block; font-weight: 800; font-size: 12px; }
-    .staff .role { display: block; margin-top: 1px; color: var(--muted); font-size: 10px; }
-    .staff button, .button { border: 1px solid rgba(97, 217, 157, .68); border-radius: 7px; background: rgba(40, 112, 80, .34); color: #d7ffe6; padding: 7px 9px; font-size: 11px; font-weight: 800; cursor: pointer; }
-    .staff button:hover, .button:hover { background: rgba(60, 145, 105, .5); }
-    .staff button:disabled { border-color: var(--line); background: transparent; color: var(--muted); cursor: default; }
-    .staff .assigned { color: var(--green); font-size: 10px; font-weight: 800; text-transform: uppercase; }
-
-    .incident { padding: 14px; border: 1px solid rgba(255, 195, 92, .5); border-radius: 10px; background: linear-gradient(135deg, rgba(81, 55, 25, .62), rgba(35, 31, 34, .64)); }
-    .incident.critical { border-color: rgba(255, 124, 121, .75); background: linear-gradient(135deg, rgba(93, 35, 41, .68), rgba(35, 26, 37, .68)); }
-    .incident h3 { margin: 0; font-size: 14px; }
-    .incident p { margin: 5px 0 10px; color: #e8d5aa; font-size: 12px; }
-    .incident.critical p { color: #ffd2d0; }
-    .incident-actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; }
-    .incident-actions button { min-height: 52px; padding: 7px; border: 1px solid rgba(255, 209, 103, .5); border-radius: 7px; background: rgba(70, 51, 23, .68); color: #fff4d9; font-size: 10px; font-weight: 750; cursor: pointer; text-align: left; }
-    .incident-actions button:hover { background: rgba(113, 78, 28, .8); }
-    .incident.critical .incident-actions button { border-color: rgba(255, 143, 140, .65); background: rgba(91, 37, 42, .7); }
-    .incident.critical .incident-actions button:hover { background: rgba(128, 46, 56, .9); }
-    .quiet-state { padding: 16px; border: 1px dashed #35576d; border-radius: 10px; color: var(--muted); font-size: 12px; }
-    .quiet-state strong { color: var(--ink); }
-    .log-item { display: grid; grid-template-columns: 55px 1fr; gap: 10px; padding-bottom: 8px; border-bottom: 1px solid rgba(62, 93, 116, .35); color: var(--muted); font-size: 11px; }
-    .log-item:last-child { padding-bottom: 0; border-bottom: 0; }
-    .log-item time { color: var(--cyan); font-weight: 800; }
-    .log-item strong { color: var(--ink); }
-
-    .footer-actions { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 16px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 12px; background: rgba(8, 20, 32, .72); }
-    .footer-actions p { margin: 0; color: var(--muted); font-size: 12px; }
-    .button.primary { border-color: #68d99c; background: linear-gradient(135deg, #236847, #1d965f); color: white; padding: 10px 14px; white-space: nowrap; }
-    .button.primary:hover { background: linear-gradient(135deg, #2b8258, #22aa6a); }
-
-    .modal[hidden] { display: none; }
-    .modal { position: fixed; z-index: 10; inset: 0; display: grid; place-items: center; padding: 18px; background: rgba(1, 7, 13, .75); backdrop-filter: blur(7px); }
-    .dialog { width: min(760px, 100%); max-height: min(800px, calc(100vh - 36px)); overflow: auto; border: 1px solid #3b6986; border-radius: 16px; background: linear-gradient(160deg, #14263a, #0d1a29); box-shadow: 0 22px 70px rgba(0,0,0,.5); }
-    .dialog-header { display: flex; justify-content: space-between; gap: 12px; padding: 18px 20px 12px; }
-    .dialog-header h2 { margin: 0; font-size: 20px; }
-    .dialog-header p { margin: 5px 0 0; color: var(--muted); font-size: 12px; }
-    .close { width: 30px; height: 30px; border: 1px solid var(--line); border-radius: 8px; background: transparent; color: var(--ink); cursor: pointer; font-size: 18px; }
-    .dialog-body { padding: 0 20px 20px; }
-    .walkthrough { position: relative; min-height: 260px; overflow: hidden; border: 1px solid #37637f; border-radius: 10px; background: linear-gradient(180deg, #17364d 0 46%, #0c1724 46%); }
-    .walkthrough::before { content: ""; position: absolute; left: 0; right: 0; top: 45%; height: 10px; background: #ec9a58; box-shadow: 0 -24px 0 rgba(90, 188, 224, .15); opacity: .8; }
-    .walk-rack { position: absolute; bottom: 16px; width: 84px; height: 138px; border: 2px solid #487b99; border-radius: 4px; background: repeating-linear-gradient(to bottom, #102234 0 8px, #203b51 8px 12px); box-shadow: 0 6px 0 #07111b; }
-    .walk-rack.a { left: 10%; }
-    .walk-rack.b { left: 39%; }
-    .walk-rack.c { right: 13%; }
-    .clue { position: absolute; display: grid; place-items: center; width: 27px; height: 27px; border: 1px solid #ffd57f; border-radius: 50%; background: #6c4a1f; color: #fff3c9; font-weight: 900; font-size: 12px; cursor: pointer; box-shadow: 0 0 0 3px rgba(255, 194, 92, .15); }
-    .clue:hover { transform: scale(1.08); }
-    .clue.found { border-color: #73d9a0; background: #225e42; color: #dfffe9; box-shadow: none; }
-    .clue.one { left: 17%; bottom: 46px; }
-    .clue.two { left: 50%; bottom: 88px; }
-    .clue.three { right: 19%; top: 57px; }
-    .clue.four { left: 35%; top: 72px; }
-    .inspection-info { min-height: 44px; margin: 12px 0; color: var(--muted); font-size: 12px; }
-    .inspection-info strong { color: var(--ink); }
-    .puzzle-progress { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 12px 0 0; }
-    .puzzle-progress span { color: var(--amber); font-size: 12px; font-weight: 800; }
-    .trivia-options { display: grid; gap: 8px; }
-    .trivia-options button { padding: 12px; border: 1px solid var(--line); border-radius: 9px; background: rgba(9, 23, 35, .75); color: var(--ink); cursor: pointer; text-align: left; font-size: 13px; }
-    .trivia-options button:hover { border-color: var(--cyan); background: rgba(20, 48, 66, .9); }
-    .trivia-explain { min-height: 40px; margin-top: 12px; color: var(--muted); font-size: 12px; }
-    .trivia-explain.correct { color: #baf3cb; }
-    .trivia-explain.incorrect { color: #ffd2a0; }
-
-    #toast { position: fixed; z-index: 20; left: 50%; bottom: 24px; max-width: min(560px, calc(100% - 32px)); transform: translate(-50%, 20px); padding: 11px 14px; border: 1px solid #4c7592; border-radius: 10px; background: #142b40; color: var(--ink); box-shadow: var(--shadow); opacity: 0; pointer-events: none; transition: opacity .2s ease, transform .2s ease; font-size: 12px; }
-    #toast.show { opacity: 1; transform: translate(-50%, 0); }
-    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
-
-    @media (max-width: 1100px) { .metrics { grid-template-columns: repeat(3, 1fr); } .layout { grid-template-columns: 1fr; } }
-    @media (max-width: 700px) { .shell { width: min(100% - 20px, 1500px); padding-top: 16px; } .topbar { gap: 10px; } .shift { min-width: auto; } .metrics { grid-template-columns: repeat(2, 1fr); } .campus { grid-template-columns: 1fr; } .campus-legend { grid-template-columns: repeat(3, 1fr); } .racks { margin-left: 0; margin-right: 0; gap: 5px; } .rack { height: 72px; font-size: 9px; } .meter { grid-template-columns: 105px minmax(0, 1fr) 58px; gap: 7px; } .actions { grid-template-columns: 1fr; } .incident-actions { grid-template-columns: 1fr; } .footer-actions { align-items: flex-start; flex-direction: column; } }
+    :root { --ink:#f7fff6; --muted:#b9d3cb; --line:rgba(229,255,232,.17); --panel:rgba(8,33,35,.87); --mint:#9affb5; --gold:#ffdb68; --pink:#ff8b98; --danger:#ff9b9b; }
+    * { box-sizing:border-box; }
+    body { min-width:320px; min-height:100vh; margin:0; color:var(--ink); background:radial-gradient(circle at 9% 0%,rgba(255,204,85,.24),transparent 29rem),radial-gradient(circle at 91% 2%,rgba(49,229,189,.2),transparent 33rem),linear-gradient(150deg,#102f34,#071b25 58%,#0a2724); font:15px/1.42 ui-rounded,"Avenir Next",Avenir,"Segoe UI",system-ui,sans-serif; }
+    button,input,select { font:inherit; } button { cursor:pointer; } button:focus-visible,input:focus-visible,select:focus-visible { outline:3px solid white; outline-offset:2px; }
+    .shell { width:min(1320px,calc(100% - 28px)); margin:0 auto; padding:25px 0 40px; }
+    header { display:flex; align-items:flex-end; justify-content:space-between; gap:20px; margin:0 4px 17px; }
+    .eyebrow { color:var(--mint); font-size:11px; font-weight:900; letter-spacing:.17em; text-transform:uppercase; }
+    h1 { margin:1px 0 0; font-size:clamp(32px,6vw,54px); letter-spacing:-.065em; line-height:.96; }
+    .tagline { margin:8px 0 0; color:var(--muted); font-size:14px; }
+    .connection { display:flex; align-items:center; gap:7px; color:var(--muted); font-size:12px; font-weight:800; }
+    .connection::before { content:""; width:9px; height:9px; border-radius:50%; background:#f0a15b; box-shadow:0 0 12px currentColor; }
+    .connection.online { color:var(--mint); }.connection.error { color:var(--danger); }
+    .stats { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:9px; margin-bottom:14px; }
+    .stat,.card,.game-card { border:1px solid var(--line); background:linear-gradient(135deg,rgba(19,62,58,.8),var(--panel)); box-shadow:0 18px 44px rgba(0,0,0,.18); }
+    .stat { min-height:73px; padding:10px 13px; border-radius:13px; }.stat span { display:block; color:var(--muted); font-size:10px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; }.stat strong { display:block; margin-top:3px; font-size:23px; letter-spacing:-.045em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }.stat .gold { color:var(--gold); }
+    .layout { display:grid; grid-template-columns:minmax(0,1fr) 285px; gap:14px; align-items:start; }
+    .game-card { position:relative; padding:11px; border-radius:19px; overflow:hidden; }.canvas-wrap { position:relative; overflow:hidden; border-radius:12px; background:#183939; } canvas { display:block; width:100%; height:auto; cursor:crosshair; touch-action:none; }
+    .course-tip { position:absolute; z-index:2; top:12px; left:13px; max-width:310px; padding:8px 10px; border:1px solid rgba(239,255,232,.3); border-radius:9px; background:rgba(6,27,28,.68); color:#efffe8; font-size:11px; pointer-events:none; transition:opacity .2s; }.course-tip strong { color:var(--gold); }
+    .canvas-status { position:absolute; z-index:3; right:12px; bottom:12px; max-width:280px; padding:8px 10px; border:1px solid rgba(229,255,232,.24); border-radius:9px; background:rgba(5,28,30,.7); color:#eef9ec; text-align:right; font-size:11px; font-weight:750; }
+    .canvas-status.alert { border-color:rgba(255,219,104,.65); color:#fff1b7; }.canvas-status.finish { border-color:rgba(154,255,181,.65); color:#ddffe5; }
+    .side { display:grid; gap:14px; }.card { padding:15px; border-radius:15px; }.card h2 { margin:0; font-size:16px; letter-spacing:-.025em; }.card p { margin:6px 0 0; color:var(--muted); font-size:12px; }
+    .room-code { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:12px; padding:10px; border:1px dashed rgba(154,255,181,.55); border-radius:10px; background:rgba(30,100,70,.16); }.room-code span { color:var(--muted); font-size:10px; text-transform:uppercase; letter-spacing:.1em; font-weight:800; }.room-code strong { color:var(--gold); font-size:19px; letter-spacing:.15em; }.room-code button { border:0; border-radius:6px; background:rgba(255,255,255,.11); color:var(--ink); padding:5px 7px; font-size:10px; font-weight:800; }
+    .lobby-fields { display:grid; gap:8px; margin-top:12px; }.lobby-fields label { display:grid; grid-template-columns:62px minmax(0,1fr); align-items:center; gap:7px; color:var(--muted); font-size:11px; }.lobby-fields input[type="text"],.lobby-fields input[type="text"],.lobby-fields select { width:100%; border:1px solid rgba(214,255,220,.25); border-radius:7px; background:#123a3d; color:var(--ink); padding:7px; font-size:12px; }.style-row { display:grid; grid-template-columns:62px 38px minmax(0,1fr); align-items:center; gap:7px; color:var(--muted); font-size:11px; }.style-row input[type="color"] { width:37px; height:31px; padding:1px; border:1px solid rgba(214,255,220,.25); border-radius:7px; background:#123a3d; }
+    .button-row { display:grid; grid-template-columns:1fr 1fr; gap:7px; margin-top:10px; }.button-row button,.full-button { border:1px solid rgba(154,255,181,.6); border-radius:8px; background:rgba(41,130,80,.45); color:white; padding:9px; font-size:11px; font-weight:850; }.button-row button:hover,.full-button:hover { background:rgba(60,166,100,.68); }.button-row button.secondary,.full-button.secondary { border-color:rgba(235,255,238,.23); background:rgba(8,35,37,.56); color:#e7f8e8; }.button-row button:disabled,.full-button:disabled { opacity:.45; cursor:not-allowed; }
+    .join-line { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:7px; margin-top:9px; }.join-line input { min-width:0; border:1px solid rgba(214,255,220,.25); border-radius:7px; background:#123a3d; color:var(--ink); padding:7px; font-size:12px; text-transform:uppercase; letter-spacing:.12em; }.join-line button { border:1px solid rgba(255,219,104,.55); border-radius:7px; background:rgba(107,79,25,.49); color:#fff6c5; padding:7px 9px; font-size:11px; font-weight:850; }
+    .roster { display:grid; gap:7px; margin-top:11px; }.player { display:grid; grid-template-columns:23px minmax(0,1fr) auto; gap:8px; align-items:center; padding:7px; border:1px solid rgba(212,255,220,.17); border-radius:8px; background:rgba(5,28,30,.4); }.player.me { border-color:rgba(154,255,181,.55); background:rgba(43,133,84,.17); }.ball-dot { width:19px; height:19px; border:1px solid rgba(255,255,255,.83); border-radius:50%; }.player strong { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:12px; }.player span { color:var(--muted); font-size:10px; }.host-chip { color:var(--gold); font-size:10px; font-weight:800; }
+    .turn-strip { display:flex; align-items:center; gap:10px; margin-top:12px; padding:9px; border:1px solid rgba(214,255,220,.2); border-radius:9px; background:rgba(5,29,31,.45); }.turn-strip .ball-dot { width:26px; height:26px; flex:0 0 26px; }.turn-strip span { display:block; color:var(--muted); font-size:9px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; }.turn-strip strong { display:block; font-size:13px; }
+    .score-scroll { overflow-x:auto; margin-top:10px; }.scorecard { width:100%; min-width:410px; border-collapse:separate; border-spacing:0 5px; color:var(--muted); font-size:10px; }.scorecard th { padding:0 4px 4px; color:#a9c9bb; font-size:9px; font-weight:900; letter-spacing:.08em; text-align:center; text-transform:uppercase; }.scorecard th:first-child { text-align:left; }.scorecard td { padding:6px 4px; background:rgba(8,35,37,.5); text-align:center; }.scorecard td:first-child { border-radius:7px 0 0 7px; padding-left:7px; text-align:left; color:var(--ink); font-weight:800; white-space:nowrap; }.scorecard td:last-child { border-radius:0 7px 7px 0; color:var(--gold); font-weight:800; }.scorecard tr.active td { background:rgba(80,168,113,.25); }.scorecard .mini-ball { display:inline-block; width:14px; height:14px; margin-right:4px; border:1px solid rgba(255,255,255,.78); border-radius:50%; vertical-align:-3px; }
+    .toast { min-height:18px; margin:12px 3px 0; color:#dcf8df; text-align:center; font-size:12px; font-weight:760; }.toast.error { color:#ffd0d0; }
+    @media (max-width:920px) { .layout { grid-template-columns:1fr; }.side { grid-template-columns:repeat(2,minmax(0,1fr)); }.card:last-child { grid-column:1/-1; } }
+    @media (max-width:600px) { .shell { width:min(100% - 18px,1320px); padding-top:18px; } header { align-items:flex-start; }.connection { max-width:105px; text-align:right; }.stats { grid-template-columns:repeat(3,minmax(0,1fr)); }.stat { min-height:61px; padding:9px; }.stat strong { font-size:19px; }.side { grid-template-columns:1fr; }.card:last-child { grid-column:auto; }.course-tip { top:8px; left:8px; max-width:230px; font-size:10px; } }
   </style>
 </head>
 <body>
   <main class="shell">
-    <header class="topbar">
-      <div>
-        <div class="eyebrow">Harbor One · Data-center strategy RPG</div>
-        <h1>Critical Path</h1>
-        <p class="subhead">Grow a resilient campus without running out of power, cooling, capacity—or trust.</p>
-      </div>
-      <div class="shift">
-        <span class="status" id="siteStatus">Nominal</span>
-        <strong id="shiftNumber">Shift 1</strong>
-        <span>Morning operations board</span>
-      </div>
+    <header>
+      <div><div class="eyebrow">Joinable rooms · 2–4 players · live shared turns</div><h1>Putt Putt: Neon Garden</h1><p class="tagline">Create a room, share its five-character code, and play the same course from separate browsers.</p></div>
+      <div class="connection" id="connection">Connecting…</div>
     </header>
-
-    <section class="metrics" aria-label="Campus status">
-      <article class="metric"><span class="metric-label">Capital</span><strong class="metric-value" id="cashMetric">$280k</strong><span class="metric-note">Build & recovery budget</span></article>
-      <article class="metric"><span class="metric-label">Customer trust</span><strong class="metric-value" id="trustMetric">62</strong><span class="metric-note">Premium work unlocks at 75</span></article>
-      <article class="metric"><span class="metric-label">IT load</span><strong class="metric-value" id="itMetric">32 kW</strong><span class="metric-note" id="itNote">40% of conditioned capacity</span></article>
-      <article class="metric"><span class="metric-label">Cooling margin</span><strong class="metric-value" id="coolingMetric">26 kW</strong><span class="metric-note">Room + local airflow limits</span></article>
-      <article class="metric"><span class="metric-label">PUE</span><strong class="metric-value" id="pueMetric">1.58</strong><span class="metric-note">Facility energy ÷ IT energy</span></article>
-      <article class="metric"><span class="metric-label">Resilience</span><strong class="metric-value" id="resilienceMetric">48</strong><span class="metric-note" id="resilienceNote">N+1 only if maintained</span></article>
+    <section class="stats" aria-label="Score status">
+      <article class="stat"><span>Hole</span><strong id="holeStat">—</strong></article>
+      <article class="stat"><span>Turn</span><strong id="playerStat">—</strong></article>
+      <article class="stat"><span>Strokes</span><strong id="strokeStat">—</strong></article>
+      <article class="stat"><span>Par</span><strong class="gold" id="parStat">—</strong></article>
+      <article class="stat"><span>Your total</span><strong id="totalStat">—</strong></article>
+      <article class="stat"><span>To par</span><strong id="toParStat">—</strong></article>
     </section>
-
     <section class="layout">
-      <div class="column">
-        <article class="panel">
-          <div class="panel-header">
-            <div><h2>Harbor One · Hall A</h2><p>Physical layout, live load, and local thermal risk.</p></div>
-            <span class="badge" id="sellableBadge">Sellable: 26 kW</span>
-          </div>
-          <div class="panel-body campus">
-            <aside class="campus-legend" aria-label="Hall summary">
-              <div class="legend-card"><span>Rack positions</span><strong id="racksLegend">8 / 16 used</strong></div>
-              <div class="legend-card power"><span>Conditioned power</span><strong id="powerLegend">80 kW usable</strong></div>
-              <div class="legend-card cooling"><span>Cooling plant</span><strong id="coolingLegend">58 kW effective</strong></div>
-            </aside>
-            <div class="hall" aria-label="Data hall grid">
-              <div class="hall-label"><span>Cold aisle →</span><span id="hotspotLabel">2 thermal clues</span></div>
-              <div class="racks" id="rackGrid"></div>
-              <div class="aisle">Hot aisle / partial containment</div>
-              <div class="equipment-row"><div class="equipment">CRAC-1</div><div class="equipment" id="cracTwo">CRAC-2</div><div class="equipment amber">PDU-A</div></div>
-            </div>
-          </div>
-        </article>
-
-        <article class="panel">
-          <div class="panel-header"><div><h2>Capacity lens</h2><p>Empty racks are not automatically sellable capacity.</p></div><span class="badge purple">Constraint-driven</span></div>
-          <div class="panel-body meter-row">
-            <div class="meter"><span>Rack positions</span><div class="track"><div class="fill" id="rackBar"></div></div><strong id="rackBarLabel">8 / 16</strong></div>
-            <div class="meter"><span>Power path</span><div class="track"><div class="fill amber" id="powerBar"></div></div><strong id="powerBarLabel">32 / 80 kW</strong></div>
-            <div class="meter"><span>Cooling path</span><div class="track"><div class="fill green" id="coolingBar"></div></div><strong id="coolingBarLabel">32 / 58 kW</strong></div>
-            <p class="mini-note" id="constraintNote">Your current limiting factor is cooling margin (26 kW). Containment will protect that margin and lower PUE.</p>
-          </div>
-        </article>
-
-        <article class="panel">
-          <div class="panel-header"><div><h2>Build, operate, and sell capacity</h2><p>Each action changes a real operating trade-off.</p></div><span class="badge green">Safe growth</span></div>
-          <div class="panel-body actions" id="actionGrid"></div>
-        </article>
-      </div>
-
-      <aside class="column">
-        <article class="panel">
-          <div class="panel-header"><div><h2>Operations team</h2><p>Hire specialists; expertise improves your incident choices.</p></div><span class="badge" id="staffBadge">0 specialists</span></div>
-          <div class="panel-body staff-list" id="staffList"></div>
-        </article>
-
-        <article class="panel">
-          <div class="panel-header"><div><h2>Live incident queue</h2><p>Stabilize first. Diagnose before you change a system.</p></div><span class="badge amber" id="incidentBadge">No active event</span></div>
-          <div class="panel-body" id="incidentArea"></div>
-        </article>
-
-        <article class="panel">
-          <div class="panel-header"><div><h2>Shift log</h2><p>Small decisions become your reliability story.</p></div><span class="badge purple" id="knowledgeBadge">0 knowledge</span></div>
-          <div class="panel-body log" id="logArea"></div>
-        </article>
+      <article class="game-card"><div class="canvas-wrap"><canvas id="game" width="1000" height="600" aria-label="Online mini-golf course"></canvas><div class="course-tip" id="courseTip"><strong>Club ready:</strong> join a room, then wait for the host to start the round.</div><div class="canvas-status" id="canvasStatus">Connect to enter the clubhouse.</div></div></article>
+      <aside class="side">
+        <section class="card"><h2>Online clubhouse</h2><p id="clubhouseCopy">Choose your golfer, then create or join a room.</p>
+          <div class="lobby-fields"><label>Name <input id="nameInput" type="text" maxlength="16" value="Poppy"></label><div class="style-row"><span>Ball</span><input id="colorInput" type="color" value="#ff8295" aria-label="Ball color"><select id="styleInput" aria-label="Ball style"><option value="classic">Classic</option><option value="stripe">Stripe</option><option value="star">Star</option><option value="glow">Glow</option></select></div></div>
+          <div id="roomActions"><div class="button-row"><button id="createRoom">Create room</button><button id="startGame" class="secondary" disabled>Host: start game</button></div><div class="join-line"><input id="roomInput" maxlength="5" placeholder="ROOM CODE" aria-label="Room code"><button id="joinRoom">Join</button></div></div>
+          <div id="roomCodeBox" class="room-code" hidden><span>Share code</span><strong id="roomCode">—</strong><button id="copyCode">Copy</button></div>
+          <div class="roster" id="roster"></div>
+          <div class="button-row" id="gameActions" hidden><button id="resetHole" class="secondary">Reset my tee</button><button id="restartGame" class="secondary">Host: new round</button></div>
+        </section>
+        <section class="card"><h2 id="courseName">The garden course</h2><p id="courseDescription">Nine par-3 courses, moving obstacles, bouncy bumpers, and just enough water to keep it honest.</p><div class="turn-strip"><i class="ball-dot" id="turnBall"></i><div><span>Now putting</span><strong id="turnName">Waiting for players</strong></div></div></section>
+        <section class="card"><h2>Live scorecard</h2><div class="score-scroll"><table class="scorecard" id="scorecard"></table></div></section>
       </aside>
     </section>
-
-    <footer class="footer-actions">
-      <p id="shiftPrompt"><strong>Recommended next move:</strong> inspect the hall, then decide whether to improve containment or accept a new customer load.</p>
-      <button class="button primary" id="nextShift">Close shift →</button>
-    </footer>
+    <p class="toast" id="toast" aria-live="polite"></p>
   </main>
 
-  <section class="modal" id="puzzleModal" hidden aria-modal="true" role="dialog" aria-labelledby="puzzleTitle">
-    <div class="dialog">
-      <div class="dialog-header"><div><h2 id="puzzleTitle">Operations Walkthrough</h2><p>Find the contextual clues before approving the heat-season load plan.</p></div><button class="close" data-close="puzzleModal" aria-label="Close walkthrough">×</button></div>
-      <div class="dialog-body">
-        <div class="walkthrough" aria-label="Illustrated hall inspection. Select the four clues.">
-          <div class="walk-rack a"></div><div class="walk-rack b"></div><div class="walk-rack c"></div>
-          <button class="clue one" data-clue="blanking" aria-label="Inspect rack gap">?</button>
-          <button class="clue two" data-clue="cable" aria-label="Inspect cable bundle">?</button>
-          <button class="clue three" data-clue="sensor" aria-label="Inspect temperature sensor">?</button>
-          <button class="clue four" data-clue="tag" aria-label="Inspect service tag">?</button>
-        </div>
-        <p class="inspection-info" id="inspectionInfo">Select a highlighted area. Look for airflow, monitoring, and maintenance issues.</p>
-        <div class="puzzle-progress"><span id="puzzleProgress">0 / 4 clues inspected</span><button class="button" id="completeWalkthrough" disabled>Log findings</button></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="modal" id="triviaModal" hidden aria-modal="true" role="dialog" aria-labelledby="triviaTitle">
-    <div class="dialog">
-      <div class="dialog-header"><div><h2 id="triviaTitle">Knowledge Vault</h2><p>A 15-second operations question. It is optional, but gives your team an edge.</p></div><button class="close" data-close="triviaModal" aria-label="Close trivia">×</button></div>
-      <div class="dialog-body">
-        <p><strong>Why can a data hall with vacant rack space still have no sellable capacity?</strong></p>
-        <div class="trivia-options" id="triviaOptions">
-          <button data-answer="a">Because unused racks must remain unused for aesthetic symmetry.</button>
-          <button data-answer="b">Because the limiting factor may be power, cooling, network capacity, or the reliability margin—not floor space.</button>
-          <button data-answer="c">Because racks become unavailable whenever a generator is installed.</button>
-        </div>
-        <p class="trivia-explain" id="triviaExplain"></p>
-      </div>
-    </div>
-  </section>
-
-  <div id="toast" role="status" aria-live="polite"></div>
-
   <script>
-    const state = {
-      shift: 1,
-      cash: 280000,
-      trust: 62,
-      rackSlots: 16,
-      rackUsed: 8,
-      itLoad: 32,
-      utilityCapacity: 96,
-      upsCapacity: 80,
-      coolingCapacity: 58,
-      containment: 0,
-      coolingPods: 0,
-      maintenanceDebt: 2,
-      hotspots: 2,
-      staff: {},
-      knowledge: 0,
-      activeEvent: null,
-      resolvedEvents: [],
-      tempStress: 0,
-      generatorReadiness: 52,
-      completedWalkthrough: false,
-      answeredTrivia: false,
-      log: [
-        { time: '08:00', title: 'Morning board', text: 'Harbor One is operating normally, but Hall A has two thermal clues.' },
-        { time: '08:10', title: 'Capacity view', text: 'Cooling—not empty floor space—is the current growth constraint.' }
-      ]
-    };
-
-    const staff = [
-      { id: 'maya', initials: 'MO', name: 'Maya Ortiz', role: 'Facilities lead', cost: 38000, ability: 'Walk the Path: exposes a dependency and improves maintenance outcomes.' },
-      { id: 'eli', initials: 'EP', name: 'Eli Park', role: 'Electrical engineer', cost: 42000, ability: 'Clean Transfer: adds safer choices during utility and UPS events.' },
-      { id: 'nia', initials: 'NB', name: 'Nia Banerjee', role: 'Mechanical engineer', cost: 40000, ability: 'Thermal Model: reduces hot spots and improves cooling actions.' },
-      { id: 'rowan', initials: 'RO', name: 'Rowan Okafor', role: 'Capacity planner', cost: 34000, ability: 'Constraint Lens: improves contract and capacity decisions.' },
-      { id: 'imani', initials: 'IB', name: 'Imani Brooks', role: 'Security & OT analyst', cost: 39000, ability: 'Segment and Seal: adds a safe response to controls-security events.' }
-    ];
-
-    const actionDefinitions = [
-      {
-        id: 'containment', tag: 'Thermal + efficiency', title: 'Install aisle containment', desc: 'Correct recirculation and improve local cooling delivery. Lowers PUE without pretending extra cooling is free.', cost: 22000,
-        available: () => state.containment < 2,
-        apply: () => { state.cash -= 22000; state.containment += 1; state.hotspots = Math.max(0, state.hotspots - 1); addLog('Build', 'Installed containment. Local thermal margin and PUE improve.'); }
-      },
-      {
-        id: 'cooling', tag: 'Cooling capacity', title: 'Add cooling pod', desc: 'Add 25 kW of effective room cooling capacity. Stronger with a mechanical specialist on staff.', cost: 56000,
-        available: () => state.coolingPods < 2,
-        apply: () => { state.cash -= 56000; state.coolingPods += 1; state.coolingCapacity += state.staff.nia ? 28 : 25; state.hotspots = Math.max(0, state.hotspots - 1); addLog('Build', 'Added a cooling pod and commissioned it into Hall A.'); }
-      },
-      {
-        id: 'ups', tag: 'Power path', title: 'Add UPS module', desc: 'Raise conditioned power capacity by 30 kW and restore N+1 margin. It does not add utility service capacity.', cost: 68000,
-        available: () => state.upsCapacity < 140,
-        apply: () => { state.cash -= 68000; state.upsCapacity += 30; state.maintenanceDebt = Math.max(0, state.maintenanceDebt - 1); addLog('Build', 'Commissioned a UPS module; conditioned power headroom increased.'); }
-      },
-      {
-        id: 'racks', tag: 'Physical capacity', title: 'Fit out four rack positions', desc: 'Adds physical room, but the new positions only become sellable if power and cooling headroom are available.', cost: 28000,
-        available: () => state.rackSlots < 28,
-        apply: () => { state.cash -= 28000; state.rackSlots += 4; addLog('Build', 'Four rack positions added. Check the other capacity ledgers before selling them.'); }
-      },
-      {
-        id: 'maintenance', tag: 'Reliability work', title: 'Run planned maintenance', desc: 'Use a controlled window to inspect UPS, transfer path, and cooling controls. Reduces hidden technical debt.', cost: 12000,
-        available: () => state.maintenanceDebt > 0,
-        apply: () => { state.cash -= 12000; state.maintenanceDebt = Math.max(0, state.maintenanceDebt - (state.staff.maya ? 2 : 1)); state.generatorReadiness = Math.min(100, state.generatorReadiness + 18); addLog('Window', 'Completed planned maintenance and documented rollback steps.'); }
-      },
-      {
-        id: 'walk', tag: 'Puzzle · hidden clues', title: 'Conduct an operations walkthrough', desc: 'Find concrete airflow, monitoring, and maintenance clues in the hall. Unlocks a low-risk thermal response.', cost: 0,
-        available: () => !state.completedWalkthrough,
-        apply: () => openModal('puzzleModal')
-      },
-      {
-        id: 'healthcare', tag: 'Customer opportunity', title: 'Accept healthcare workload', desc: 'A steady 8 kW, two-rack customer. Builds trust but needs headroom in every capacity ledger.', cost: -24000,
-        available: () => canFit(2, 8),
-        apply: () => { state.cash += 24000; state.trust += 5; state.rackUsed += 2; state.itLoad += 8; addLog('Contract', 'Accepted an 8 kW healthcare workload with clear service commitments.'); }
-      },
-      {
-        id: 'ai', tag: 'Customer opportunity', title: 'Accept AI inference pod', desc: 'A high-margin 18 kW, two-rack load. It places immediate pressure on local cooling and capacity planning.', cost: -60000,
-        available: () => canFit(2, 18) && state.trust >= 60,
-        apply: () => { state.cash += 60000; state.trust += 2; state.rackUsed += 2; state.itLoad += 18; state.hotspots += 2; addLog('Contract', 'Accepted a high-density AI inference pod. Thermal monitoring has been elevated.'); }
+    (() => {
+      const canvas = document.getElementById('game');
+      const ctx = canvas.getContext('2d');
+      const W = canvas.width, H = canvas.height, BALL_R = 12, MAX_PULL = 140, MAX_SPEED = 770, FRICTION = .985, RESTITUTION = .83;
+      const el = (id) => document.getElementById(id);
+      const clamp = (n,min,max) => Math.max(min,Math.min(max,n));
+      const rect = (x,y,w,h) => ({x,y,w,h});
+      const holes = [
+        {name:'Petal Lane',par:3,tee:{x:105,y:315},cup:{x:885,y:315},description:'A friendly first putt—unless the rose bumper sends you back.',palette:['#3fbd77','#2c9d69'],walls:[rect(335,120,36,265),rect(610,220,35,265),rect(750,100,36,280)],bumpers:[{x:490,y:300,r:27,color:'#ff7e91'},{x:746,y:460,r:25,color:'#ff9c77'}],hazards:[],gates:[],windmills:[]},
+        {name:'Lily Leap',par:3,tee:{x:120,y:470},cup:{x:856,y:130},description:'The pond tempts a direct line. Banking around it is safer.',palette:['#50c881','#329c70'],walls:[rect(270,60,38,260),rect(588,280,38,260),rect(760,225,35,255)],bumpers:[{x:221,y:210,r:25,color:'#fdbe5f'},{x:745,y:157,r:24,color:'#ff7e91'}],hazards:[rect(340,240,250,154)],gates:[],windmills:[]},
+        {name:'Whirligig Walk',par:3,tee:{x:100,y:300},cup:{x:875,y:300},description:'Time the spinning flower gate—or use it to slingshot around the corner.',palette:['#56c690','#2d9d79'],walls:[rect(288,55,32,205),rect(288,340,32,205),rect(682,55,32,205),rect(682,340,32,205)],bumpers:[{x:510,y:118,r:23,color:'#ff9c77'},{x:510,y:484,r:23,color:'#ff9c77'}],hazards:[],gates:[],windmills:[{x:500,y:300,arm:116,width:15,speed:1.6,color:'#ffd363'}]},
+        {name:'Glowbug Arcade',par:3,tee:{x:100,y:500},cup:{x:875,y:100},description:'A maze of bumpers and a roaming gate. Let the chaos work for you.',palette:['#43b999','#2e8f88'],walls:[rect(200,70,34,290),rect(410,260,34,280),rect(635,70,34,285),rect(795,240,34,300)],bumpers:[{x:330,y:150,r:24,color:'#ff7e91'},{x:508,y:165,r:25,color:'#fcbb5c'},{x:760,y:443,r:24,color:'#ff7e91'},{x:533,y:435,r:28,color:'#ff9c77'}],hazards:[rect(50,405,156,130)],gates:[{x:350,y:360,w:120,h:21,axis:'y',range:112,speed:1.45,phase:1.2,color:'#ffd363'}],windmills:[]},
+        {name:'Moonlight Finale',par:3,tee:{x:100,y:295},cup:{x:876,y:300},description:'Two hazards, two moving gates, one final cup. Keep your nerve.',palette:['#4ca5a5','#2f7d88'],walls:[rect(235,60,35,210),rect(235,350,35,190),rect(465,165,38,375),rect(695,60,37,210),rect(695,350,37,190)],bumpers:[{x:365,y:114,r:24,color:'#ff7e91'},{x:602,y:492,r:26,color:'#ff9c77'},{x:808,y:294,r:22,color:'#fcbb5c'}],hazards:[rect(301,305,162,116),rect(530,177,165,112)],gates:[{x:336,y:435,w:20,h:100,axis:'x',range:98,speed:1.2,phase:.3,color:'#ffd363'},{x:590,y:352,w:116,h:20,axis:'y',range:90,speed:1.65,phase:2.4,color:'#ffd363'}],windmills:[{x:810,y:300,arm:88,width:13,speed:-2.1,color:'#ffd363'}]},
+        {name:'Prism Switchbacks',par:3,tee:{x:105,y:490},cup:{x:860,y:120},description:'Bounce through the switchbacks and keep a watchful eye on the gold gate.',palette:['#5cbdba','#328e91'],walls:[rect(215,70,35,315),rect(420,230,35,310),rect(645,60,35,305),rect(790,270,35,270)],bumpers:[{x:330,y:475,r:25,color:'#ff7e91'},{x:535,y:120,r:25,color:'#fcbb5c'},{x:735,y:470,r:24,color:'#ff9c77'}],hazards:[rect(265,350,150,110)],gates:[{x:480,y:350,w:125,h:20,axis:'x',range:92,speed:1.35,phase:.5,color:'#ffd363'}],windmills:[]},
+        {name:'Lotus Lock',par:3,tee:{x:110,y:110},cup:{x:870,y:485},description:'A pond divides the garden. Let the lily bumpers guide a banked escape.',palette:['#61c67f','#349b6d'],walls:[rect(230,180,35,340),rect(460,60,35,245),rect(460,385,35,155),rect(690,120,35,330)],bumpers:[{x:150,y:400,r:25,color:'#fcbb5c'},{x:375,y:124,r:27,color:'#ff7e91'},{x:601,y:466,r:26,color:'#ff9c77'}],hazards:[rect(295,250,170,125)],gates:[{x:710,y:250,w:20,h:110,axis:'y',range:100,speed:1.5,phase:1.1,color:'#ffd363'}],windmills:[]},
+        {name:'Comet Chicane',par:3,tee:{x:100,y:300},cup:{x:875,y:300},description:'The fastest route runs through a pair of spinning comet paddles.',palette:['#5f9fd2','#3977a4'],walls:[rect(250,60,35,195),rect(250,345,35,195),rect(720,60,35,195),rect(720,345,35,195)],bumpers:[{x:430,y:130,r:24,color:'#ff7e91'},{x:430,y:470,r:24,color:'#fcbb5c'},{x:610,y:300,r:27,color:'#ff9c77'}],hazards:[],gates:[],windmills:[{x:470,y:300,arm:104,width:13,speed:1.9,color:'#ffd363'},{x:650,y:300,arm:84,width:12,speed:-2.3,color:'#ffd363'}]},
+        {name:'Aurora Ace',par:3,tee:{x:95,y:500},cup:{x:870,y:100},description:'The finale mixes water, moving gates, and a high-stakes last bank shot.',palette:['#5c79c5','#375195'],walls:[rect(190,60,35,295),rect(385,250,35,290),rect(600,60,35,295),rect(795,220,35,320)],bumpers:[{x:305,y:135,r:26,color:'#ff7e91'},{x:500,y:470,r:25,color:'#fcbb5c'},{x:715,y:150,r:27,color:'#ff9c77'}],hazards:[rect(55,350,145,150),rect(435,120,165,130)],gates:[{x:275,y:385,w:120,h:20,axis:'x',range:86,speed:1.4,phase:1.9,color:'#ffd363'},{x:650,y:320,w:20,h:110,axis:'y',range:95,speed:1.6,phase:.4,color:'#ffd363'}],windmills:[{x:780,y:110,arm:68,width:11,speed:2.2,color:'#ffd363'}]}
+      ];
+      let socket, localId = null, state = null, ball = {x:105,y:315,vx:0,vy:0,moving:false}, aiming = false, aim = {x:0,y:0}, lastTime = 0, gateTime = 0, lastBallSend = 0, receivedEvent = -1, toastTimer, audio;
+      const send = (type,payload={}) => { if (socket?.readyState === WebSocket.OPEN) socket.send(JSON.stringify({type,payload})); };
+      const mine = () => state?.players.find((p) => p.id === localId) || null;
+      const active = () => state?.players.find((p) => p.id === state.activePlayerId) || null;
+      const isMyTurn = () => Boolean(state?.started && !state.finished && state.activePlayerId === localId);
+      const course = () => holes[state?.holeIndex || 0];
+      const velocity = () => Math.hypot(ball.vx,ball.vy);
+      const totalPar = (player, includeCurrent = true) => player.scores.reduce((sum,_,i)=>sum+holes[i].par,0) + (includeCurrent && player.scores[state?.holeIndex || 0] === undefined ? course().par : 0);
+      const myTotal = (player) => player.scores.reduce((sum,n)=>sum+n,0) + player.strokes;
+      function toast(text,kind='') { const node=el('toast'); node.textContent=text; node.className=`toast ${kind}`; clearTimeout(toastTimer); toastTimer=setTimeout(()=>{node.textContent='';node.className='toast';},4500); }
+      function connect() {
+        const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+        socket = new WebSocket(`${protocol}//${location.host}/ws`);
+        socket.addEventListener('open',()=>{el('connection').textContent='Online clubhouse connected';el('connection').className='connection online';});
+        socket.addEventListener('close',()=>{el('connection').textContent='Connection closed — refresh to reconnect';el('connection').className='connection error';});
+        socket.addEventListener('error',()=>{el('connection').textContent='Could not reach the game server';el('connection').className='connection error';});
+        socket.addEventListener('message',(event)=>{ let message; try { message=JSON.parse(event.data); } catch { return; } if(message.type==='joined') localId=message.playerId; if(message.type==='error') toast(message.error,'error'); if(message.type==='state'){state=message.state;ball={...state.ball};if(state.message?.id!==receivedEvent){receivedEvent=state.message.id;toast(state.message.text,state.message.kind==='hazard'?'error':'');} updateUI();} });
       }
-    ];
-
-    const events = {
-      heatwave: {
-        title: 'Heatwave: Hall A inlet trend rising', severity: 'warning',
-        body: 'Outside air is hotter than forecast. CRAC-2 is still operating, but its margin is shrinking. Your data hall walkthrough can reveal whether a local defect is making this worse.',
-        choices: [
-          { label: 'Walkthrough + rebalance', effect: () => {
-            if (!state.completedWalkthrough) { toast('Run the operations walkthrough first to use this low-risk response.'); return false; }
-            state.hotspots = Math.max(0, state.hotspots - 2); state.tempStress = 0; state.trust += 3; state.cash -= 5000;
-            addLog('Incident', 'Used inspection findings to rebalance heat load before the thermal trend escalated.'); return true;
-          } },
-          { label: 'Rent temporary cooling · $18k', effect: () => { state.cash -= 18000; state.coolingCapacity += 10; state.tempStress = 0; state.trust += 1; addLog('Incident', 'Rented temporary cooling capacity for the heatwave.'); return true; } },
-          { label: 'Throttle noncritical load', effect: () => { state.itLoad = Math.max(20, state.itLoad - 4); state.trust -= 3; state.tempStress = 0; addLog('Incident', 'Throttled noncritical load to protect inlet temperatures; a customer accepted a service reduction.'); return true; } }
-        ]
-      },
-      utility: {
-        title: 'Utility voltage sag: transfer readiness check', severity: 'critical',
-        body: 'The utility has reported a localized disturbance. There is no outage yet. Your task is to stabilize operations and prove that backup systems are ready—not to panic-transfer a healthy site.',
-        choices: [
-          { label: 'Verify path & test status', effect: () => {
-            if (!state.staff.eli && state.generatorReadiness < 70) { toast('Without an electrical specialist or better maintenance state, the team cannot confidently verify the transfer path.'); return false; }
-            state.trust += 4; state.generatorReadiness = Math.min(100, state.generatorReadiness + 5); addLog('Incident', 'Verified the electrical path and generator readiness; the sag passed without customer impact.'); return true;
-          } },
-          { label: 'Run controlled contingency drill · $9k', effect: () => { state.cash -= 9000; state.generatorReadiness = Math.min(100, state.generatorReadiness + 25); state.maintenanceDebt = Math.max(0, state.maintenanceDebt - 1); state.trust += 1; addLog('Incident', 'Ran a controlled contingency drill, improving transfer confidence.'); return true; } },
-          { label: 'Defer until a real outage', effect: () => { state.trust -= 5; state.maintenanceDebt += 2; addLog('Incident', 'Deferred transfer readiness work. The risk is now visible in the reliability ledger.'); return true; } }
-        ]
-      },
-      circuit: {
-        title: 'PDU circuit creep: local capacity mismatch', severity: 'warning',
-        body: 'The building remains under its overall power limit, but a branch circuit is trending above its safe planning threshold after incremental customer changes. This is a local constraint, not a campus-wide free pass.',
-        choices: [
-          { label: 'Map circuits & move load', effect: () => {
-            if (!state.staff.rowan && !state.staff.maya) { toast('Hire a capacity/facilities specialist or complete planned maintenance to perform this safely.'); return false; }
-            state.cash -= 6000; state.hotspots = Math.max(0, state.hotspots - 1); state.trust += 3; addLog('Incident', 'Mapped branch circuits and performed a controlled workload move.'); return true;
-          } },
-          { label: 'Install local distribution · $23k', effect: () => { state.cash -= 23000; state.upsCapacity += 8; state.trust += 2; addLog('Incident', 'Added local distribution capacity and updated the as-built record.'); return true; } },
-          { label: 'Watch it for now', effect: () => { state.maintenanceDebt += 2; state.trust -= 2; addLog('Incident', 'Marked circuit creep for later; technical debt increased.'); return true; } }
-        ]
-      },
-      bms: {
-        title: 'BMS security alert: unusual remote session', severity: 'critical',
-        body: 'Monitoring has identified an unusual remote session targeting building-management systems. Keep critical equipment safe while you verify access and preserve approved manual procedures.',
-        choices: [
-          { label: 'Segment & preserve manual ops', effect: () => {
-            if (!state.staff.imani) { toast('This response needs a Security & OT analyst. Hire Imani or choose a slower containment path.'); return false; }
-            state.cash -= 4000; state.trust += 4; state.maintenanceDebt = Math.max(0, state.maintenanceDebt - 1); addLog('Incident', 'Segmented BMS access, preserved manual controls, and started clean recovery.'); return true;
-          } },
-          { label: 'Bring in approved response partner · $16k', effect: () => { state.cash -= 16000; state.trust += 1; addLog('Incident', 'An approved response partner contained the BMS security alert.'); return true; } },
-          { label: 'Power-cycle management systems', effect: () => { state.trust -= 7; state.tempStress += 2; addLog('Incident', 'A broad shutdown disrupted visibility and raised thermal operations risk.'); return true; } }
-        ]
+      function profilePayload(){return {name:el('nameInput').value,color:el('colorInput').value,style:el('styleInput').value};}
+      function updateProfile(){if(state&&!state.started)send('profile',profilePayload());}
+      function updateUI(){
+        const current=course(), me=mine(), turn=active();
+        el('holeStat').textContent=state?.started?`${(state.holeIndex||0)+1} / ${holes.length}`:'—';el('playerStat').textContent=turn?.name||'—';el('strokeStat').textContent=me?.strokes??'—';el('parStat').textContent=state?.started?current.par:'—';el('totalStat').textContent=me?myTotal(me):'—';
+        const diff=me&&state?.started?myTotal(me)-totalPar(me):null;el('toParStat').textContent=diff===null?'—':diff===0?'E':diff>0?`+${diff}`:`${diff}`;
+        el('courseName').textContent=state?.started?`${state.holeIndex+1}. ${current.name}`:'The garden course';el('courseDescription').textContent=state?.started?current.description:'Nine par-3 courses, moving obstacles, bouncy bumpers, and just enough water to keep it honest.';
+        el('turnName').textContent=turn?turn.name:(state?'Waiting for host':'Waiting for connection');el('turnBall').style.background=turn?.color||'#7a9f98';
+        const joined=Boolean(state), host=state?.hostId===localId;el('roomActions').hidden=joined;el('roomCodeBox').hidden=!joined;el('gameActions').hidden=!joined||!state.started;el('roomCode').textContent=state?.roomCode||'—';
+        const locked=Boolean(state?.started);el('nameInput').disabled=locked;el('colorInput').disabled=locked;el('styleInput').disabled=locked;el('startGame').disabled=!(host&&!state.started&&state.players.length>=2);el('startGame').textContent=host?'Host: start game':'Host starts game';el('restartGame').disabled=!host;el('resetHole').disabled=!isMyTurn();
+        const copy= !state ? 'Choose your golfer, then create or join a room.' : !state.started ? (host?'Invite 1–3 golfers, then start the round.':'You are in the clubhouse. Wait for the host to tee off.') : state.finished?'Round complete—host can start another.':isMyTurn()?`Your turn: drag back from your ${me?.style||'classic'} ball and release.`:`Watching ${turn?.name||'the current player'} line up their putt.`;el('clubhouseCopy').textContent=copy;
+        const status=!state?'Connect to enter the clubhouse.':!state.started?'Waiting in the clubhouse.':state.finished?'Round complete! Check the scorecard.':isMyTurn()?(ball.moving?'Your ball is rolling…':'Your turn—take the shot.'):ball.moving?`${turn?.name}'s ball is rolling…`:`${turn?.name}'s turn.`;el('canvasStatus').textContent=status;el('canvasStatus').className=`canvas-status ${state?.finished?'finish':state?.started&&!isMyTurn()?'alert':''}`;el('courseTip').style.opacity=state?.started?'.12':'1';
+        renderRoster();renderScorecard();
       }
-    };
-
-    const clueText = {
-      blanking: ['Missing blanking panels', 'Empty U-space lets hot exhaust recirculate into the cold aisle. Fill it before raising rack density.'],
-      cable: ['Cable bundle blocks airflow', 'Unmanaged cabling near the rack intake can create a local hot spot even when the room average is acceptable.'],
-      sensor: ['Sensor in the wrong stream', 'A sensor must represent the inlet condition you are trying to protect; poor placement can hide localized heat.'],
-      tag: ['Overdue service tag', 'A maintenance tag is a clue about latent reliability risk. Verify work history before relying on the device during a heat event.']
-    };
-
-    const $ = (selector) => document.querySelector(selector);
-    const money = (number) => `$${Math.round(number / 1000)}k`;
-    const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
-
-    function hasStaff(id) { return Boolean(state.staff[id]); }
-    function reliablePower() { return Math.max(0, Math.min(state.utilityCapacity, state.upsCapacity) - state.maintenanceDebt * 2); }
-    function effectiveCooling() { return Math.max(0, state.coolingCapacity - Math.max(0, state.hotspots - state.containment) * 1.5 - state.tempStress * 2); }
-    function freeRackSlots() { return state.rackSlots - state.rackUsed; }
-    function powerHeadroom() { return reliablePower() - state.itLoad; }
-    function coolingHeadroom() { return effectiveCooling() - state.itLoad; }
-    function sellableCapacity() { return Math.max(0, Math.min(powerHeadroom(), coolingHeadroom(), freeRackSlots() * 9)); }
-    function pue() { return clamp(1.58 - state.containment * .065 - state.coolingPods * .04 - (hasStaff('nia') ? .018 : 0) + state.hotspots * .012 + state.tempStress * .018, 1.22, 1.85); }
-    function resilience() { return clamp(Math.round(44 + (state.upsCapacity - 80) * .32 + (state.generatorReadiness - 50) * .18 - state.maintenanceDebt * 5 - state.hotspots * 1.5 + Object.keys(state.staff).length * 1.5), 5, 98); }
-    function canFit(racks, kw) { return freeRackSlots() >= racks && powerHeadroom() >= kw && coolingHeadroom() >= kw; }
-    function setText(selector, value) { $(selector).textContent = value; }
-    function valueClass(value, warning, bad, invert = false) {
-      if (invert) return value >= warning ? 'value-good' : value >= bad ? 'value-warn' : 'value-bad';
-      return value <= bad ? 'value-bad' : value <= warning ? 'value-warn' : 'value-good';
-    }
-
-    function addLog(title, text) {
-      state.log.unshift({ time: String(8 + state.shift).padStart(2, '0') + ':20', title, text });
-      state.log = state.log.slice(0, 6);
-    }
-
-    let toastTimer;
-    function toast(message) {
-      const target = $('#toast');
-      target.textContent = message;
-      target.classList.add('show');
-      window.clearTimeout(toastTimer);
-      toastTimer = window.setTimeout(() => target.classList.remove('show'), 3600);
-    }
-
-    function renderRacks() {
-      const grid = $('#rackGrid');
-      grid.innerHTML = '';
-      for (let i = 0; i < state.rackSlots; i += 1) {
-        const used = i < state.rackUsed;
-        const hot = used && i >= Math.max(0, state.rackUsed - state.hotspots);
-        const rack = document.createElement('div');
-        rack.className = `rack ${used ? 'used' : 'empty'} ${hot ? 'hot' : ''}`;
-        rack.innerHTML = used
-          ? `<span>R-${String(i + 1).padStart(2, '0')}</span><span class="kw">${i % 3 === 0 ? '6' : i % 2 === 0 ? '4' : '3'}–${hot ? '7' : '5'} kW</span>`
-          : `<span>R-${String(i + 1).padStart(2, '0')}</span><span>Available</span>`;
-        grid.appendChild(rack);
-      }
-    }
-
-    function renderMetrics() {
-      const power = reliablePower();
-      const cooling = effectiveCooling();
-      const sellable = sellableCapacity();
-      const res = resilience();
-      const siteStatus = state.activeEvent ? (events[state.activeEvent].severity === 'critical' ? 'Critical attention' : 'Operational alert') : (res < 35 ? 'Fragile' : 'Nominal');
-      const statusEl = $('#siteStatus');
-      statusEl.textContent = siteStatus;
-      statusEl.className = `status ${state.activeEvent ? events[state.activeEvent].severity : (res < 35 ? 'critical' : '')}`;
-      setText('#shiftNumber', `Shift ${state.shift}`);
-      setText('#cashMetric', money(state.cash));
-      setText('#trustMetric', state.trust);
-      setText('#itMetric', `${state.itLoad} kW`);
-      setText('#itNote', `${Math.round((state.itLoad / power) * 100)}% of conditioned capacity`);
-      setText('#coolingMetric', `${Math.max(0, Math.round(coolingHeadroom()))} kW`);
-      setText('#pueMetric', pue().toFixed(2));
-      setText('#resilienceMetric', res);
-      setText('#resilienceNote', state.maintenanceDebt ? `${state.maintenanceDebt} maintenance debt` : 'Maintenance current');
-      $('#coolingMetric').className = `metric-value ${valueClass(coolingHeadroom(), 15, 6)}`;
-      $('#resilienceMetric').className = `metric-value ${valueClass(res, 60, 35, true)}`;
-      $('#pueMetric').className = `metric-value ${valueClass(1.62 - pue(), .1, -.1, true)}`;
-      setText('#racksLegend', `${state.rackUsed} / ${state.rackSlots} used`);
-      setText('#powerLegend', `${power} kW usable`);
-      setText('#coolingLegend', `${Math.round(cooling)} kW effective`);
-      setText('#hotspotLabel', `${state.hotspots} thermal ${state.hotspots === 1 ? 'clue' : 'clues'}`);
-      setText('#sellableBadge', `Sellable: ${Math.floor(sellable)} kW`);
-      setText('#rackBarLabel', `${state.rackUsed} / ${state.rackSlots}`);
-      setText('#powerBarLabel', `${state.itLoad} / ${power} kW`);
-      setText('#coolingBarLabel', `${state.itLoad} / ${Math.round(cooling)} kW`);
-      $('#rackBar').style.width = `${clamp((state.rackUsed / state.rackSlots) * 100, 0, 100)}%`;
-      $('#powerBar').style.width = `${clamp((state.itLoad / power) * 100, 0, 100)}%`;
-      $('#coolingBar').style.width = `${clamp((state.itLoad / cooling) * 100, 0, 100)}%`;
-      $('#powerBar').className = `fill ${powerHeadroom() < 8 ? 'red' : powerHeadroom() < 18 ? 'amber' : 'amber'}`;
-      $('#coolingBar').className = `fill ${coolingHeadroom() < 8 ? 'red' : coolingHeadroom() < 18 ? 'amber' : 'green'}`;
-      const constraints = [
-        { name: 'rack positions', value: freeRackSlots() * 9, explainer: 'Add rack positions only after confirming that electrical and thermal ledgers can support them.' },
-        { name: 'conditioned power', value: powerHeadroom(), explainer: 'Power is constrained by the usable path, including maintenance state—not just the utility feed.' },
-        { name: 'cooling margin', value: coolingHeadroom(), explainer: 'Cooling margin is local as well as room-wide; airflow defects lower the usable value.' }
-      ].sort((a, b) => a.value - b.value);
-      setText('#constraintNote', `Your current limiting factor is ${constraints[0].name} (${Math.max(0, Math.floor(constraints[0].value))} kW). ${constraints[0].explainer}`);
-      $('#cracTwo').textContent = state.coolingPods ? `Cooling Pod +${state.coolingPods}` : 'CRAC-2';
-      renderRacks();
-    }
-
-    function renderActions() {
-      const grid = $('#actionGrid');
-      grid.innerHTML = '';
-      actionDefinitions.forEach((action) => {
-        const button = document.createElement('button');
-        const enoughCash = state.cash >= action.cost;
-        const available = action.available() && enoughCash;
-        button.className = 'action';
-        button.disabled = !available;
-        button.innerHTML = `<span><span class="tag">${action.tag}</span><span class="title">${action.title}</span><span class="desc">${action.desc}</span></span><span class="cost ${action.cost > state.cash ? 'warning' : ''}">${action.cost < 0 ? `+${money(-action.cost)}` : action.cost === 0 ? 'No capital cost' : money(action.cost)}</span>`;
-        button.addEventListener('click', () => {
-          action.apply();
-          render();
-        });
-        grid.appendChild(button);
-      });
-    }
-
-    function renderStaff() {
-      const list = $('#staffList');
-      list.innerHTML = '';
-      staff.forEach((person) => {
-        const hired = hasStaff(person.id);
-        const row = document.createElement('div');
-        row.className = 'staff';
-        row.innerHTML = `<span class="avatar">${person.initials}</span><span><span class="name">${person.name}</span><span class="role">${person.role} · ${person.ability}</span></span>`;
-        const button = document.createElement('button');
-        button.textContent = hired ? 'On team' : `Hire ${money(person.cost)}`;
-        button.disabled = hired || state.cash < person.cost;
-        button.addEventListener('click', () => {
-          state.cash -= person.cost;
-          state.staff[person.id] = true;
-          if (person.id === 'nia') state.hotspots = Math.max(0, state.hotspots - 1);
-          if (person.id === 'maya') state.maintenanceDebt = Math.max(0, state.maintenanceDebt - 1);
-          addLog('Team', `Hired ${person.name}, ${person.role}.`);
-          render();
-        });
-        row.appendChild(button);
-        list.appendChild(row);
-      });
-      setText('#staffBadge', `${Object.keys(state.staff).length} specialist${Object.keys(state.staff).length === 1 ? '' : 's'}`);
-    }
-
-    function resolveEvent(choiceIndex) {
-      const current = events[state.activeEvent];
-      if (!current) return;
-      const success = current.choices[choiceIndex].effect();
-      if (!success) return;
-      const resolved = state.activeEvent;
-      state.activeEvent = null;
-      state.resolvedEvents.push(resolved);
-      state.trust = clamp(state.trust, 0, 100);
-      state.cash = Math.max(0, state.cash);
-      toast('Incident stabilized. A postmortem note has been added to the shift log.');
-      render();
-    }
-
-    function renderIncident() {
-      const area = $('#incidentArea');
-      const badge = $('#incidentBadge');
-      area.innerHTML = '';
-      if (!state.activeEvent) {
-        badge.textContent = 'No active event';
-        badge.className = 'badge green';
-        area.innerHTML = `<div class="quiet-state"><strong>Quiet operations window.</strong><br>Use this time to build capacity, schedule maintenance, inspect clues, or assemble a stronger on-call team.</div>`;
-        return;
-      }
-      const event = events[state.activeEvent];
-      badge.textContent = event.severity === 'critical' ? 'Critical response' : 'Action needed';
-      badge.className = `badge ${event.severity === 'critical' ? 'amber' : 'amber'}`;
-      const card = document.createElement('div');
-      card.className = `incident ${event.severity === 'critical' ? 'critical' : ''}`;
-      card.innerHTML = `<h3>${event.title}</h3><p>${event.body}</p>`;
-      const choices = document.createElement('div');
-      choices.className = 'incident-actions';
-      event.choices.forEach((choice, index) => {
-        const button = document.createElement('button');
-        button.textContent = choice.label;
-        button.addEventListener('click', () => resolveEvent(index));
-        choices.appendChild(button);
-      });
-      card.appendChild(choices);
-      area.appendChild(card);
-    }
-
-    function renderLog() {
-      const list = $('#logArea');
-      list.innerHTML = '';
-      state.log.forEach((entry) => {
-        const item = document.createElement('div');
-        item.className = 'log-item';
-        item.innerHTML = `<time>${entry.time}</time><span><strong>${entry.title}</strong><br>${entry.text}</span>`;
-        list.appendChild(item);
-      });
-      setText('#knowledgeBadge', `${state.knowledge} knowledge`);
-    }
-
-    function renderPrompt() {
-      let prompt = '<strong>Recommended next move:</strong> inspect the hall, then decide whether to improve containment or accept a new customer load.';
-      if (state.activeEvent) prompt = '<strong>Operations priority:</strong> stabilize the active event before closing the shift.';
-      else if (!state.completedWalkthrough) prompt = '<strong>Recommended next move:</strong> conduct the Operations Walkthrough. It unlocks the least disruptive heat-event response.';
-      else if (coolingHeadroom() < 12) prompt = '<strong>Capacity alert:</strong> local cooling margin is thin. Improve airflow or cooling before selling dense load.';
-      else if (state.maintenanceDebt > 2) prompt = '<strong>Reliability alert:</strong> planned maintenance will reduce technical debt before the next failure tests the site.';
-      $('#shiftPrompt').innerHTML = prompt;
-    }
-
-    function render() {
-      renderMetrics();
-      renderActions();
-      renderStaff();
-      renderIncident();
-      renderLog();
-      renderPrompt();
-    }
-
-    function openModal(id) { document.getElementById(id).hidden = false; }
-    function closeModal(id) { document.getElementById(id).hidden = true; }
-
-    const inspected = new Set();
-    document.querySelectorAll('.clue').forEach((button) => {
-      button.addEventListener('click', () => {
-        const [title, detail] = clueText[button.dataset.clue];
-        inspected.add(button.dataset.clue);
-        button.classList.add('found');
-        button.textContent = '✓';
-        $('#inspectionInfo').innerHTML = `<strong>${title}.</strong> ${detail}`;
-        setText('#puzzleProgress', `${inspected.size} / 4 clues inspected`);
-        $('#completeWalkthrough').disabled = inspected.size < 4;
-      });
-    });
-    $('#completeWalkthrough').addEventListener('click', () => {
-      state.completedWalkthrough = true;
-      state.hotspots = Math.max(0, state.hotspots - 1);
-      state.maintenanceDebt = Math.max(0, state.maintenanceDebt - 1);
-      state.knowledge += 1;
-      addLog('Walkthrough', 'Logged four operational clues: airflow, cabling, sensor placement, and service history.');
-      closeModal('puzzleModal');
-      openModal('triviaModal');
-      render();
-    });
-
-    document.querySelectorAll('[data-close]').forEach((button) => button.addEventListener('click', () => closeModal(button.dataset.close)));
-    document.querySelectorAll('.modal').forEach((modal) => modal.addEventListener('click', (event) => { if (event.target === modal) modal.hidden = true; }));
-    $('#triviaOptions').addEventListener('click', (event) => {
-      const answer = event.target.closest('button')?.dataset.answer;
-      if (!answer || state.answeredTrivia) return;
-      state.answeredTrivia = true;
-      if (answer === 'b') {
-        state.knowledge += 1;
-        state.trust += 1;
-        $('#triviaExplain').className = 'trivia-explain correct';
-        $('#triviaExplain').textContent = 'Correct. Sellable capacity is the tightest of physical rack space, usable power, cooling, network, and planned reliability margins. +1 knowledge.';
-        addLog('Knowledge', 'Capacity-planning concept reinforced: vacant floor space is not sellable capacity by itself.');
-      } else {
-        $('#triviaExplain').className = 'trivia-explain incorrect';
-        $('#triviaExplain').textContent = 'Not quite. A rack can be empty while the electrical, cooling, network, or resilience ledger is already constrained. The explanation is now saved in the Knowledge Vault.';
-      }
-      document.querySelectorAll('#triviaOptions button').forEach((button) => button.disabled = true);
-      render();
-    });
-
-    function triggerNextEvent() {
-      const sequence = ['heatwave', 'utility', 'circuit', 'bms'];
-      const candidate = sequence.find((name) => !state.resolvedEvents.includes(name));
-      if (candidate) {
-        state.activeEvent = candidate;
-        addLog('Alert', `${events[candidate].title} requires an operations decision.`);
-        toast('A live operational event has appeared in the incident queue.');
-      }
-    }
-
-    $('#nextShift').addEventListener('click', () => {
-      if (state.activeEvent) { toast('Resolve the active incident before closing the shift.'); return; }
-      state.shift += 1;
-      const operatingMargin = Math.max(0, state.itLoad * 850 - state.coolingPods * 1200 - state.containment * 600);
-      state.cash += operatingMargin;
-      state.generatorReadiness = Math.max(25, state.generatorReadiness - 3);
-      if (state.shift % 3 === 0) state.maintenanceDebt += 1;
-      if (state.itLoad > effectiveCooling() - 8) state.tempStress += 1;
-      state.trust = clamp(state.trust + (resilience() > 60 ? 1 : 0), 0, 100);
-      addLog('Shift close', `Collected operating margin ${money(operatingMargin)}. Readiness and maintenance state have been updated.`);
-      triggerNextEvent();
-      render();
-    });
-
-    render();
+      function renderRoster(){const roster=el('roster');roster.innerHTML='';if(!state)return;state.players.forEach(p=>{const row=document.createElement('div');row.className=`player ${p.id===localId?'me':''}`;row.innerHTML=`<i class="ball-dot" style="background:${p.color}"></i><span><strong>${escapeHtml(p.name)} ${p.id===localId?'(you)':''}</strong><span>${p.style} ball</span></span><em class="host-chip">${p.id===state.hostId?'HOST':''}</em>`;roster.appendChild(row);});}
+      function escapeHtml(value){return String(value).replace(/[&<>"]/g,(c)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+      function renderScorecard(){const table=el('scorecard');if(!state){table.innerHTML='<thead><tr><th>Player</th><th>H1</th><th>H2</th><th>H3</th><th>H4</th><th>H5</th><th>H6</th><th>H7</th><th>H8</th><th>H9</th><th>Total</th></tr></thead><tbody><tr><td colspan="11">Join a room to see the live scorecard.</td></tr></tbody>';return;}let head='<thead><tr><th>Player</th>'+holes.map((_,i)=>`<th>H${i+1}</th>`).join('')+'<th>Total</th></tr></thead>';let rows=state.players.map(p=>{const cells=holes.map((_,i)=>{const n=p.scores[i];const live=i===state.holeIndex&&n===undefined&&p.id===state.activePlayerId&&state.started?`(${p.strokes})`:n===undefined?'—':n;return `<td>${live}</td>`;}).join('');return `<tr class="${p.id===state.activePlayerId&&!state.finished?'active':''}"><td><i class="mini-ball" style="background:${p.color}"></i>${escapeHtml(p.name)}</td>${cells}<td>${p.total}</td></tr>`;}).join('');table.innerHTML=head+`<tbody>${rows}</tbody>`;}
+      function point(event){const b=canvas.getBoundingClientRect();return{x:(event.clientX-b.left)*W/b.width,y:(event.clientY-b.top)*H/b.height};}
+      canvas.addEventListener('pointerdown',(event)=>{if(!isMyTurn()||ball.moving)return;const p=point(event);if(Math.hypot(p.x-ball.x,p.y-ball.y)>70){toast('Start the drag near your ball.');return;}canvas.setPointerCapture(event.pointerId);aiming=true;aim=p;el('courseTip').style.opacity=.05;});canvas.addEventListener('pointermove',(event)=>{if(aiming)aim=point(event);});canvas.addEventListener('pointerup',(event)=>{if(!aiming)return;aim=point(event);const dx=ball.x-aim.x,dy=ball.y-aim.y,pull=Math.hypot(dx,dy);aiming=false;if(pull<9){el('courseTip').style.opacity=.12;return;}const factor=Math.min(MAX_PULL,pull)/MAX_PULL;const v=170+factor*(MAX_SPEED-170);send('shot',{vx:dx/pull*v,vy:dy/pull*v});playTone(170+factor*100,.045,'triangle',.07);});canvas.addEventListener('pointercancel',()=>{aiming=false;});
+      function getGate(g){const o=Math.sin(gateTime*g.speed+g.phase)*g.range;return g.axis==='x'?{...g,x:g.x+o}:{...g,y:g.y+o};}
+      function reflect(nx,ny,boost=1){const dot=ball.vx*nx+ball.vy*ny;if(dot>=0)return;ball.vx=(ball.vx-2*dot*nx)*RESTITUTION*boost;ball.vy=(ball.vy-2*dot*ny)*RESTITUTION*boost;}
+      function collideRect(r){const px=clamp(ball.x,r.x,r.x+r.w),py=clamp(ball.y,r.y,r.y+r.h);let dx=ball.x-px,dy=ball.y-py,d=Math.hypot(dx,dy);if(d>=BALL_R)return;if(d<.001){const ds=[Math.abs(ball.x-r.x),Math.abs(ball.x-(r.x+r.w)),Math.abs(ball.y-r.y),Math.abs(ball.y-(r.y+r.h))],min=Math.min(...ds);if(min===ds[0]){dx=-1;dy=0;}else if(min===ds[1]){dx=1;dy=0;}else if(min===ds[2]){dx=0;dy=-1;}else{dx=0;dy=1;}d=1;}const nx=dx/d,ny=dy/d;ball.x+=nx*(BALL_R-d+.5);ball.y+=ny*(BALL_R-d+.5);reflect(nx,ny);}
+      function collideCircle(c){const dx=ball.x-c.x,dy=ball.y-c.y,d=Math.hypot(dx,dy),min=BALL_R+c.r;if(d>=min)return;const nx=d?dx/d:1,ny=d?dy/d:0;ball.x=c.x+nx*(min+.6);ball.y=c.y+ny*(min+.6);reflect(nx,ny,1.12);playTone(430,.045,'square',.035);}
+      function collideSegment(a,b,thick){const abx=b.x-a.x,aby=b.y-a.y,len=abx*abx+aby*aby,t=clamp(((ball.x-a.x)*abx+(ball.y-a.y)*aby)/len,0,1),px=a.x+abx*t,py=a.y+aby*t,dx=ball.x-px,dy=ball.y-py,d=Math.hypot(dx,dy);if(d>=BALL_R+thick)return;const nx=d?dx/d:-aby/Math.sqrt(len),ny=d?dy/d:abx/Math.sqrt(len);ball.x=px+nx*(BALL_R+thick+.8);ball.y=py+ny*(BALL_R+thick+.8);reflect(nx,ny,1.05);playTone(520,.04,'square',.04);}
+      function localPhysics(dt,time){if(!isMyTurn()||!ball.moving)return;ball.x+=ball.vx*dt;ball.y+=ball.vy*dt;const f=Math.pow(FRICTION,dt*60);ball.vx*=f;ball.vy*=f;if(ball.x-BALL_R<20){ball.x=20+BALL_R;reflect(1,0);}if(ball.x+BALL_R>W-20){ball.x=W-20-BALL_R;reflect(-1,0);}if(ball.y-BALL_R<20){ball.y=20+BALL_R;reflect(0,1);}if(ball.y+BALL_R>H-20){ball.y=H-20-BALL_R;reflect(0,-1);}const c=course();c.walls.forEach(collideRect);c.gates.map(getGate).forEach(collideRect);c.bumpers.forEach(collideCircle);c.windmills.forEach(w=>{const a=gateTime*w.speed,p={x:w.x+Math.cos(a)*w.arm,y:w.y+Math.sin(a)*w.arm},q={x:w.x-Math.cos(a)*w.arm,y:w.y-Math.sin(a)*w.arm},r={x:w.x+Math.cos(a+Math.PI/2)*w.arm,y:w.y+Math.sin(a+Math.PI/2)*w.arm},s={x:w.x-Math.cos(a+Math.PI/2)*w.arm,y:w.y-Math.sin(a+Math.PI/2)*w.arm};collideSegment(p,q,w.width);collideSegment(r,s,w.width);});if(c.hazards.some(h=>ball.x>h.x-BALL_R*.45&&ball.x<h.x+h.w+BALL_R*.45&&ball.y>h.y-BALL_R*.45&&ball.y<h.y+h.h+BALL_R*.45)){send('hazard');ball.moving=false;playTone(120,.16,'sine',.09);return;}if(Math.hypot(ball.x-c.cup.x,ball.y-c.cup.y)<16&&velocity()<105){send('sink');ball.moving=false;playTone(660,.12,'triangle',.08);setTimeout(()=>playTone(880,.17,'triangle',.07),100);return;}if(velocity()<.8){ball.vx=0;ball.vy=0;ball.moving=false;lastBallSend=time;send('ballUpdate',ball);return;}if(time-lastBallSend>55){lastBallSend=time;send('ballUpdate',ball);}}
+      function draw(){const c=course(),g=ctx.createLinearGradient(0,0,W,H);g.addColorStop(0,c.palette[0]);g.addColorStop(1,c.palette[1]);ctx.fillStyle=g;ctx.fillRect(0,0,W,H);ctx.fillStyle='rgba(255,255,255,.08)';for(let x=40;x<W;x+=60)ctx.fillRect(x,0,1,H);for(let y=30;y<H;y+=60)ctx.fillRect(0,y,W,1);ctx.strokeStyle='rgba(19,68,58,.72)';ctx.lineWidth=20;ctx.strokeRect(10,10,W-20,H-20);ctx.strokeStyle='rgba(210,255,198,.43)';ctx.lineWidth=2;ctx.strokeRect(21,21,W-42,H-42);c.hazards.forEach(drawHazard);c.walls.forEach(w=>drawWall(w,'#174e47'));c.gates.map(getGate).forEach(w=>drawWall(w,w.color,true));c.bumpers.forEach(drawBumper);c.windmills.forEach(drawWindmill);drawTee(c.tee);drawCup(c.cup);drawBall();if(aiming)drawAim();}
+      function rounded(x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fill();}
+      function drawHazard(h){ctx.save();ctx.fillStyle='#2ba8d1';rounded(h.x,h.y,h.w,h.h,17);ctx.clip();ctx.strokeStyle='rgba(235,255,255,.42)';ctx.lineWidth=3;for(let y=h.y+16;y<h.y+h.h;y+=17){ctx.beginPath();ctx.moveTo(h.x,y);ctx.bezierCurveTo(h.x+35,y-10,h.x+55,y+11,h.x+95,y);ctx.stroke();}ctx.restore();}
+      function drawWall(w,color,moving=false){ctx.save();ctx.shadowColor='rgba(0,0,0,.25)';ctx.shadowBlur=4;ctx.shadowOffsetY=4;ctx.fillStyle=color;rounded(w.x,w.y,w.w,w.h,Math.min(9,w.w/2,w.h/2));ctx.shadowColor='transparent';ctx.fillStyle=moving?'rgba(255,255,224,.72)':'rgba(204,255,215,.2)';ctx.fillRect(w.x+4,w.y+4,Math.max(0,w.w-8),4);if(moving){ctx.fillStyle='rgba(153,100,22,.45)';for(let x=w.x+13;x<w.x+w.w;x+=24)ctx.fillRect(x,w.y+3,8,w.h-6);}ctx.restore();}
+      function drawBumper(b){const g=ctx.createRadialGradient(b.x-7,b.y-8,2,b.x,b.y,b.r);g.addColorStop(0,'#fff7d4');g.addColorStop(.15,b.color);g.addColorStop(1,'#a83c62');ctx.save();ctx.shadowColor='rgba(38,23,34,.42)';ctx.shadowBlur=8;ctx.shadowOffsetY=4;ctx.fillStyle=g;ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,Math.PI*2);ctx.fill();ctx.shadowColor='transparent';ctx.strokeStyle='rgba(255,255,255,.65)';ctx.lineWidth=2;ctx.stroke();ctx.restore();}
+      function drawWindmill(w){const a=gateTime*w.speed;ctx.save();ctx.translate(w.x,w.y);ctx.rotate(a);ctx.strokeStyle='rgba(83,54,20,.32)';ctx.lineWidth=w.width+8;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(-w.arm,0);ctx.lineTo(w.arm,0);ctx.stroke();ctx.strokeStyle=w.color;ctx.lineWidth=w.width;ctx.beginPath();ctx.moveTo(-w.arm,0);ctx.lineTo(w.arm,0);ctx.stroke();ctx.rotate(Math.PI/2);ctx.strokeStyle='rgba(83,54,20,.32)';ctx.lineWidth=w.width+8;ctx.beginPath();ctx.moveTo(-w.arm,0);ctx.lineTo(w.arm,0);ctx.stroke();ctx.strokeStyle=w.color;ctx.lineWidth=w.width;ctx.beginPath();ctx.moveTo(-w.arm,0);ctx.lineTo(w.arm,0);ctx.stroke();ctx.rotate(-Math.PI/2);ctx.fillStyle='#93552a';ctx.beginPath();ctx.arc(0,0,23,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff1a5';ctx.beginPath();ctx.arc(0,0,9,0,Math.PI*2);ctx.fill();ctx.restore();}
+      function drawTee(t){ctx.save();ctx.fillStyle='rgba(255,255,255,.22)';ctx.beginPath();ctx.arc(t.x,t.y,31,0,Math.PI*2);ctx.fill();ctx.strokeStyle='rgba(255,255,255,.7)';ctx.setLineDash([4,4]);ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(t.x,t.y,27,0,Math.PI*2);ctx.stroke();ctx.restore();}
+      function drawCup(c){ctx.save();ctx.fillStyle='rgba(11,45,34,.8)';ctx.beginPath();ctx.ellipse(c.x,c.y+6,17,8,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#183b36';ctx.beginPath();ctx.arc(c.x,c.y,13,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#edfce2';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(c.x,c.y);ctx.lineTo(c.x,c.y-89);ctx.stroke();ctx.fillStyle='#fff0a3';ctx.beginPath();ctx.moveTo(c.x,c.y-89);ctx.lineTo(c.x+40,c.y-76);ctx.lineTo(c.x,c.y-62);ctx.closePath();ctx.fill();ctx.fillStyle='#a15c33';ctx.font='bold 11px sans-serif';ctx.fillText(String((state?.holeIndex||0)+1),c.x+12,c.y-74);ctx.restore();}
+      function drawBall(){const player=active()||mine()||{color:'#f5fae8',style:'classic'},g=ctx.createRadialGradient(ball.x-4,ball.y-5,2,ball.x,ball.y,BALL_R);g.addColorStop(0,'#ffffff');g.addColorStop(.45,player.color);g.addColorStop(1,'#6e7880');ctx.save();ctx.shadowColor=player.style==='glow'?player.color:'rgba(4,26,25,.48)';ctx.shadowBlur=player.style==='glow'?16:7;ctx.shadowOffsetY=player.style==='glow'?0:5;ctx.fillStyle=g;ctx.beginPath();ctx.arc(ball.x,ball.y,BALL_R,0,Math.PI*2);ctx.fill();ctx.shadowColor='transparent';ctx.save();ctx.beginPath();ctx.arc(ball.x,ball.y,BALL_R-1,0,Math.PI*2);ctx.clip();if(player.style==='stripe'){ctx.rotate(-.55);ctx.fillStyle='rgba(255,255,255,.72)';ctx.fillRect(ball.x-28,ball.y-3,56,5);}if(player.style==='star'){ctx.fillStyle='rgba(255,248,191,.9)';star(ball.x,ball.y,6,2.8,5);}ctx.restore();ctx.strokeStyle='#e8ffe7';ctx.lineWidth=1;ctx.beginPath();ctx.arc(ball.x,ball.y,BALL_R,0,Math.PI*2);ctx.stroke();ctx.restore();}
+      function star(x,y,r,inner,n){ctx.beginPath();for(let i=0;i<n*2;i++){const a=-Math.PI/2+i*Math.PI/n,rr=i%2?r:inner;const px=x+Math.cos(a)*rr,py=y+Math.sin(a)*rr;i?ctx.lineTo(px,py):ctx.moveTo(px,py);}ctx.closePath();ctx.fill();}
+      function drawAim(){const dx=ball.x-aim.x,dy=ball.y-aim.y,d=Math.hypot(dx,dy);if(d<1)return;const power=clamp(d/MAX_PULL,0,1),ex=ball.x+dx/d*(70+power*105),ey=ball.y+dy/d*(70+power*105);ctx.save();ctx.setLineDash([7,7]);ctx.lineWidth=3;ctx.strokeStyle=power>.72?'#ffdf73':'#e9fff1';ctx.beginPath();ctx.moveTo(ball.x,ball.y);ctx.lineTo(ex,ey);ctx.stroke();ctx.setLineDash([]);const a=Math.atan2(ey-ball.y,ex-ball.x);ctx.fillStyle=ctx.strokeStyle;ctx.translate(ex,ey);ctx.rotate(a);ctx.beginPath();ctx.moveTo(11,0);ctx.lineTo(-8,-7);ctx.lineTo(-8,7);ctx.closePath();ctx.fill();ctx.restore();}
+      function playTone(freq,duration,type='sine',gain=.05){try{if(!audio)audio=new(window.AudioContext||window.webkitAudioContext)();if(audio.state==='suspended')audio.resume();const osc=audio.createOscillator(),amp=audio.createGain();osc.type=type;osc.frequency.setValueAtTime(freq,audio.currentTime);amp.gain.setValueAtTime(gain,audio.currentTime);amp.gain.exponentialRampToValueAtTime(.001,audio.currentTime+duration);osc.connect(amp).connect(audio.destination);osc.start();osc.stop(audio.currentTime+duration);}catch(_){}}
+      function loop(time){const dt=Math.min(.033,(time-lastTime||16)/1000);lastTime=time;gateTime+=dt;localPhysics(dt,time);draw();requestAnimationFrame(loop);}
+      el('createRoom').addEventListener('click',()=>send('createRoom',profilePayload()));el('joinRoom').addEventListener('click',()=>send('joinRoom',{...profilePayload(),code:el('roomInput').value}));el('startGame').addEventListener('click',()=>send('startGame'));el('restartGame').addEventListener('click',()=>send('restartRound'));el('resetHole').addEventListener('click',()=>send('resetHole'));el('copyCode').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(state?.roomCode||'');toast('Room code copied.');}catch{toast(`Room code: ${state?.roomCode||'—'}`);}});el('nameInput').addEventListener('change',updateProfile);el('colorInput').addEventListener('change',updateProfile);el('styleInput').addEventListener('change',updateProfile);el('roomInput').addEventListener('input',(e)=>{e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,5);});
+      updateUI();connect();requestAnimationFrame(loop);
+    })();
   </script>
 </body>
 </html>
