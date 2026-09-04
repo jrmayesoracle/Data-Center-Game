@@ -2015,7 +2015,7 @@
       const game = {
         THREE:THREE, holder:holder, renderer:renderer, scene:scene, camera:camera, player:player, raycaster:raycaster, pointer:pointer,
         terminalCanvas:terminalCanvas, terminalContext:terminalContext, terminalTexture:terminalTexture, terminalRoot:terminalRoot, terminalScreen:terminalScreen,
-        terminalOpen:false, terminalTarget:null, terminalInput:false, codeBuffer:'', terminalHitboxes:[], targets:[], keys:new Set(), touchMoves:new Map(), listeners:[],
+        terminalOpen:false, terminalTarget:null, terminalInput:false, codeBuffer:'', terminalHitboxes:[], targets:[], keys:new Set(), touchMoves:new Map(), listeners:[], puzzles:Object.create(null),
         yaw:0, pitch:0, pointerLocked:false, entered:false, touchLook:null, dragLook:null, nearest:null, lastSignature:'', lastObjectiveMarkup:'', lastPrompt:'', lastUiAt:0, lastNearestAt:0, lastRenderAt:0, lastMapAt:0, frame:null, resizeObserver:null,
         canvas:renderer.domElement, isTouch:isTouch, quality:quality, playerRadius:.42,
         miniMapCanvas:miniMapCanvas, miniMapContext:miniMapContext,
@@ -2046,6 +2046,115 @@
         parent.add(mesh);
         return mesh;
       };
+      // Reused geometry/materials keep the room detailed without making the FPS view heavy.
+      const facilityGeometry = new Map();
+      const facilityCylinderGeometry = new Map();
+      const facilityBox = (parent, size, position, material, rotation) => {
+        const key = size.join('|');
+        let geometry = facilityGeometry.get(key);
+        if (!geometry) { geometry = new THREE.BoxGeometry(size[0], size[1], size[2]); facilityGeometry.set(key, geometry); }
+        const mesh = new THREE.Mesh(geometry, material);
+        mesh.position.set(position[0], position[1], position[2]);
+        if (rotation) mesh.rotation.set(rotation[0] || 0, rotation[1] || 0, rotation[2] || 0);
+        parent.add(mesh);
+        return mesh;
+      };
+      const facilityCylinder = (parent, radius, height, position, material, rotation, segments) => {
+        const key = [radius,height,segments || 18].join('|');
+        let geometry = facilityCylinderGeometry.get(key);
+        if (!geometry) { geometry = new THREE.CylinderGeometry(radius, radius, height, segments || 18); facilityCylinderGeometry.set(key, geometry); }
+        const mesh = new THREE.Mesh(geometry, material);
+        mesh.position.set(position[0], position[1], position[2]);
+        if (rotation) mesh.rotation.set(rotation[0] || 0, rotation[1] || 0, rotation[2] || 0);
+        parent.add(mesh);
+        return mesh;
+      };
+      const facilityMaterials = {
+        floor:makeMaterial(0x1b3345,{roughness:.88,metalness:.18,vertexColors:true}),
+        floorDark:makeMaterial(0x102432,{roughness:.86,metalness:.2}),
+        floorVent:makeMaterial(0x07131d,{roughness:.54,metalness:.64}),
+        line:makeMaterial(0x7cc8ef,{roughness:.36,metalness:.36,emissive:0x123f58,emissiveIntensity:.42}),
+        safety:makeMaterial(0xe1b65c,{roughness:.48,metalness:.25,emissive:0x5c4010,emissiveIntensity:.38}),
+        steel:makeMaterial(0x587487,{roughness:.38,metalness:.76}),
+        steelDark:makeMaterial(0x1e3646,{roughness:.46,metalness:.72}),
+        glass:makeMaterial(0x79cfe9,{roughness:.1,metalness:.08,transparent:true,opacity:.12,depthWrite:false,side:THREE.DoubleSide}),
+        rack:makeMaterial(0x1a2b36,{roughness:.42,metalness:.75}),
+        rackDoor:makeMaterial(0x071119,{roughness:.27,metalness:.72,transparent:true,opacity:.64,depthWrite:false}),
+        rackTrim:makeMaterial(0x5b7789,{roughness:.3,metalness:.83}),
+        server:makeMaterial(0x0b1720,{roughness:.4,metalness:.67}),
+        serverLine:makeMaterial(0x2f4e60,{roughness:.38,metalness:.58}),
+        ledGreen:makeMaterial(0x46d99b,{roughness:.25,metalness:.12,emissive:0x46d99b,emissiveIntensity:1.2}),
+        ledBlue:makeMaterial(0x55c8f7,{roughness:.25,metalness:.12,emissive:0x55c8f7,emissiveIntensity:1.05}),
+        ledAmber:makeMaterial(0xf0bb51,{roughness:.25,metalness:.12,emissive:0xf0a63c,emissiveIntensity:1.05}),
+        ledRed:makeMaterial(0xe85652,{roughness:.25,metalness:.12,emissive:0xd13936,emissiveIntensity:1.2}),
+        cableBlue:makeMaterial(0x48bce8,{roughness:.35,metalness:.28,emissive:0x0f5473,emissiveIntensity:.4}),
+        cableYellow:makeMaterial(0xe5b94e,{roughness:.35,metalness:.24,emissive:0x4b3410,emissiveIntensity:.32}),
+        cableRed:makeMaterial(0xd15b58,{roughness:.35,metalness:.24,emissive:0x4b1514,emissiveIntensity:.34}),
+        ceilingLight:makeMaterial(0xe9f7ff,{roughness:.3,metalness:.18,emissive:0xb8e9ff,emissiveIntensity:1.65}),
+        screen:makeMaterial(0x1d80aa,{roughness:.2,metalness:.24,emissive:0x176b94,emissiveIntensity:.88}),
+        white:makeMaterial(0xd9edf7,{roughness:.35,metalness:.3,emissive:0x24495f,emissiveIntensity:.22})
+      };
+      const rackFaceCanvas = document.createElement('canvas');
+      rackFaceCanvas.width = 192;
+      rackFaceCanvas.height = 512;
+      const rackFaceContext = rackFaceCanvas.getContext('2d');
+      rackFaceContext.fillStyle = '#071018'; rackFaceContext.fillRect(0,0,192,512);
+      for (let unit=0;unit<10;unit+=1) {
+        const y=20+unit*47;
+        rackFaceContext.fillStyle = unit % 2 ? '#0e1d28' : '#101f2b'; rackFaceContext.fillRect(14,y,164,31);
+        rackFaceContext.fillStyle = '#2c4a5d'; rackFaceContext.fillRect(28,y+9,91,4);
+        rackFaceContext.fillStyle = '#16465f'; rackFaceContext.fillRect(127,y+9,19,4);
+        rackFaceContext.fillStyle = unit % 4 === 0 ? '#e3b44b' : '#43d69b'; rackFaceContext.fillRect(156,y+10,7,7);
+      }
+      rackFaceContext.strokeStyle = '#6b8798'; rackFaceContext.lineWidth = 4; rackFaceContext.strokeRect(4,4,184,504);
+      const rackFaceTexture = new THREE.CanvasTexture(rackFaceCanvas);
+      if ('colorSpace' in rackFaceTexture && THREE.SRGBColorSpace) rackFaceTexture.colorSpace = THREE.SRGBColorSpace;
+      facilityMaterials.rackFace = new THREE.MeshBasicMaterial({map:rackFaceTexture,transparent:true,opacity:.95,depthWrite:false});
+      const addCable = (parent, start, end, material, lift) => {
+        const curve = new THREE.CatmullRomCurve3([
+          new THREE.Vector3(start[0],start[1],start[2]),
+          new THREE.Vector3(start[0],lift || 5.92,start[2]),
+          new THREE.Vector3(end[0],lift || 5.92,end[2]),
+          new THREE.Vector3(end[0],end[1],end[2])
+        ]);
+        const cable = new THREE.Mesh(new THREE.TubeGeometry(curve,18,.035,5,false),material);
+        parent.add(cable);
+        return cable;
+      };
+      const addCableTray = (parent, x, z, length, alongX) => {
+        const group = new THREE.Group();
+        group.position.set(x,6.15,z);
+        const railLength = alongX ? [length,.11,.11] : [.11,.11,length];
+        const sideOffset = .42;
+        facilityBox(group,railLength,[0,0,sideOffset],facilityMaterials.steel);
+        facilityBox(group,railLength,[0,0,-sideOffset],facilityMaterials.steel);
+        const rungs = Math.max(3,Math.floor(length / .9));
+        for (let index=0; index<=rungs; index+=1) {
+          const value = -length / 2 + index * (length / rungs);
+          facilityBox(group,alongX ? [.08,.08,.92] : [.92,.08,.08],alongX ? [value,0,0] : [0,0,value],facilityMaterials.steelDark);
+        }
+        parent.add(group);
+        return group;
+      };
+      const addDetailedRack = (parent, x, z, index, warning) => {
+        const group = new THREE.Group();
+        group.position.set(x,0,z);
+        facilityBox(group,[1.24,3.5,1.34],[0,1.75,0],facilityMaterials.rack);
+        facilityBox(group,[1.11,.11,.06],[0,3.38,-.7],facilityMaterials.rackTrim);
+        facilityBox(group,[1.11,.11,.06],[0,.2,-.7],facilityMaterials.rackTrim);
+        [-.57,.57].forEach(offset => facilityBox(group,[.07,3.18,.06],[offset,1.79,-.7],facilityMaterials.rackTrim));
+        facilityBox(group,[1.05,3.04,.018],[0,1.76,-.734],facilityMaterials.rackFace);
+        facilityBox(group,[1.1,3.12,.025],[0,1.77,-.751],facilityMaterials.rackDoor);
+        facilityBox(group,[.33,.16,.04],[-.27,3.14,-.765],facilityMaterials.white);
+        facilityBox(group,[.16,.035,.045],[.38,3.13,-.77],warning ? facilityMaterials.ledRed : facilityMaterials.ledGreen);
+        facilityBox(group,[.05,.05,.035],[.18,.52,-.77],index % 3 ? facilityMaterials.ledBlue : facilityMaterials.ledGreen);
+        facilityBox(group,[.12,.65,.06],[-.46,1.74,-.77],facilityMaterials.rackTrim);
+        facilityBox(group,[.12,.65,.06],[.46,1.74,-.77],facilityMaterials.rackTrim);
+        facilityBox(group,[1.18,.17,1.42],[0,3.58,0],facilityMaterials.steelDark);
+        facilityBox(group,[.98,.19,.12],[0,3.78,.3],facilityMaterials.screen);
+        parent.add(group);
+        return group;
+      };
       renderer.setClearColor(0x091b29, 1);
       renderer.setPixelRatio(quality.pixelRatio);
       if ('outputColorSpace' in renderer && THREE.SRGBColorSpace) renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -2054,81 +2163,131 @@
       renderer.domElement.tabIndex = 0;
       renderer.domElement.setAttribute('aria-label', 'First-person fictional data center training room.');
       holder.replaceChildren(renderer.domElement);
-      scene.background = new THREE.Color(0x0b2233);
-      scene.fog = new THREE.Fog(0x0b2233, 30, 65);
-      scene.add(new THREE.HemisphereLight(0xb9e8ff, 0x173448, 3.15));
-      scene.add(new THREE.AmbientLight(0x7db9df, .55));
-      const keyLight = new THREE.DirectionalLight(0xd9f3ff, 3.05);
+      scene.background = new THREE.Color(0x0d1d29);
+      scene.fog = new THREE.Fog(0x0d1d29, 34, 72);
+      scene.add(new THREE.HemisphereLight(0xd5f4ff, 0x1b3345, 3.3));
+      scene.add(new THREE.AmbientLight(0x9dd1ee, .74));
+      const keyLight = new THREE.DirectionalLight(0xe9f8ff, 3.7);
       keyLight.position.set(2, 14, 7);
       scene.add(keyLight);
-      const overheadLight = new THREE.PointLight(0x8fd3ff, 9, 34, 2);
-      overheadLight.position.set(0, 6.4, 5.5);
-      scene.add(overheadLight);
-      const redLight = new THREE.PointLight(0xb94a4d, 8.5, 20, 2);
-      redLight.position.set(6, 4.5, 0);
-      scene.add(redLight);
-      const blueLight = new THREE.PointLight(0x52b5ff, 9.5, 22, 2);
-      blueLight.position.set(-7, 4.5, -4);
-      scene.add(blueLight);
+      [[-9,6.45,-5],[0,6.45,3],[9,6.45,-2]].forEach((point,index) => {
+        const light = new THREE.PointLight(index === 1 ? 0xcdf3ff : 0x9ad8f7, 6.2, 25, 2);
+        light.position.set(point[0],point[1],point[2]);
+        scene.add(light);
+      });
+      const alertLight = new THREE.PointLight(0xe15a55, 3.2, 12, 2);
+      alertLight.position.set(8.5,4.2,.35);
+      scene.add(alertLight);
       const world = new THREE.Group();
       const makeFpsLabel = (text, color) => makeThreeLabel(THREE, text, color, { alwaysVisible:true, renderOrder:30 });
-      const floor = new THREE.Mesh(new THREE.PlaneGeometry(32, 24), makeMaterial(0x1c3b52, { roughness:.82, metalness:.24 }));
+      const floor = new THREE.Mesh(new THREE.PlaneGeometry(32, 24), makeMaterial(0x102837, { roughness:.9, metalness:.2 }));
       floor.rotation.x = -Math.PI / 2;
       world.add(floor);
-      const grid = new THREE.GridHelper(32, 32, 0x6097b9, 0x2a506a);
-      grid.position.y = .012;
-      world.add(grid);
-      const coldAisle = new THREE.Mesh(new THREE.PlaneGeometry(16.5, 2.4), new THREE.MeshBasicMaterial({ color:0x3aa6ea, transparent:true, opacity:.26, depthWrite:false }));
+      const floorTileGeometry = new THREE.BoxGeometry(1.92,.065,1.92);
+      const floorTileCount = 16 * 12;
+      const floorTiles = new THREE.InstancedMesh(floorTileGeometry, facilityMaterials.floor, floorTileCount);
+      const tileMatrix = new THREE.Matrix4();
+      let tileIndex = 0;
+      for (let row=0; row<12; row+=1) {
+        for (let column=0; column<16; column+=1) {
+          const x = -15 + column * 2;
+          const z = -11 + row * 2;
+          tileMatrix.makeTranslation(x,.035,z);
+          floorTiles.setMatrixAt(tileIndex,tileMatrix);
+          floorTiles.setColorAt(tileIndex,new THREE.Color((row + column) % 4 === 0 ? 0x213f52 : 0x1a3345));
+          tileIndex += 1;
+        }
+      }
+      floorTiles.instanceMatrix.needsUpdate = true;
+      if (floorTiles.instanceColor) floorTiles.instanceColor.needsUpdate = true;
+      world.add(floorTiles);
+      [[-10,-7],[-4,-7],[4,-7],[10,-7],[-10,7],[-4,7],[4,7],[10,7]].forEach(point => {
+        facilityBox(world,[1.22,.024,1.22],[point[0],.079,point[1]],facilityMaterials.floorVent);
+        for (let slot=-.38; slot<=.38; slot+=.19) facilityBox(world,[.045,.026,.92],[point[0]+slot,.095,point[1]],facilityMaterials.steelDark);
+      });
+      const coldAisle = new THREE.Mesh(new THREE.PlaneGeometry(16.8,2.42),new THREE.MeshBasicMaterial({color:0x62c9f5,transparent:true,opacity:.16,depthWrite:false}));
       coldAisle.rotation.x = -Math.PI / 2;
-      coldAisle.position.set(0, .022, 1.25);
+      coldAisle.position.set(0,.103,1.25);
       world.add(coldAisle);
-      const hotAisle = new THREE.Mesh(new THREE.PlaneGeometry(16.5, 2.3), new THREE.MeshBasicMaterial({ color:0xd95755, transparent:true, opacity:.18, depthWrite:false }));
+      const hotAisle = new THREE.Mesh(new THREE.PlaneGeometry(16.8,2.25),new THREE.MeshBasicMaterial({color:0xe98661,transparent:true,opacity:.1,depthWrite:false}));
       hotAisle.rotation.x = -Math.PI / 2;
-      hotAisle.position.set(0, .027, -2.55);
+      hotAisle.position.set(0,.105,-2.55);
       world.add(hotAisle);
-      const wallMaterial = makeMaterial(0x2a5068, { roughness:.7, metalness:.34 });
-      [[0, 3.55, -12, 32, 7.1, .32], [0, 3.55, 12, 32, 7.1, .32], [-16, 3.55, 0, .32, 7.1, 24], [16, 3.55, 0, .32, 7.1, 24]].forEach(item => {
-        const wall = new THREE.Mesh(new THREE.BoxGeometry(item[3], item[4], item[5]), wallMaterial);
-        wall.position.set(item[0], item[1], item[2]);
+      [-8.45,8.45].forEach(x => {
+        facilityBox(world,[.12,.025,5.9],[x,.12,1.25],facilityMaterials.line);
+        facilityBox(world,[.12,.025,5.9],[x,.12,-2.55],facilityMaterials.safety);
+      });
+      for (let x=-7.15;x<=7.15;x+=2.15) {
+        facilityBox(world,[.78,.025,.09],[x,.122,.2],facilityMaterials.white);
+        facilityBox(world,[.42,.025,.09],[x+.18,.122,2.27],facilityMaterials.line);
+      }
+      const wallMaterial = makeMaterial(0x304a59,{roughness:.68,metalness:.47});
+      [[0,3.55,-12,32,7.1,.32],[0,3.55,12,32,7.1,.32],[-16,3.55,0,.32,7.1,24],[16,3.55,0,.32,7.1,24]].forEach(item => {
+        const wall = new THREE.Mesh(new THREE.BoxGeometry(item[3],item[4],item[5]),wallMaterial);
+        wall.position.set(item[0],item[1],item[2]);
         world.add(wall);
       });
-      const ceiling = new THREE.Mesh(new THREE.BoxGeometry(32, .18, 24), makeMaterial(0x23465d, { roughness:.74, metalness:.3 }));
-      ceiling.position.set(0, 7.12, 0);
+      for (let x=-14;x<=14;x+=4) {
+        facilityBox(world,[.16,6.75,.1],[x,3.42,-11.8],facilityMaterials.steelDark);
+        facilityBox(world,[.16,6.75,.1],[x,3.42,11.8],facilityMaterials.steelDark);
+      }
+      const ceiling = new THREE.Mesh(new THREE.BoxGeometry(32,.18,24),makeMaterial(0x294858,{roughness:.74,metalness:.38}));
+      ceiling.position.set(0,7.12,0);
       world.add(ceiling);
-      // Interior divider walls deliberately leave a north and south passage so every zone remains reachable.
-      [-12,-6,0,6,12].forEach(x => {
-        addBox(world, [.22, 6.8, 14.5], [x, 3.5, -.5], 0x3d6680, { metalness:.57 });
-        game.addCollider(x, -.5, .22, 14.5, 'wall');
+      [-11,-5,1,7,13].forEach(x => [-8,-2,4].forEach(z => {
+        facilityBox(world,[2.45,.10,.62],[x,6.86,z],facilityMaterials.ceilingLight);
+        facilityBox(world,[2.72,.08,.9],[x,6.93,z],facilityMaterials.steelDark);
+      }));
+      addCableTray(world,0,-4.35,26,true);
+      addCableTray(world,0,4.55,26,true);
+      addCableTray(world,-8.5,.2,17.2,false);
+      [[-6,.6,-6,3.0],[-3.0,.6,-.75,3.0],[0,.6,2.95,3.0],[3,.6,-.75,3.0],[6,.6,2.95,3.0],[8.2,.6,-.25,3.1],[-8.8,.6,2.45,3.0]].forEach((cable,index) => {
+        addCable(world,[cable[0],cable[1],cable[2]],[cable[0]+(index%3-1)*1.1,6.05,cable[3]],index%3===0 ? facilityMaterials.cableRed : index%3===1 ? facilityMaterials.cableBlue : facilityMaterials.cableYellow,5.95);
       });
-      const roomLabel = makeFpsLabel('DATA HALL A · FICTIONAL TRAINING SIMULATION', '#6eb9ff');
-      roomLabel.position.set(0, 5.7, -11.72);
-      roomLabel.scale.set(8.2, 1.3, 1);
+      const containment = new THREE.Group();
+      [-8.35,-4.2,0,4.2,8.35].forEach(x => {
+        [0.04,2.46].forEach(z => facilityBox(containment,[.13,5.2,.13],[x,2.6,z],facilityMaterials.steel));
+      });
+      [-6.25,-2.1,2.1,6.25].forEach(x => {
+        [0.04,2.46].forEach(z => facilityBox(containment,[3.85,4.45,.03],[x,2.48,z],facilityMaterials.glass));
+      });
+      [0.04,2.46].forEach(z => facilityBox(containment,[16.9,.13,.15],[0,5.22,z],facilityMaterials.steel));
+      [-8.35,8.35].forEach(x => facilityBox(containment,[.15,.13,2.58],[x,5.22,1.25],facilityMaterials.steel));
+      world.add(containment);
+      const roomLabel = makeFpsLabel('DATA HALL A · FICTIONAL TRAINING SIMULATION','#8bd7ff');
+      roomLabel.position.set(0,5.58,-11.70);
+      roomLabel.scale.set(7.55,1.18,1);
       world.add(roomLabel);
-      const rackGeometry = new THREE.BoxGeometry(1.15, 3.35, 1.25);
-      const rackMaterial = makeMaterial(0x315463, { metalness:.52, roughness:.53 });
-      const rackPositions = [];
-      [-.75, 2.95].forEach(z => [-6,-4.5,-3,-1.5,0,1.5,3,4.5,6].forEach(x => rackPositions.push([x,z])));
-      const racks = new THREE.InstancedMesh(rackGeometry, rackMaterial, rackPositions.length);
-      const matrix = new THREE.Matrix4();
-      rackPositions.forEach((position, index) => {
-        matrix.makeTranslation(position[0], 1.68, position[1]);
-        racks.setMatrixAt(index, matrix);
+      const rowMarkers = new THREE.Group();
+      [-.75,2.95].forEach((z,row) => {
+        facilityBox(rowMarkers,[.12,3.9,1.75],[-8.95,1.95,z],facilityMaterials.steelDark);
+        facilityBox(rowMarkers,[.18,.7,1.25],[-9.05,3.62,z],row ? facilityMaterials.ledBlue : facilityMaterials.ledGreen);
       });
-      world.add(racks);
-      const rackStripes = new THREE.Mesh(new THREE.BoxGeometry(13.5, .075, .075), makeMaterial(0x75a9c6, { emissive:0x17445f, emissiveIntensity:.55, metalness:.2 }));
-      [-.75,2.95].forEach(z => {
-        for (let y = .7; y < 3; y += .45) {
-          const stripe = rackStripes.clone();
-          stripe.position.set(0, y, z - .67);
-          world.add(stripe);
-        }
+      world.add(rowMarkers);
+      [-.75,2.95].forEach((z,row) => [-6,-4.5,-3,-1.5,0,1.5,3,4.5,6].forEach((x,column) => addDetailedRack(world,x,z,row * 9 + column,row === 0 && column === 7)));
+      const nocBackdrop = new THREE.Group();
+      facilityBox(nocBackdrop,[10.8,2.7,.10],[-8.6,3.75,-11.67],facilityMaterials.steelDark);
+      [-12.2,-9.9,-7.6,-5.3].forEach((x,index) => {
+        facilityBox(nocBackdrop,[1.72,1.16,.05],[x,3.8,-11.76],index === 1 ? facilityMaterials.screen : facilityMaterials.line);
+        facilityBox(nocBackdrop,[1.86,1.30,.08],[x,3.8,-11.72],facilityMaterials.steel);
       });
+      world.add(nocBackdrop);
+      const serviceBay = new THREE.Group();
+      [[-2.7,8.95,.9,.72,.7],[.8,9.25,1.1,.72,.85],[-1.1,9.72,.65,.55,.55]].forEach(box => facilityBox(serviceBay,[box[2],box[3],box[4]],[box[0],box[3]/2,box[1]],facilityMaterials.steelDark));
+      facilityBox(serviceBay,[3.9,1.5,.08],[-1.0,2.1,11.76],facilityMaterials.steel);
+      world.add(serviceBay);
       const makeTerminal = (definition, color) => {
         const group = new THREE.Group();
         group.position.set(definition.position[0], 0, definition.position[1]);
         game.addCollider(definition.position[0], definition.position[1], 3.55, 2.05, 'terminal');
         addBox(group, [3.45, .6, 1.85], [0, .62, 0], 0x28495f, { metalness:.54 });
         addBox(group, [2.75, 1.72, .12], [0, 1.78, -.73], color, { emissive:color, emissiveIntensity:.56, metalness:.19, rotation:[-.11,0,0] });
+        facilityBox(group,[3.02,1.98,.18],[0,1.78,-.64],facilityMaterials.steelDark,[-.11,0,0]);
+        facilityBox(group,[2.64,1.57,.045],[0,1.78,-.755],facilityMaterials.screen,[-.11,0,0]);
+        facilityBox(group,[.82,.06,.5],[0,.96,-1.02],facilityMaterials.steelDark,[-.11,0,0]);
+        facilityBox(group,[.72,.04,.38],[0,.99,-1.14],facilityMaterials.white,[-.11,0,0]);
+        facilityBox(group,[.18,1.15,.18],[0,.87,-.44],facilityMaterials.steel);
+        [-1.48,1.48].forEach(x => facilityCylinder(group,.26,.12,[x,.14,.48],facilityMaterials.steelDark,[Math.PI/2,0,0],12));
         [-1.22,1.22].forEach(x => addBox(group, [.18,1.1,.18], [x,.16,0], 0x415d70, { metalness:.62 }));
         const ringMaterial = new THREE.MeshBasicMaterial({ color:0x546d80, transparent:true, opacity:.7, depthWrite:false });
         const ring = new THREE.Mesh(new THREE.TorusGeometry(2.18,.08,8,42), ringMaterial);
@@ -2161,19 +2320,58 @@
       const cabinetModel = (group, color) => {
         const body = addBox(group, [1.75,3.2,1.25], [0,1.6,0], 0x344e5f, { metalness:.62 });
         addBox(group, [1.18,.5,.08], [0,2.32,-.67], color, { emissive:color, emissiveIntensity:.62, metalness:.17 });
+        facilityBox(group,[1.52,2.95,.055],[0,1.61,-.66],facilityMaterials.steelDark);
+        [-.68,.68].forEach(x => facilityBox(group,[.065,3.08,.075],[x,1.61,-.70],facilityMaterials.steel));
+        facilityBox(group,[1.28,.58,.032],[0,2.33,-.72],facilityMaterials.screen);
+        facilityBox(group,[.68,.10,.04],[-.17,2.31,-.755],facilityMaterials.white);
+        for (let row=0;row<6;row+=1) {
+          const y=.73 + row*.22;
+          facilityBox(group,[1.12,.11,.025],[-.05,y,-.733],facilityMaterials.rackTrim);
+          facilityBox(group,[.09,.055,.03],[.48,y,-.758],row===3 ? facilityMaterials.ledAmber : facilityMaterials.ledGreen);
+        }
+        facilityBox(group,[1.5,.16,1.37],[0,3.31,0],facilityMaterials.steelDark);
+        [-.42,.42].forEach(x => facilityCylinder(group,.055,.64,[x,3.72,.42],facilityMaterials.steel,[0,0,0],10));
         addCylinder(group,.075,.08,[.48,.74,-.69],color,{ emissive:color, emissiveIntensity:.9, rotation:[Math.PI/2,0,0] });
         return body;
       };
       const rackModel = (group, color) => {
         const body = addBox(group, [1.5,3.5,1.45], [0,1.75,0], 0x352c35, { metalness:.57 });
-        for (let y=.7;y<3.1;y+=.42) addBox(group,[1.12,.055,.05],[0,y,-.76],0x5e7990,{ emissive:0x153149, emissiveIntensity:.26, metalness:.2 });
+        facilityBox(group,[1.32,3.25,.035],[0,1.78,-.755],facilityMaterials.rackDoor);
+        [-.63,.63].forEach(x => facilityBox(group,[.075,3.2,.07],[x,1.78,-.78],facilityMaterials.rackTrim));
+        for (let y=.55;y<3.12;y+=.36) {
+          facilityBox(group,[1.13,.19,.03],[0,y,-.776],facilityMaterials.server);
+          facilityBox(group,[.73,.025,.015],[-.10,y+.06,-.797],facilityMaterials.serverLine);
+          facilityBox(group,[.045,.045,.015],[.43,y,-.804],y > 2.3 ? facilityMaterials.ledBlue : facilityMaterials.ledGreen);
+        }
+        facilityBox(group,[1.34,.16,1.55],[0,3.6,0],facilityMaterials.steelDark);
+        facilityBox(group,[1.0,.22,.13],[0,3.82,.23],facilityMaterials.screen);
+        facilityBox(group,[.11,.64,.06],[-.5,1.75,-.81],facilityMaterials.rackTrim);
+        facilityBox(group,[.11,.64,.06],[.5,1.75,-.81],facilityMaterials.rackTrim);
         addCylinder(group,.09,.07,[.52,.6,-.78],color,{emissive:color,emissiveIntensity:.95,rotation:[Math.PI/2,0,0]});
         return body;
       };
       const cracModel = (group, color) => {
         const body = addBox(group,[2.35,4.05,1.6],[0,2.02,0],0x22536b,{metalness:.46});
-        [-.6,-.2,.2,.6].forEach(x => addBox(group,[.11,2.3,.06],[x,2.18,-.84],0x7dd8fb,{emissive:0x176c91,emissiveIntensity:.56,metalness:.18}));
+        facilityBox(group,[2.08,3.78,.055],[0,2.02,-.84],facilityMaterials.steelDark);
+        for (let y=.58;y<3.45;y+=.22) facilityBox(group,[1.72,.065,.028],[0,y,-.875],facilityMaterials.rackTrim);
+        [-.6,-.2,.2,.6].forEach(x => addBox(group,[.11,2.3,.06],[x,2.18,-.90],0x7dd8fb,{emissive:0x176c91,emissiveIntensity:.56,metalness:.18}));
+        facilityCylinder(group,.46,.07,[0,3.22,-.93],facilityMaterials.screen,[Math.PI/2,0,0],18);
+        facilityCylinder(group,.34,.08,[0,3.22,-.98],facilityMaterials.steelDark,[Math.PI/2,0,0],18);
+        for (let blade=0;blade<6;blade+=1) facilityBox(group,[.05,.42,.02],[0,3.22,-1.03],facilityMaterials.rackTrim,[0,0,blade*Math.PI/3]);
+        facilityBox(group,[.58,.38,.03],[.58,1.32,-.90],facilityMaterials.screen);
+        [-.62,.62].forEach(x => facilityCylinder(group,.06,.92,[x,4.42,.42],facilityMaterials.steel,[0,0,0],10));
+        facilityBox(group,[2.08,.22,1.72],[0,4.1,0],facilityMaterials.steelDark);
         addCylinder(group,.4,.1,[0,3.22,-.9],color,{emissive:color,emissiveIntensity:.62,rotation:[Math.PI/2,0,0]});
+        return body;
+      };
+      const upsModel = (group, color) => {
+        const body = cabinetModel(group,color);
+        facilityBox(group,[1.95,.34,1.48],[0,.2,0],facilityMaterials.steelDark);
+        [-.42,.42].forEach(x => {
+          facilityBox(group,[.46,.48,.10],[x,.56,-.72],facilityMaterials.server);
+          facilityBox(group,[.36,.04,.03],[x,.66,-.78],facilityMaterials.ledGreen);
+        });
+        facilityBox(group,[.9,.16,.05],[0,3.54,-.72],facilityMaterials.screen);
         return body;
       };
       makeTerminal({ id:'noc', kind:'noc', title:'NOC CONSOLE', position:[-11.2,-7.25], assetKeys:['noc'] }, 0x2c7caa);
@@ -2183,7 +2381,7 @@
       makeEquipment({ id:'scan-pdu', kind:'scan', type:'pdu', title:'PDU-B · VIRTUAL', position:[10.4,-.25], assetKeys:['power-b'], ring:1.75, footprint:[2.05,1.55] }, 0xe23c36, cabinetModel);
       makeEquipment({ id:'scan-rack', kind:'scan', type:'rack', title:'RACK C14 · VIRTUAL', position:[7.8,1.25], assetKeys:['rack'], ring:1.75, footprint:[1.8,1.75] }, 0xe23c36, rackModel);
       makeEquipment({ id:'scan-crac', kind:'scan', type:'crac', title:'CRAC-1 · VIRTUAL', position:[-12.3,2.45], assetKeys:['cooling'], ring:2.15, labelHeight:4.58, footprint:[2.65,1.9] }, 0x55cdf4, cracModel);
-      makeEquipment({ id:'scan-ups', kind:'scan', type:'ups', title:'UPS-A · VIRTUAL', position:[-12.0,7.45], assetKeys:['power-a'], ring:1.75, footprint:[2.05,1.55] }, 0x42cf91, cabinetModel);
+      makeEquipment({ id:'scan-ups', kind:'scan', type:'ups', title:'UPS-A · VIRTUAL', position:[-12.0,7.45], assetKeys:['power-a'], ring:1.75, footprint:[2.05,1.55] }, 0x42cf91, upsModel);
       makeEquipment({ id:'scan-tor', kind:'scan', type:'tor', title:'TOR-07 · VIRTUAL', position:[6.2,6.25], assetKeys:['rack'], ring:1.75, footprint:[1.8,1.75] }, 0x6eb9ff, rackModel);
       makeTerminal({ id:'keypad', kind:'keypad', title:'RECOVERY KEY PAD', position:[.2,6.9], assetKeys:['rack'] }, 0xf6bd4d);
       makeTerminal({ id:'recovery', kind:'recovery', title:'RECOVERY CONSOLE', position:[-8.7,8.3], assetKeys:['recovery'] }, 0x42cf91);
@@ -2703,6 +2901,265 @@
       }
       return '';
     }
+    function fpsPuzzleState(game, key, create) {
+      if (!game.puzzles) game.puzzles = Object.create(null);
+      if (!Object.prototype.hasOwnProperty.call(game.puzzles,key)) game.puzzles[key] = typeof create === 'function' ? create() : create;
+      return game.puzzles[key];
+    }
+    function fpsPuzzleIcon(value) {
+      const key = String(value || '').toLowerCase();
+      if (/power|pdu|ups|generator|battery/.test(key)) return '⚡';
+      if (/cool|crac|thermal|airflow|water|leak|humidity/.test(key)) return '❄';
+      if (/network|fabric|tor|route|cable|cross/.test(key)) return '⌁';
+      if (/storage|replication|queue/.test(key)) return '▥';
+      if (/compute|node|cluster/.test(key)) return '▦';
+      if (/access|security|badge/.test(key)) return '▧';
+      if (/safety|fire|supervisory/.test(key)) return '✦';
+      if (/monitor|telemetry|alert/.test(key)) return '◉';
+      if (/change/.test(key)) return '↻';
+      return '◇';
+    }
+    function fpsShortLabel(value, fallback) {
+      const words = String(value || fallback || '').replace(/[·→]/g,' ').trim().split(/\s+/).filter(Boolean);
+      return words.slice(0,3).join(' ').toUpperCase() || (fallback || 'VIRTUAL NODE');
+    }
+    function drawFpsGraphicalPuzzle(game, target, context, width, height, ui) {
+      const drawHeader = ui.drawHeader;
+      const addHitbox = ui.addHitbox;
+      const drawFooter = ui.drawFooter;
+      const palette = { blue:'#6eb9ff', green:'#42cf91', amber:'#f6bd4d', red:'#e23c36', violet:'#b982ff', ink:'#06131d', pale:'#edf8ff', muted:'#9ec0d8' };
+      const stateFor = (key, create) => fpsPuzzleState(game,key,create);
+      const box = (x,y,w,h,color,fill,active) => {
+        context.fillStyle = fill || 'rgba(8,30,46,.72)';
+        context.fillRect(x,y,w,h);
+        context.strokeStyle = color || palette.blue;
+        context.lineWidth = active ? 4 : 2;
+        context.strokeRect(x,y,w,h);
+      };
+      const label = (text,x,y,size,color,align) => {
+        context.fillStyle = color || palette.pale;
+        context.font = '800 ' + (size || 16) + 'px Arial, sans-serif';
+        context.textAlign = align || 'center';
+        context.fillText(String(text),x,y);
+      };
+      const hint = (text,x,y,maxWidth,lines) => {
+        context.fillStyle = palette.muted;
+        context.font = '600 15px Arial, sans-serif';
+        context.textAlign = 'left';
+        fpsCanvasLines(context,text,x,y,maxWidth || width-92,19,lines || 2);
+      };
+      const drawNode = (x,y,r,icon,title,color,done,action) => {
+        context.beginPath();
+        context.arc(x,y,r,0,Math.PI*2);
+        context.fillStyle = done ? 'rgba(37,117,79,.78)' : 'rgba(14,49,74,.93)';
+        context.fill();
+        context.strokeStyle = done ? palette.green : color;
+        context.lineWidth = done ? 4 : 3;
+        context.stroke();
+        context.fillStyle = done ? '#c9f7df' : '#eff9ff';
+        context.font = '900 29px Arial, sans-serif';
+        context.textAlign = 'center';
+        context.fillText(done ? '✓' : icon,x,y+10);
+        label(title,x,y+r+22,12,done ? '#bff0d4' : palette.muted);
+        if (!done && action) addHitbox(x-r,y-r,r*2,r*2,action);
+      };
+      const drawPulse = (x,y,w,color,seed,complete) => {
+        context.save();
+        context.beginPath();
+        context.rect(x,y,w,50);
+        context.clip();
+        context.strokeStyle = complete ? palette.green : color;
+        context.lineWidth = 3;
+        context.beginPath();
+        for (let step=0;step<=w;step+=5) {
+          const spike = (step > w*.45 && step < w*.57) ? Math.sin((step-w*.45)*1.4)*15 : Math.sin((step+seed*19)*.09)*5;
+          const yy = y+25+spike;
+          if (!step) context.moveTo(x+step,yy); else context.lineTo(x+step,yy);
+        }
+        context.stroke();
+        context.restore();
+      };
+      game.terminalInput = false;
+      if (target.kind === 'noc') {
+        drawHeader('SIGNAL TRIANGULATION','Tap each glowing anomaly in the fictional signal mesh to collect evidence.','#6eb9ff');
+        const keys = state.config.clues;
+        const columns = keys.length > 3 ? 3 : keys.length;
+        const tileWidth = Math.min(255,(width-120-(columns-1)*16)/columns);
+        keys.forEach((key,index) => {
+          const row = Math.floor(index/columns), col = index%columns;
+          const x = 52 + col*(tileWidth+16), y = 185 + row*170;
+          const card = state.scenario && state.scenario.clues && state.scenario.clues[key];
+          const done = state.clues.has(key);
+          const color = done ? palette.green : index === 0 ? palette.red : palette.blue;
+          box(x,y,tileWidth,142,color,done ? 'rgba(22,87,60,.48)' : 'rgba(8,35,54,.7)',done);
+          label(fpsPuzzleIcon(key),x+34,y+38,26,done ? '#c7f7df' : color);
+          label(done ? 'EVIDENCE LOCKED' : 'ANOMALY',x+70,y+34,13,done ? '#bff1d5' : palette.pale,'left');
+          drawPulse(x+18,y+55,tileWidth-36,color,index,done);
+          label(fpsShortLabel(card && card.title,key),x+tileWidth/2,y+125,12,done ? '#bff1d5' : palette.muted);
+          if (!done) addHitbox(x,y,tileWidth,142,{type:'dom',selector:'[data-clue="' + key + '"]'});
+        });
+        if (completed(state.clues,state.config.clues)) {
+          box(300,535,424,52,palette.green,'rgba(20,95,61,.62)',true);
+          label('RECONSTRUCT INCIDENT TIMELINE',512,568,17,'#d9ffe9');
+          addHitbox(300,535,424,52,{type:'dom',selector:'#analyzeButton'});
+        } else hint('Collect each illuminated virtual signal. Green traces are already locked into the evidence board.',52,552,width-104,2);
+        drawFooter('Graphical training puzzle · no real telemetry or equipment is connected.');
+        return true;
+      }
+      if (target.kind === 'timeline') {
+        drawHeader('INCIDENT SEQUENCE','Build the fictional incident trace from first cause through the modeled impact.','#b982ff');
+        const keys = state.config.timeline;
+        const positions = keys.map((key,index) => ({ x:128 + index*((width-256)/Math.max(1,keys.length-1)), y:315 + (index%2 ? 70 : -70) }));
+        context.strokeStyle = 'rgba(185,130,255,.52)';
+        context.lineWidth = 4;
+        context.setLineDash([10,10]);
+        context.beginPath();
+        positions.forEach((point,index) => { if (!index) context.moveTo(point.x,point.y); else context.lineTo(point.x,point.y); });
+        context.stroke();
+        context.setLineDash([]);
+        keys.forEach((key,index) => {
+          const card = state.scenario && state.scenario.timelineCards && state.scenario.timelineCards[key];
+          const done = state.config.timeline.indexOf(key) < state.timelineIndex;
+          const current = state.config.timeline[state.timelineIndex] === key;
+          drawNode(positions[index].x,positions[index].y,43,fpsPuzzleIcon(key),done ? 'LOCKED' : fpsShortLabel(card && card.title,key),current ? palette.amber : palette.violet,done,done ? null : {type:'dom',selector:'[data-timeline-step="' + key + '"]'});
+        });
+        label('CAUSE',128,512,13,palette.muted);
+        label('MODELED IMPACT',width-128,512,13,palette.muted);
+        hint(state.timelineIndex ? 'Trace segment ' + (state.timelineIndex + 1) + ' is next. A wrong node costs fictional time.' : 'Find the first reliable virtual event, then continue along the trace.',52,548,width-104,2);
+        drawFooter('Select only one node at a time. The line will lock in green when its sequence is correct.');
+        return true;
+      }
+      if (target.kind === 'incident' && (state.stage === 2 || (state.difficulty === 'hard' && state.stage === 6))) {
+        const property = state.stage === 2 ? 'diagnosis' : 'summary';
+        const cards = $$('[data-' + property + ']').map(button => ({ key:button.dataset[property], title:button.querySelector('b') ? button.querySelector('b').textContent : button.dataset[property] }));
+        drawHeader(state.stage === 2 ? 'DEPENDENCY GRAPH' : 'FINAL DEPENDENCY REVIEW',state.stage === 2 ? 'Choose the virtual component that best explains the highlighted impact.' : 'Confirm the fictional fault domain supported by the full evidence trail.','#f6bd4d');
+        const center = {x:width/2,y:367};
+        context.beginPath(); context.arc(center.x,center.y,82,0,Math.PI*2); context.fillStyle='rgba(112,47,44,.52)'; context.fill(); context.strokeStyle=palette.red; context.lineWidth=4; context.stroke();
+        label(fpsPuzzleIcon(state.scenario && state.scenario.key),center.x,center.y+8,34,'#fff0ed');
+        label('MODELED',center.x,center.y+108,13,palette.pale);
+        label('IMPACT',center.x,center.y+125,13,palette.pale);
+        const positions = [[196,236],[512,190],[828,236]];
+        cards.slice(0,3).forEach((card,index) => {
+          const point = positions[index];
+          context.strokeStyle = index === 1 ? 'rgba(246,189,77,.72)' : 'rgba(110,185,255,.48)';
+          context.lineWidth=4; context.beginPath(); context.moveTo(point[0],point[1]+48); context.lineTo(center.x,center.y-74); context.stroke();
+          drawNode(point[0],point[1],52,fpsPuzzleIcon(card.key),fpsShortLabel(card.title,card.key),index === 1 ? palette.amber : palette.blue,false,{type:'dom',selector:'[data-' + property + '="' + card.key + '"]'});
+        });
+        hint('Review the virtual relationship, not the loudest alert. This selection controls only the fictional scenario.',52,548,width-104,2);
+        drawFooter('Tap a source node to submit your fictional diagnosis.');
+        return true;
+      }
+      if (target.kind === 'correlation') {
+        const puzzle = state.scenario && state.scenario.componentPuzzle;
+        const path = stateFor('path:' + (state.scenarioKey || 'scenario'),() => ({progress:0}));
+        drawHeader(puzzle ? puzzle.title.toUpperCase() : 'COMPONENT LINK','Trace a complete fictional source-to-impact route. A decoy path resets the trace.','#f6bd4d');
+        const routes = (puzzle && puzzle.choices ? puzzle.choices : []).map((choice,index) => ({ key:choice.key, title:choice.title, y:225 + index*130 }));
+        const nodeX = [112,360,620,875];
+        routes.forEach((route,routeIndex) => {
+          const active = route.key === 'primary';
+          const color = active ? palette.amber : routeIndex === 1 ? palette.blue : palette.violet;
+          context.strokeStyle = active ? 'rgba(246,189,77,.70)' : 'rgba(110,185,255,.28)';
+          context.lineWidth = 4;
+          context.setLineDash(active ? [] : [8,9]);
+          context.beginPath(); context.moveTo(nodeX[0]+31,route.y); context.lineTo(nodeX[3]-31,route.y); context.stroke(); context.setLineDash([]);
+          ['SOURCE','MODEL LINK','VIRTUAL LOAD','IMPACT'].forEach((step,index) => {
+            const done = active && index < path.progress;
+            const next = active && index === path.progress;
+            drawNode(nodeX[index],route.y,31,index === 0 ? fpsPuzzleIcon(route.title) : index === 3 ? '▣' : '◇',done ? 'LOCKED' : step,next ? palette.green : color,done,done ? null : {type:'path-node',route:route.key,index:index});
+          });
+          label(active ? 'PRIMARY EVIDENCE ROUTE' : 'INDEPENDENT SIGNAL ROUTE',512,route.y+57,11,active ? '#ffe2a0' : '#8eabc0');
+        });
+        label('TRACE ' + path.progress + ' / 4',512,602,16,path.progress ? '#bff5d7' : '#f5d68d');
+        drawFooter('Click connected nodes left-to-right on the route supported by your evidence.');
+        return true;
+      }
+      if (target.kind === 'scan') {
+        const scan = stateFor('scan:' + target.id,() => ({hits:new Set()}));
+        const done = scan.hits;
+        drawHeader(target.title,'Inspect three simulated panel markers: identity, signal, and virtual path tag.','#e23c36');
+        const panel = {x:286,y:170,w:452,h:350};
+        box(panel.x,panel.y,panel.w,panel.h,palette.blue,'rgba(4,18,29,.90)',true);
+        context.fillStyle='rgba(40,73,91,.9)'; context.fillRect(panel.x+42,panel.y+42,panel.w-84,panel.h-84);
+        for (let row=0;row<8;row+=1) {
+          context.fillStyle='rgba(8,17,26,.92)'; context.fillRect(panel.x+78,panel.y+78+row*28,panel.w-156,18);
+          context.fillStyle='rgba(75,110,130,.62)'; context.fillRect(panel.x+95,panel.y+84+row*28,156,5);
+        }
+        const points = [
+          {id:'identity',x:panel.x+103,y:panel.y+76,icon:'▤',label:'ID TAG'},
+          {id:'signal',x:panel.x+348,y:panel.y+236,icon:'◉',label:'SIGNAL'},
+          {id:'path',x:panel.x+104,y:panel.y+318,icon:'⌁',label:'PATH'}
+        ];
+        points.forEach(point => drawNode(point.x,point.y,32,point.icon,done.has(point.id) ? 'LOCKED' : point.label,done.has(point.id) ? palette.green : point.id === 'signal' ? palette.red : palette.blue,done.has(point.id),done.has(point.id) ? null : {type:'scan-hotspot',targetId:target.id,scanType:target.type,hotspot:point.id}));
+        label(done.size + ' / 3 SIMULATED MARKERS',512,561,16,done.size === 3 ? '#bff4d8' : '#d6eaf8');
+        drawFooter('These are fictional panel markers; no live equipment can be changed in this game.');
+        return true;
+      }
+      if (target.kind === 'recovery') {
+        drawHeader('VIRTUAL RECOVERY SEQUENCE','Route the fictional recovery tokens in the correct order, then choose the protected path.','#42cf91');
+        if (state.runbookIndex < state.config.runbook.length) {
+          const keys = state.config.runbook;
+          const startX = 170;
+          keys.forEach((key,index) => {
+            const card = document.querySelector('[data-runbook-step="' + key + '"]');
+            const title = card && card.querySelector('b') ? card.querySelector('b').textContent : key;
+            const x = startX + index * ((width-340)/Math.max(1,keys.length-1));
+            const done = index < state.runbookIndex;
+            if (index) { context.strokeStyle='rgba(66,207,145,.48)'; context.lineWidth=5; context.beginPath(); context.moveTo(x-105,330); context.lineTo(x-48,330); context.stroke(); }
+            drawNode(x,330,48,fpsPuzzleIcon(key),done ? 'LOCKED' : fpsShortLabel(title,key),index === state.runbookIndex ? palette.green : palette.blue,done,done ? null : {type:'dom',selector:'[data-runbook-step="' + key + '"]'});
+          });
+          label('SEQUENCE ' + state.runbookIndex + ' / ' + keys.length,512,465,17,state.runbookIndex ? '#baf4d3' : '#d4e9f7');
+          hint('The active token is green. Selecting a later token applies a fictional time penalty.',52,530,width-104,2);
+        } else {
+          const choices = $$('[data-recovery]').map(button => ({key:button.dataset.recovery,title:button.querySelector('b') ? button.querySelector('b').textContent : button.dataset.recovery}));
+          choices.forEach((choice,index) => {
+            const x = 200 + index*312, y=280;
+            const safe = choice.key === 'runbook';
+            box(x-112,y-55,224,172,safe ? palette.green : palette.red,safe ? 'rgba(23,103,66,.48)' : 'rgba(102,33,39,.42)',safe);
+            label(safe ? '✓' : '!',x,y-5,36,safe ? '#c9f8dd' : '#ffd0cd');
+            label(fpsShortLabel(choice.title,choice.key),x,y+38,14,safe ? '#c9f8dd' : '#f3dce0');
+            label(safe ? 'PROTECTED' : 'UNSUPPORTED',x,y+69,12,safe ? '#aaf1ce' : '#ffada8');
+            addHitbox(x-112,y-55,224,172,{type:'dom',selector:'[data-recovery="' + choice.key + '"]'});
+          });
+          hint('The protected route preserves the fictional sequence you just completed.',52,535,width-104,2);
+        }
+        drawFooter('Training logic only — no live recovery or control action exists here.');
+        return true;
+      }
+      if (target.kind === 'validation') {
+        const dial = stateFor('dial:' + target.id,() => ({value:(target.type.length + (state.scenarioKey || '').length) % 6}));
+        const gaugeX=178,gaugeY=296,gaugeW=668;
+        drawHeader(target.title,'Move the fictional health needle into the green validation window, then record the stable result.','#42cf91');
+        box(gaugeX,gaugeY,gaugeW,62,palette.blue,'rgba(4,18,28,.86)',true);
+        context.fillStyle='rgba(66,207,145,.36)'; context.fillRect(gaugeX+gaugeW*.41,gaugeY+8,gaugeW*.18,46);
+        for (let tick=0;tick<=6;tick+=1) {
+          const x=gaugeX+38+tick*((gaugeW-76)/6);
+          context.strokeStyle='rgba(220,242,255,.5)'; context.lineWidth=2; context.beginPath(); context.moveTo(x,gaugeY+62); context.lineTo(x,gaugeY+72); context.stroke();
+        }
+        const pointerX = gaugeX+38+dial.value*((gaugeW-76)/6);
+        context.beginPath(); context.moveTo(pointerX,gaugeY-34); context.lineTo(pointerX-18,gaugeY-7); context.lineTo(pointerX+18,gaugeY-7); context.closePath(); context.fillStyle=dial.value===3 ? palette.green : palette.amber; context.fill();
+        label(dial.value===3 ? 'STABLE' : 'ADJUST',512,405,18,dial.value===3 ? '#c7f7dd' : '#ffe1a1');
+        box(210,470,176,62,palette.blue,'rgba(18,60,86,.72)',false); label('◀  NUDGE LEFT',298,508,15); addHitbox(210,470,176,62,{type:'calibration-adjust',targetId:target.id,delta:-1});
+        box(638,470,176,62,palette.blue,'rgba(18,60,86,.72)',false); label('NUDGE RIGHT  ▶',726,508,15); addHitbox(638,470,176,62,{type:'calibration-adjust',targetId:target.id,delta:1});
+        box(400,558,224,44,dial.value===3 ? palette.green : palette.amber,dial.value===3 ? 'rgba(25,107,69,.58)' : 'rgba(118,83,28,.42)',dial.value===3); label('RECORD VALIDATION',512,587,14,dial.value===3 ? '#d9ffe9' : '#ffe2a0'); addHitbox(400,558,224,44,{type:'calibration-confirm',targetId:target.id,validationType:target.type});
+        drawFooter('This is a fictional stability gauge; it does not represent a real operating threshold.');
+        return true;
+      }
+      if (target.kind === 'exit') {
+        const wheel = stateFor('exit-wheel',() => ({turns:0}));
+        drawHeader('EXIT AUTHORIZATION','Turn the fictional authorization wheel three times, then release the training interlock.','#42cf91');
+        const x=512,y=343;
+        context.beginPath(); context.arc(x,y,126,0,Math.PI*2); context.fillStyle='rgba(17,71,57,.56)'; context.fill(); context.strokeStyle=wheel.turns>=3 ? palette.green : palette.blue; context.lineWidth=8; context.stroke();
+        for (let notch=0;notch<8;notch+=1) {
+          const angle=notch*Math.PI/4 + wheel.turns*.28;
+          context.strokeStyle=notch<wheel.turns*2 ? palette.green : '#7ba4bb'; context.lineWidth=7; context.beginPath(); context.moveTo(x+Math.cos(angle)*82,y+Math.sin(angle)*82); context.lineTo(x+Math.cos(angle)*108,y+Math.sin(angle)*108); context.stroke();
+        }
+        label(wheel.turns + ' / 3',x,y+9,29,wheel.turns>=3 ? '#d5ffe5' : '#d8edf9');
+        box(368,505,288,52,wheel.turns>=3 ? palette.green : palette.blue,wheel.turns>=3 ? 'rgba(23,105,67,.64)' : 'rgba(18,61,88,.72)',wheel.turns>=3); label(wheel.turns>=3 ? 'RELEASE TRAINING INTERLOCK' : 'TURN WHEEL',512,538,16,wheel.turns>=3 ? '#d8ffe7' : '#e6f5ff'); addHitbox(368,505,288,52,wheel.turns>=3 ? {type:'exit-confirm'} : {type:'exit-turn'});
+        drawFooter('The exit is a fictional game objective only.');
+        return true;
+      }
+      return false;
+    }
     function drawFpsTerminal(game) {
       const context = game.terminalContext;
       const width = game.terminalCanvas.width;
@@ -2823,6 +3280,10 @@
         game.terminalTexture.needsUpdate = true;
         return;
       }
+      if (drawFpsGraphicalPuzzle(game,target,context,width,height,{drawHeader:drawHeader,addHitbox:addHitbox,drawFooter:drawFooter})) {
+        game.terminalTexture.needsUpdate = true;
+        return;
+      }
       let y = 184;
       if (target.kind === 'noc') {
         drawHeader('NOC EVIDENCE','Inspect each required fictional alert. Once every required item is collected, analyze the incident evidence.','#6eb9ff');
@@ -2930,6 +3391,81 @@
         return;
       }
       if (action.type === 'clear-code') { game.codeBuffer = ''; game.drawTerminal(); return; }
+      if (action.type === 'path-node') {
+        const path = fpsPuzzleState(game,'path:' + (state.scenarioKey || 'scenario'),() => ({progress:0}));
+        const correctRoute = 'primary';
+        if (state.componentPuzzleSolved) return;
+        if (action.route !== correctRoute) {
+          path.progress = 0;
+          solveComponentPuzzle(action.route === 'decoy-two' ? 'decoy-two' : 'decoy-one');
+        } else if (action.index === path.progress) {
+          path.progress += 1;
+          if (path.progress >= 4) solveComponentPuzzle(correctRoute);
+          else {
+            setFeedback('componentFeedback','Virtual route segment ' + path.progress + ' of 4 confirmed. Continue tracing the primary evidence path.','good');
+            playTrainingCue('correct');
+          }
+        } else {
+          path.progress = 0;
+          penalty('Virtual route traced out of order');
+          setFeedback('componentFeedback','That node does not continue the current fictional route. The trace has reset.','bad');
+        }
+        game.drawTerminal();
+        setTimeout(() => updateFpsExperience(true),0);
+        return;
+      }
+      if (action.type === 'scan-hotspot') {
+        const scan = fpsPuzzleState(game,'scan:' + action.targetId,() => ({hits:new Set()}));
+        scan.hits.add(action.hotspot);
+        if (scan.hits.size >= 3) {
+          const button = document.querySelector('[data-scan="' + action.scanType + '"]');
+          if (button && !button.disabled) button.click();
+        } else {
+          setFeedback('aisleFeedback',scan.hits.size + ' of 3 fictional panel markers inspected.','warn');
+          playTrainingCue('ping');
+        }
+        game.drawTerminal();
+        setTimeout(() => updateFpsExperience(true),0);
+        return;
+      }
+      if (action.type === 'calibration-adjust') {
+        const dial = fpsPuzzleState(game,'dial:' + action.targetId,() => ({value:0}));
+        dial.value = Math.max(0,Math.min(6,dial.value + Number(action.delta || 0)));
+        game.drawTerminal();
+        return;
+      }
+      if (action.type === 'calibration-confirm') {
+        const dial = fpsPuzzleState(game,'dial:' + action.targetId,() => ({value:0}));
+        if (dial.value === 3) {
+          const button = document.querySelector('[data-validation="' + action.validationType + '"]');
+          if (button && !button.disabled) button.click();
+        } else {
+          penalty('Fictional validation gauge was outside its stable window');
+          setFeedback('validationFeedback','The simulated needle is not in the green training window. Adjust it before recording validation.','bad');
+        }
+        game.drawTerminal();
+        setTimeout(() => updateFpsExperience(true),0);
+        return;
+      }
+      if (action.type === 'exit-turn') {
+        const wheel = fpsPuzzleState(game,'exit-wheel',() => ({turns:0}));
+        wheel.turns = Math.min(3,wheel.turns + 1);
+        if (wheel.turns === 3) { showCaption('Fictional exit authorization complete. Release the training interlock.'); playTrainingCue('correct'); }
+        game.drawTerminal();
+        return;
+      }
+      if (action.type === 'exit-confirm') {
+        const wheel = fpsPuzzleState(game,'exit-wheel',() => ({turns:0}));
+        if (wheel.turns >= 3) {
+          const button = $('#escapeButton');
+          if (button && !button.disabled) button.click();
+        } else {
+          penalty('Fictional exit authorization was incomplete');
+          game.drawTerminal();
+        }
+        setTimeout(() => updateFpsExperience(true),0);
+        return;
+      }
       if (action.type === 'verify-code') {
         const input = $('#recoveryCode');
         input.value = game.codeBuffer;
