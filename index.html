@@ -175,17 +175,18 @@
     body.fps-playing .app { width:min(1440px,calc(100% - 20px)); padding-top:10px; }
     .fps-game { position:relative; min-height:clamp(560px,72vh,860px); overflow:hidden; background:#050b12; border:1px solid #355069; border-radius:18px; box-shadow:var(--shadow),inset 0 0 0 1px rgba(255,255,255,.025); }
     .fps-viewport { position:absolute; inset:0; background:radial-gradient(circle at 50% 45%,#1d3448 0,#07111b 68%); }
-    .fps-viewport canvas { display:block; width:100%; height:100%; touch-action:none; outline:none; }
+    .fps-viewport canvas { display:block; width:100%; height:100%; touch-action:none; outline:none; user-select:none; -webkit-user-select:none; cursor:crosshair; }
     .fps-vignette { position:absolute; inset:0; pointer-events:none; background:radial-gradient(ellipse at center,transparent 38%,rgba(0,0,0,.22) 73%,rgba(0,0,0,.62) 100%); }
-    .fps-hud { position:absolute; z-index:4; top:15px; left:15px; display:flex; gap:8px; max-width:calc(100% - 30px); pointer-events:none; }
-    .fps-hud-card { min-width:92px; padding:8px 10px; color:#d7e8f7; background:rgba(4,13,22,.79); border:1px solid rgba(114,178,224,.42); border-radius:9px; box-shadow:0 8px 22px rgba(0,0,0,.22); }
+    .fps-hud { position:absolute; z-index:4; top:15px; left:15px; display:flex; flex-wrap:wrap; gap:8px; max-width:calc(100% - 30px); pointer-events:none; }
+    .fps-hud-card { position:relative; min-width:92px; padding:8px 10px; overflow:hidden; color:#d7e8f7; background:linear-gradient(145deg,rgba(13,34,52,.9),rgba(3,12,21,.87)); border:1px solid rgba(114,178,224,.42); border-radius:9px; box-shadow:0 8px 22px rgba(0,0,0,.22); backdrop-filter:blur(8px); }
+    .fps-hud-card::before { content:""; position:absolute; inset:0 auto 0 0; width:2px; background:var(--blue); opacity:.9; }.fps-hud-card.mode-card::before { background:var(--yellow); }.fps-hud-card.mode-card b { color:#f6d07a; }
     .fps-hud-card span,.fps-hud-card b { display:block; }.fps-hud-card span { color:#8ba8be; font-size:.61rem; font-weight:900; letter-spacing:.1em; text-transform:uppercase; }.fps-hud-card b { margin-top:2px; color:#f2f9ff; font-size:1rem; }.fps-hud-card.timer-card b { color:var(--green); font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
-    .fps-objective { position:absolute; z-index:4; top:16px; right:15px; width:min(390px,calc(100% - 330px)); margin:0; padding:9px 11px; color:#d8e9f8; background:rgba(4,13,22,.79); border:1px solid rgba(114,178,224,.34); border-radius:9px; font-size:.76rem; font-weight:750; pointer-events:none; }.fps-objective span { display:block; margin-top:4px; color:#a8c8dd; font-size:.7rem; }
+    .fps-objective { position:absolute; z-index:4; top:16px; right:15px; width:min(390px,calc(100% - 440px)); margin:0; padding:9px 11px; color:#d8e9f8; background:rgba(4,13,22,.82); border:1px solid rgba(114,178,224,.34); border-left:3px solid var(--blue); border-radius:9px; box-shadow:0 8px 22px rgba(0,0,0,.18); backdrop-filter:blur(8px); font-size:.76rem; font-weight:750; pointer-events:none; }.fps-objective span { display:block; margin-top:4px; color:#a8c8dd; font-size:.7rem; }
     .fps-objective b { color:var(--blue); }.fps-crosshair { position:absolute; z-index:5; top:50%; left:50%; width:22px; height:22px; pointer-events:none; transform:translate(-50%,-50%); }.fps-crosshair::before,.fps-crosshair::after { content:""; position:absolute; background:rgba(235,247,255,.95); box-shadow:0 0 8px rgba(110,185,255,.8); }.fps-crosshair::before { top:10px; left:0; width:22px; height:2px; }.fps-crosshair::after { top:0; left:10px; width:2px; height:22px; }
-    .fps-prompt { position:absolute; z-index:6; right:50%; bottom:25px; width:min(550px,calc(100% - 30px)); margin:0; padding:10px 13px; color:#e5f3ff; text-align:center; background:rgba(4,13,22,.84); border:1px solid rgba(110,185,255,.4); border-radius:10px; transform:translateX(50%); font-size:.83rem; font-weight:750; pointer-events:none; }.fps-prompt b { color:var(--green); }
+    .fps-prompt { position:absolute; z-index:6; right:50%; bottom:25px; width:min(550px,calc(100% - 30px)); margin:0; padding:10px 13px; color:#e5f3ff; text-align:center; background:rgba(4,13,22,.86); border:1px solid rgba(110,185,255,.4); border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,.2); backdrop-filter:blur(8px); transform:translateX(50%); font-size:.83rem; font-weight:750; pointer-events:none; }.fps-prompt b { color:var(--green); }
     .fps-enter-overlay { position:absolute; z-index:8; inset:0; display:grid; place-items:center; padding:20px; text-align:center; background:radial-gradient(circle at center,rgba(10,35,54,.32),rgba(2,8,14,.88)); }
     .fps-enter-overlay.hidden { display:none!important; }.fps-enter-panel { width:min(540px,100%); padding:28px; background:rgba(7,18,29,.9); border:1px solid rgba(110,185,255,.55); border-radius:16px; box-shadow:0 22px 65px rgba(0,0,0,.38); }.fps-enter-panel h2 { margin-bottom:7px; font-size:clamp(1.35rem,3.4vw,2rem); }.fps-enter-panel p { margin:8px auto; color:#b8cce0; }.fps-enter-panel button { margin-top:12px; }.fps-control-help { color:#87a8c1!important; font-size:.78rem; }
-    .fps-touch-controls { position:absolute; z-index:9; inset:auto 0 0; display:none; justify-content:space-between; align-items:flex-end; padding:17px; pointer-events:none; }.fps-touch-pad { display:grid; grid-template-columns:repeat(3,48px); grid-template-rows:repeat(2,45px); gap:4px; pointer-events:auto; }.fps-touch-pad button,.fps-use-button { display:grid; min-width:0; min-height:0; place-items:center; padding:0; color:#e9f7ff; background:rgba(10,28,43,.86); border:1px solid rgba(110,185,255,.55); border-radius:12px; box-shadow:none; font-size:1.1rem; }.fps-touch-pad button:nth-child(1) { grid-column:2; }.fps-touch-pad button:nth-child(2) { grid-column:1; grid-row:2; }.fps-touch-pad button:nth-child(3) { grid-column:2; grid-row:2; }.fps-touch-pad button:nth-child(4) { grid-column:3; grid-row:2; }.fps-use-button { width:74px; height:74px; flex:0 0 auto; color:#05131d; background:var(--green); border-color:#8bf1c3; font-size:.8rem; font-weight:950; letter-spacing:.08em; pointer-events:auto; }
+    .fps-touch-controls { position:absolute; z-index:9; inset:auto 0 0; display:none; justify-content:space-between; align-items:flex-end; padding:17px; pointer-events:none; }.fps-touch-pad { display:grid; grid-template-columns:repeat(3,48px); grid-template-rows:repeat(2,45px); gap:4px; pointer-events:auto; }.fps-touch-pad button,.fps-use-button { display:grid; min-width:0; min-height:0; place-items:center; padding:0; color:#e9f7ff; background:linear-gradient(145deg,rgba(18,47,70,.92),rgba(6,20,34,.9)); border:1px solid rgba(110,185,255,.62); border-radius:12px; box-shadow:0 8px 18px rgba(0,0,0,.22); font-size:1.1rem; touch-action:none; }.fps-touch-pad button:active,.fps-use-button:active { transform:translateY(1px) scale(.97); }.fps-touch-pad button:nth-child(1) { grid-column:2; }.fps-touch-pad button:nth-child(2) { grid-column:1; grid-row:2; }.fps-touch-pad button:nth-child(3) { grid-column:2; grid-row:2; }.fps-touch-pad button:nth-child(4) { grid-column:3; grid-row:2; }.fps-use-button { width:74px; height:74px; flex:0 0 auto; color:#05131d; background:var(--green); border-color:#8bf1c3; font-size:.8rem; font-weight:950; letter-spacing:.08em; pointer-events:auto; }
     .fps-game.terminal-open .fps-crosshair { opacity:.18; }.fps-game.terminal-open .fps-prompt { opacity:0; }.fps-game.terminal-open .fps-touch-controls { display:none!important; }
     .map-caption { margin:12px 0 0; color:#aabbd0; font-size:.81rem; }
     .event-log { margin-top:15px; padding-top:14px; border-top:1px solid #2b3a4c; }
@@ -242,6 +243,7 @@
     .footer { margin:20px 0 0; color:#8e9eaf; font-size:.78rem; text-align:center; }
     @media (max-width:900px) {
       .hero,.game-grid { grid-template-columns:1fr; }.room-map { position:static; }.event-log { display:none; }.stage { min-height:auto; }
+      .fps-objective { top:91px; left:15px; right:auto; width:calc(100% - 30px); }
     }
     @media (max-width:680px) {
       .app { width:min(100% - 22px,1240px); padding-top:13px; }.topbar { align-items:flex-start; }.brand span { display:none; }.top-actions button { padding-inline:10px; }
@@ -599,6 +601,7 @@
           <div class="fps-hud-card timer-card"><span>Time</span><b id="fpsHudTimer">--:--</b></div>
           <div class="fps-hud-card"><span>Score</span><b id="fpsHudScore">100</b></div>
           <div class="fps-hud-card"><span>Progress</span><b id="fpsHudProgress">0 / 6</b></div>
+          <div class="fps-hud-card mode-card"><span>Mode</span><b id="fpsHudMode">READY</b></div>
         </div>
         <p id="fpsObjective" class="fps-objective"><b>Objective:</b> Preparing 3D training room…</p>
         <div class="fps-crosshair" aria-hidden="true"></div>
@@ -609,7 +612,7 @@
             <h2>Enter the fictional data hall</h2>
             <p>Every investigation, choice, recovery step, and exit action happens on 3D terminals in the room.</p>
             <button id="fpsEnterButton" type="button">Enter 3D room</button>
-            <p class="fps-control-help">Desktop: WASD / arrow keys to move · mouse to look · E to use · Esc pauses. Mobile: drag to look, use the movement pad, then tap USE.</p>
+            <p class="fps-control-help">Desktop: WASD / arrow keys to move · click-and-drag or move the mouse to freely look around · hold Shift to sprint · E to use. Mobile: drag to look, use the movement pad, then tap USE.</p>
           </div>
         </div>
         <div id="fpsTouchControls" class="fps-touch-controls" aria-label="Touch movement controls">
@@ -1467,8 +1470,13 @@
       $('#fpsHudScore').textContent = String(state.score);
       $('#fpsHudProgress').textContent = objectiveCount + ' / ' + state.config.objectiveTotal;
       const hudNote = $('#hudMessage').textContent.trim();
-      $('#fpsObjective').innerHTML = '<b>Objective:</b> ' + escapeHtml(fpsObjectiveCopy()) + (hudNote ? '<span>' + escapeHtml(hudNote) + '</span>' : '');
-      const signature = [state.started,state.finished,state.stage,state.seconds,state.score,state.difficulty,state.scenarioKey,[...state.clues].sort().join(','),[...state.scans].sort().join(','),[...state.validations].sort().join(','),state.timelineIndex,state.runbookIndex,game.codeBuffer].join('|');
+      const objectiveMarkup = '<b>Objective:</b> ' + escapeHtml(fpsObjectiveCopy()) + (hudNote ? '<span>' + escapeHtml(hudNote) + '</span>' : '');
+      if (force || game.lastObjectiveMarkup !== objectiveMarkup) {
+        $('#fpsObjective').innerHTML = objectiveMarkup;
+        game.lastObjectiveMarkup = objectiveMarkup;
+      }
+      if (game.updateMotionHud) game.updateMotionHud();
+      const signature = [state.started,state.finished,state.stage,state.score,state.difficulty,state.scenarioKey,[...state.clues].sort().join(','),[...state.scans].sort().join(','),[...state.validations].sort().join(','),state.timelineIndex,state.runbookIndex,game.codeBuffer].join('|');
       if (!force && game.lastSignature === signature) return;
       game.lastSignature = signature;
       game.updateWorld();
@@ -1506,7 +1514,7 @@
       if (!game) return;
       const rect = game.holder.getBoundingClientRect();
       if (!rect.width || !rect.height) return;
-      game.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+      game.renderer.setPixelRatio(game.quality ? game.quality.pixelRatio : Math.min(window.devicePixelRatio || 1, 1.25));
       game.renderer.setSize(Math.max(1, Math.floor(rect.width)), Math.max(1, Math.floor(rect.height)), false);
       game.camera.aspect = rect.width / rect.height;
       game.camera.updateProjectionMatrix();
@@ -1515,7 +1523,19 @@
       const holder = $('#fpsViewport');
       if (!holder || !window.THREE) return null;
       const THREE = window.THREE;
-      const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:false, powerPreference:'high-performance' });
+      const hasCoarsePointer = Boolean(window.matchMedia && window.matchMedia('(pointer:coarse)').matches);
+      const hasFinePointer = Boolean(window.matchMedia && window.matchMedia('(pointer:fine)').matches);
+      const isTouch = hasCoarsePointer || (navigator.maxTouchPoints > 0 && !hasFinePointer);
+      const coreCount = Number(navigator.hardwareConcurrency || 4);
+      const memoryGb = Number(navigator.deviceMemory || 4);
+      const lowPowerDevice = isTouch && (coreCount <= 4 || memoryGb <= 4);
+      const quality = {
+        pixelRatio:lowPowerDevice ? 1 : (isTouch ? Math.min(window.devicePixelRatio || 1, 1.15) : Math.min(window.devicePixelRatio || 1, 1.3)),
+        targetFps:lowPowerDevice ? 40 : (isTouch ? 50 : 60),
+        nearInterval:lowPowerDevice ? 125 : 80,
+        antialias:!lowPowerDevice && !isTouch
+      };
+      const renderer = new THREE.WebGLRenderer({ antialias:quality.antialias, alpha:false, powerPreference:'high-performance' });
       const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(74, 1, .1, 100);
       const player = new THREE.Vector3(0, 1.7, 10.1);
@@ -1535,8 +1555,9 @@
       const game = {
         THREE:THREE, holder:holder, renderer:renderer, scene:scene, camera:camera, player:player, raycaster:raycaster, pointer:pointer,
         terminalCanvas:terminalCanvas, terminalContext:terminalContext, terminalTexture:terminalTexture, terminalRoot:terminalRoot, terminalScreen:terminalScreen,
-        terminalOpen:false, terminalTarget:null, terminalInput:false, codeBuffer:'', terminalHitboxes:[], targets:[], keys:new Set(), listeners:[],
-        yaw:0, pitch:0, pointerLocked:false, entered:false, touchLook:null, nearest:null, lastSignature:'', lastUiAt:0, frame:null, resizeObserver:null,
+        terminalOpen:false, terminalTarget:null, terminalInput:false, codeBuffer:'', terminalHitboxes:[], targets:[], keys:new Set(), touchMoves:new Map(), listeners:[],
+        yaw:0, pitch:0, pointerLocked:false, entered:false, touchLook:null, dragLook:null, nearest:null, lastSignature:'', lastObjectiveMarkup:'', lastPrompt:'', lastUiAt:0, lastNearestAt:0, lastRenderAt:0, frame:null, resizeObserver:null,
+        canvas:renderer.domElement, isTouch:isTouch, quality:quality,
         colliders:[
           { minX:-6.8, maxX:6.8, minZ:-1.5, maxZ:.5 },
           { minX:-6.8, maxX:6.8, minZ:2.05, maxZ:4.05 }
@@ -1562,7 +1583,7 @@
         return mesh;
       };
       renderer.setClearColor(0x050b12, 1);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+      renderer.setPixelRatio(quality.pixelRatio);
       if ('outputColorSpace' in renderer && THREE.SRGBColorSpace) renderer.outputColorSpace = THREE.SRGBColorSpace;
       if (THREE.ACESFilmicToneMapping) renderer.toneMapping = THREE.ACESFilmicToneMapping;
       renderer.toneMappingExposure = 1.04;
@@ -1722,34 +1743,68 @@
         camera.rotation.x = game.pitch;
         camera.rotation.z = 0;
       };
+      game.applyLook = (deltaX, deltaY, sensitivity) => {
+        if (!game.entered || game.terminalOpen) return;
+        game.yaw -= deltaX * sensitivity;
+        game.pitch = Math.max(-1.22,Math.min(1.22,game.pitch - deltaY * sensitivity * .92));
+      };
+      game.updateMotionHud = () => {
+        const mode = game.terminalOpen ? 'TERMINAL' : (!game.entered ? 'READY' : (game.keys.has('sprint') ? 'SPRINT' : 'FREE LOOK'));
+        if (game.lastMotionMode === mode) return;
+        game.lastMotionMode = mode;
+        const target = $('#fpsHudMode');
+        if (target) target.textContent = mode;
+      };
       game.isBlocked = position => {
         if (position.x < -15.1 || position.x > 15.1 || position.z < -11.1 || position.z > 11.1) return true;
         return game.colliders.some(collider => position.x > collider.minX - .42 && position.x < collider.maxX + .42 && position.z > collider.minZ - .42 && position.z < collider.maxZ + .42);
       };
       game.move = dt => {
-        if (!game.entered || game.terminalOpen || state.finished) return;
+        if (!game.entered || game.terminalOpen || state.finished) return false;
         const forwardValue = (game.keys.has('forward') ? 1 : 0) - (game.keys.has('back') ? 1 : 0);
         const sideValue = (game.keys.has('right') ? 1 : 0) - (game.keys.has('left') ? 1 : 0);
-        if (!forwardValue && !sideValue) return;
+        if (!forwardValue && !sideValue) return false;
         const forward = new THREE.Vector3(-Math.sin(game.yaw),0,-Math.cos(game.yaw));
         const right = new THREE.Vector3(Math.cos(game.yaw),0,-Math.sin(game.yaw));
         const delta = forward.multiplyScalar(forwardValue).add(right.multiplyScalar(sideValue));
         if (delta.lengthSq() > 1) delta.normalize();
-        delta.multiplyScalar(dt * 5.2);
+        const speed = game.isTouch ? 7.6 : (game.keys.has('sprint') ? 12.4 : 8.4);
+        delta.multiplyScalar(dt * speed);
+        let moved = false;
         const xOnly = game.player.clone(); xOnly.x += delta.x;
-        if (!game.isBlocked(xOnly)) game.player.x = xOnly.x;
+        if (!game.isBlocked(xOnly)) { game.player.x = xOnly.x; moved = true; }
         const zOnly = game.player.clone(); zOnly.z += delta.z;
-        if (!game.isBlocked(zOnly)) game.player.z = zOnly.z;
+        if (!game.isBlocked(zOnly)) { game.player.z = zOnly.z; moved = true; }
+        return moved;
       };
-      game.updateNearest = () => {
-        if (game.terminalOpen || !game.entered) { game.nearest = null; return; }
-        const closeTargets = game.targets.map(target => ({ target:target, distance:Math.hypot(target.position.x - game.player.x,target.position.z - game.player.z) })).filter(item => item.distance < 3.35).sort((a,b) => a.distance - b.distance);
-        game.nearest = closeTargets.length ? closeTargets[0].target : null;
+      game.updateNearest = force => {
         const prompt = $('#fpsPrompt');
-        const lookPrefix = !game.isTouch && !game.pointerLocked ? 'Click the room to look around · ' : '';
-        if (!game.nearest) { prompt.textContent = lookPrefix + 'Move through the fictional data hall to the highlighted objective.'; return; }
-        const targetState = fpsTargetStatus(game.nearest);
-        prompt.innerHTML = lookPrefix + '<b>' + (game.isTouch ? 'USE' : 'E') + '</b> · ' + escapeHtml(game.nearest.title) + ' — ' + escapeHtml(targetState.message);
+        if (game.terminalOpen || !game.entered) {
+          game.nearest = null;
+          const idleMessage = !game.entered ? 'Click Enter 3D room, then use WASD / arrow keys or the movement pad to move.' : '';
+          if ((force || game.lastPrompt !== idleMessage) && idleMessage) { prompt.textContent = idleMessage; game.lastPrompt = idleMessage; }
+          return;
+        }
+        let nearest = null;
+        let nearestDistanceSquared = 3.35 * 3.35;
+        game.targets.forEach(target => {
+          const dx = target.position.x - game.player.x;
+          const dz = target.position.z - game.player.z;
+          const distanceSquared = dx * dx + dz * dz;
+          if (distanceSquared < nearestDistanceSquared) {
+            nearest = target;
+            nearestDistanceSquared = distanceSquared;
+          }
+        });
+        game.nearest = nearest;
+        const lookPrefix = !game.isTouch && !game.pointerLocked ? 'Click and drag to freely look · ' : '';
+        const message = !game.nearest
+          ? lookPrefix + 'Move through the fictional data hall to the highlighted objective.'
+          : lookPrefix + '<b>' + (game.isTouch ? 'USE' : 'E') + '</b> · ' + escapeHtml(game.nearest.title) + ' — ' + escapeHtml(fpsTargetStatus(game.nearest).message);
+        if (force || game.lastPrompt !== message) {
+          prompt.innerHTML = message;
+          game.lastPrompt = message;
+        }
       };
       game.updateWorld = () => {
         const alerts = new Set(state.scenario && state.scenario.map ? state.scenario.map.alertAssets || [] : []);
@@ -1773,7 +1828,7 @@
           game.beacon.visible = true;
           game.beacon.position.set(preferred.position.x,4.55 + Math.sin(performance.now()/350)*.12,preferred.position.z);
         } else game.beacon.visible = false;
-        game.updateNearest();
+        game.updateNearest(true);
       };
       game.drawTerminal = () => drawFpsTerminal(game);
       game.openTerminal = target => {
@@ -1783,6 +1838,7 @@
         game.terminalInput = target.kind === 'keypad' && fpsTargetStatus(target).level === 'available';
         game.terminalRoot.visible = true;
         $('#fpsGame').classList.add('terminal-open');
+        game.updateMotionHud();
         if (document.pointerLockElement === renderer.domElement && document.exitPointerLock) document.exitPointerLock();
         game.drawTerminal();
       };
@@ -1792,19 +1848,22 @@
         game.terminalTarget = null;
         game.terminalRoot.visible = false;
         $('#fpsGame').classList.remove('terminal-open');
-        game.updateNearest();
+        game.updateMotionHud();
+        game.updateNearest(true);
       };
       game.useNearest = () => {
         if (!game.entered) { game.enterRoom(); return; }
         if (game.terminalOpen) return;
         if (game.nearest) game.openTerminal(game.nearest);
       };
-      game.enterRoom = () => {
+      game.enterRoom = sourceEvent => {
+        const firstEntry = !game.entered;
         game.entered = true;
         $('#fpsEnterOverlay').classList.add('hidden');
-        renderer.domElement.focus();
-        game.requestPointerLock();
-        game.updateNearest();
+        try { renderer.domElement.focus({ preventScroll:true }); } catch (error) { renderer.domElement.focus(); }
+        game.updateMotionHud();
+        if (firstEntry) game.requestPointerLock(sourceEvent);
+        game.updateNearest(true);
       };
       game.activateTerminalAction = action => activateFpsTerminalAction(game, action);
       game.getTerminalHit = event => {
@@ -1819,77 +1878,145 @@
         const y = (1 - hit.uv.y) * terminalCanvas.height;
         return game.terminalHitboxes.find(box => x >= box.x && x <= box.x + box.width && y >= box.y && y <= box.y + box.height) || null;
       };
-      game.isTouch = Boolean(window.matchMedia && window.matchMedia('(pointer:coarse)').matches) || navigator.maxTouchPoints > 0;
-      game.requestPointerLock = () => {
-        if (game.isTouch || !renderer.domElement.requestPointerLock) return;
+      game.requestPointerLock = sourceEvent => {
+        if ((sourceEvent && sourceEvent.pointerType === 'touch') || !renderer.domElement.requestPointerLock) return;
         try {
           const request = renderer.domElement.requestPointerLock();
-          if (request && typeof request.catch === 'function') request.catch(() => { $('#fpsPrompt').textContent = 'Mouse-look is unavailable. You can still move with the keyboard and use nearby terminals with E.'; });
+          if (request && typeof request.catch === 'function') request.catch(() => { $('#fpsPrompt').textContent = 'Pointer lock is unavailable. Click and drag to freely look; movement and terminals still work.'; });
         } catch (error) {
-          $('#fpsPrompt').textContent = 'Mouse-look is unavailable. You can still move with the keyboard and use nearby terminals with E.';
+          $('#fpsPrompt').textContent = 'Pointer lock is unavailable. Click and drag to freely look; movement and terminals still work.';
         }
       };
-      addListener(document,'pointerlockchange',() => { game.pointerLocked = document.pointerLockElement === renderer.domElement; });
-      addListener(document,'mousemove',event => {
-        if (!state.fpsActive || !game.pointerLocked || game.terminalOpen) return;
-        game.yaw -= event.movementX * .00235;
-        game.pitch = Math.max(-1.22,Math.min(1.22,game.pitch - event.movementY * .0022));
+      game.clearMotion = () => {
+        game.keys.clear();
+        game.touchMoves.clear();
+        game.updateMotionHud();
+      };
+      addListener(document,'pointerlockchange',() => {
+        game.pointerLocked = document.pointerLockElement === renderer.domElement;
+        if (!game.pointerLocked) game.clearMotion();
+        game.updateNearest(true);
       });
-      addListener(window,'keydown',event => {
-        if (!state.fpsActive || state.fpsGame !== game) return;
+      addListener(document,'mousemove',event => {
+        if (state.fpsGame !== game || !game.pointerLocked || game.terminalOpen) return;
+        game.applyLook(event.movementX, event.movementY, .00235);
+      });
+      const movementForEvent = event => {
+        const codes = { KeyW:'forward',ArrowUp:'forward',KeyS:'back',ArrowDown:'back',KeyA:'left',ArrowLeft:'left',KeyD:'right',ArrowRight:'right' };
+        if (codes[event.code]) return codes[event.code];
+        const key = event.key && event.key.length === 1 ? event.key.toLowerCase() : event.key;
+        return ({ w:'forward',ArrowUp:'forward',s:'back',ArrowDown:'back',a:'left',ArrowLeft:'left',d:'right',ArrowRight:'right' })[key] || null;
+      };
+      const sprintForEvent = event => event.code === 'ShiftLeft' || event.code === 'ShiftRight' || event.key === 'Shift';
+      addListener(document,'keydown',event => {
+        if (state.fpsGame !== game) return;
         if (game.terminalOpen) {
           handleFpsTerminalKey(game,event);
           return;
         }
-        const moveKeys = { w:'forward',ArrowUp:'forward',s:'back',ArrowDown:'back',a:'left',ArrowLeft:'left',d:'right',ArrowRight:'right' };
-        if (moveKeys[event.key]) { game.keys.add(moveKeys[event.key]); event.preventDefault(); return; }
-        if (event.key.toLowerCase() === 'e' || event.key === 'Enter') { game.useNearest(); event.preventDefault(); }
-      });
-      addListener(window,'keyup',event => {
-        if (!state.fpsActive || state.fpsGame !== game) return;
-        const moveKeys = { w:'forward',ArrowUp:'forward',s:'back',ArrowDown:'back',a:'left',ArrowLeft:'left',d:'right',ArrowRight:'right' };
-        if (moveKeys[event.key]) game.keys.delete(moveKeys[event.key]);
-      });
+        const movement = movementForEvent(event);
+        if (movement) {
+          if (!game.entered) game.enterRoom();
+          game.keys.add(movement);
+          game.updateMotionHud();
+          event.preventDefault();
+          return;
+        }
+        if (sprintForEvent(event)) {
+          if (!game.entered) game.enterRoom();
+          game.keys.add('sprint');
+          game.updateMotionHud();
+          event.preventDefault();
+          return;
+        }
+        const key = event.key && event.key.length === 1 ? event.key.toLowerCase() : event.key;
+        if (key === 'e' || key === 'Enter') { game.useNearest(); event.preventDefault(); }
+      },true);
+      addListener(document,'keyup',event => {
+        if (state.fpsGame !== game) return;
+        const movement = movementForEvent(event);
+        if (movement) game.keys.delete(movement);
+        if (sprintForEvent(event)) game.keys.delete('sprint');
+        game.updateMotionHud();
+      },true);
+      addListener(window,'blur',() => game.clearMotion());
+      addListener(document,'visibilitychange',() => { if (document.hidden) game.clearMotion(); });
       addListener(renderer.domElement,'pointerdown',event => {
-        if (!state.fpsActive) return;
+        if (state.fpsGame !== game) return;
         if (game.terminalOpen) {
           const hit = game.getTerminalHit(event);
           if (hit) game.activateTerminalAction(hit.action);
           event.preventDefault();
           return;
         }
-        if (event.pointerType === 'touch') {
-          game.touchLook = { id:event.pointerId, x:event.clientX, y:event.clientY };
-          renderer.domElement.setPointerCapture(event.pointerId);
+        if (!game.entered) {
+          game.enterRoom(event);
+          event.preventDefault();
           return;
         }
-        if (!game.pointerLocked && game.entered) game.requestPointerLock();
-        else if (game.pointerLocked) game.useNearest();
+        if (event.pointerType === 'touch') {
+          game.touchLook = { id:event.pointerId, x:event.clientX, y:event.clientY };
+          try { renderer.domElement.setPointerCapture(event.pointerId); } catch (error) {}
+          return;
+        }
+        game.dragLook = { id:event.pointerId, x:event.clientX, y:event.clientY, moved:false };
+        try { renderer.domElement.setPointerCapture(event.pointerId); } catch (error) {}
+        if (!game.pointerLocked) game.requestPointerLock(event);
+        event.preventDefault();
       });
       addListener(renderer.domElement,'pointermove',event => {
-        if (!game.touchLook || game.touchLook.id !== event.pointerId || game.terminalOpen) return;
-        const dx = event.clientX - game.touchLook.x;
-        const dy = event.clientY - game.touchLook.y;
-        game.touchLook.x = event.clientX;
-        game.touchLook.y = event.clientY;
-        game.yaw -= dx * .009;
-        game.pitch = Math.max(-1.15,Math.min(1.15,game.pitch - dy * .008));
+        if (game.terminalOpen) return;
+        const look = event.pointerType === 'touch' ? game.touchLook : game.dragLook;
+        if (!look || look.id !== event.pointerId) return;
+        const dx = event.clientX - look.x;
+        const dy = event.clientY - look.y;
+        look.x = event.clientX;
+        look.y = event.clientY;
+        if (Math.abs(dx) + Math.abs(dy) > 0) look.moved = true;
+        game.applyLook(dx, dy, event.pointerType === 'touch' ? .009 : .006);
       });
       const clearTouchLook = event => {
         if (game.touchLook && game.touchLook.id === event.pointerId) game.touchLook = null;
+        if (game.dragLook && game.dragLook.id === event.pointerId) game.dragLook = null;
       };
       addListener(renderer.domElement,'pointerup',clearTouchLook);
       addListener(renderer.domElement,'pointercancel',clearTouchLook);
       $$('.fps-touch-pad [data-fps-move]').forEach(button => {
-        const press = event => { if (state.fpsGame === game) { game.keys.add(button.dataset.fpsMove); event.preventDefault(); } };
-        const release = event => { game.keys.delete(button.dataset.fpsMove); event.preventDefault(); };
+        const press = event => {
+          if (state.fpsGame === game) {
+            if (!game.entered) game.enterRoom(event);
+            game.keys.add(button.dataset.fpsMove);
+            game.touchMoves.set(event.pointerId, button.dataset.fpsMove);
+            try { button.setPointerCapture(event.pointerId); } catch (error) {}
+            game.updateMotionHud();
+            event.preventDefault();
+          }
+        };
+        const release = event => {
+          if (game.touchMoves.get(event.pointerId) === button.dataset.fpsMove) game.touchMoves.delete(event.pointerId);
+          game.keys.delete(button.dataset.fpsMove);
+          game.updateMotionHud();
+          event.preventDefault();
+        };
         addListener(button,'pointerdown',press);
         addListener(button,'pointerup',release);
         addListener(button,'pointercancel',release);
         addListener(button,'pointerleave',release);
+        addListener(button,'lostpointercapture',release);
       });
+      const releaseTouchMove = event => {
+        const direction = game.touchMoves.get(event.pointerId);
+        if (!direction) return;
+        game.touchMoves.delete(event.pointerId);
+        game.keys.delete(direction);
+        game.updateMotionHud();
+      };
+      addListener(document,'pointerup',releaseTouchMove,true);
+      addListener(document,'pointercancel',releaseTouchMove,true);
       addListener($('#fpsUseButton'),'click',() => game.useNearest());
-      addListener($('#fpsEnterButton'),'click',() => game.enterRoom());
+      const enterFromButton = event => { game.enterRoom(event); event.preventDefault(); };
+      addListener($('#fpsEnterButton'),'pointerdown',enterFromButton);
+      addListener($('#fpsEnterButton'),'click',enterFromButton);
       const resizeObserver = window.ResizeObserver ? new ResizeObserver(resizeFpsExperience) : null;
       if (resizeObserver) resizeObserver.observe(holder);
       else addListener(window,'resize',resizeFpsExperience);
@@ -1902,12 +2029,18 @@
         game.frame = requestAnimationFrame(loop);
         const dt = Math.min(.05,(now-lastTime)/1000 || 0);
         lastTime = now;
-        if (document.hidden || !state.fpsActive) return;
-        game.move(dt);
+        if (document.hidden || state.fpsGame !== game) return;
+        const moved = game.move(dt);
         game.updateCamera();
-        game.updateNearest();
-        game.targets.forEach(target => { if (target.ring.visible) target.ring.rotation.z = now / 1000; });
+        if (moved || now - game.lastNearestAt >= game.quality.nearInterval) {
+          game.lastNearestAt = now;
+          game.updateNearest();
+        }
         if (now - game.lastUiAt > 180) { game.lastUiAt = now; updateFpsExperience(); }
+        if (now - game.lastRenderAt < 1000 / game.quality.targetFps) return;
+        game.lastRenderAt = now;
+        game.targets.forEach(target => { if (target.ring.visible) target.ring.rotation.z = now / 1000; });
+        if (game.beacon && game.beacon.visible) game.beacon.position.y = 4.55 + Math.sin(now / 350) * .12;
         renderer.render(scene,camera);
       };
       game.frame = requestAnimationFrame(loop);
