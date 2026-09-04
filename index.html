@@ -1013,7 +1013,8 @@
       if (reset) reset.hidden = true;
       setThreeStatus(message || '3D view is unavailable in this browser. The training floor-plan fallback is shown.');
     }
-    function makeThreeLabel(THREE, text, color) {
+    function makeThreeLabel(THREE, text, color, options) {
+      const settings = options || {};
       const canvas = document.createElement('canvas');
       canvas.width = 512;
       canvas.height = 108;
@@ -1031,8 +1032,18 @@
       context.fillText(text, canvas.width / 2, canvas.height / 2 + 2);
       const texture = new THREE.CanvasTexture(canvas);
       if ('colorSpace' in texture && THREE.SRGBColorSpace) texture.colorSpace = THREE.SRGBColorSpace;
-      const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map:texture, transparent:true, depthWrite:false }));
+      const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
+        map:texture,
+        transparent:true,
+        depthTest:!settings.alwaysVisible,
+        depthWrite:false,
+        fog:!settings.alwaysVisible
+      }));
       sprite.scale.set(4.6, .97, 1);
+      if (settings.alwaysVisible) {
+        sprite.renderOrder = settings.renderOrder || 30;
+        sprite.frustumCulled = false;
+      }
       sprite.userData.noPick = true;
       return sprite;
     }
@@ -1548,9 +1559,9 @@
       const terminalTexture = new THREE.CanvasTexture(terminalCanvas);
       if ('colorSpace' in terminalTexture && THREE.SRGBColorSpace) terminalTexture.colorSpace = THREE.SRGBColorSpace;
       const terminalRoot = new THREE.Group();
-      const terminalMaterial = new THREE.MeshBasicMaterial({ map:terminalTexture, side:THREE.DoubleSide, transparent:true, depthWrite:false });
+      const terminalMaterial = new THREE.MeshBasicMaterial({ map:terminalTexture, side:THREE.DoubleSide, transparent:true, depthTest:false, depthWrite:false, fog:false });
       const terminalScreen = new THREE.Mesh(new THREE.PlaneGeometry(10.8, 6.75), terminalMaterial);
-      const terminalFrame = new THREE.Mesh(new THREE.BoxGeometry(11.08, 7.03, .12), new THREE.MeshBasicMaterial({ color:0x122b3f, transparent:true, opacity:.95 }));
+      const terminalFrame = new THREE.Mesh(new THREE.BoxGeometry(11.08, 7.03, .12), new THREE.MeshBasicMaterial({ color:0x122b3f, transparent:true, opacity:.95, depthTest:false, depthWrite:false, fog:false }));
       const terminalGlow = new THREE.PointLight(0x6eb9ff, 1.6, 10, 2);
       const game = {
         THREE:THREE, holder:holder, renderer:renderer, scene:scene, camera:camera, player:player, raycaster:raycaster, pointer:pointer,
@@ -1582,57 +1593,62 @@
         parent.add(mesh);
         return mesh;
       };
-      renderer.setClearColor(0x050b12, 1);
+      renderer.setClearColor(0x091b29, 1);
       renderer.setPixelRatio(quality.pixelRatio);
       if ('outputColorSpace' in renderer && THREE.SRGBColorSpace) renderer.outputColorSpace = THREE.SRGBColorSpace;
       if (THREE.ACESFilmicToneMapping) renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.04;
+      renderer.toneMappingExposure = 1.3;
       renderer.domElement.tabIndex = 0;
       renderer.domElement.setAttribute('aria-label', 'First-person fictional data center training room.');
       holder.replaceChildren(renderer.domElement);
-      scene.background = new THREE.Color(0x07131f);
-      scene.fog = new THREE.Fog(0x07131f, 20, 48);
-      scene.add(new THREE.HemisphereLight(0x9dd9ff, 0x071018, 2.1));
-      const keyLight = new THREE.DirectionalLight(0xc9e8ff, 2.15);
+      scene.background = new THREE.Color(0x0b2233);
+      scene.fog = new THREE.Fog(0x0b2233, 30, 65);
+      scene.add(new THREE.HemisphereLight(0xb9e8ff, 0x173448, 3.15));
+      scene.add(new THREE.AmbientLight(0x7db9df, .55));
+      const keyLight = new THREE.DirectionalLight(0xd9f3ff, 3.05);
       keyLight.position.set(2, 14, 7);
       scene.add(keyLight);
-      const redLight = new THREE.PointLight(0x9b3234, 8, 18, 2);
+      const overheadLight = new THREE.PointLight(0x8fd3ff, 9, 34, 2);
+      overheadLight.position.set(0, 6.4, 5.5);
+      scene.add(overheadLight);
+      const redLight = new THREE.PointLight(0xb94a4d, 8.5, 20, 2);
       redLight.position.set(6, 4.5, 0);
       scene.add(redLight);
-      const blueLight = new THREE.PointLight(0x2a82c2, 7, 18, 2);
+      const blueLight = new THREE.PointLight(0x52b5ff, 9.5, 22, 2);
       blueLight.position.set(-7, 4.5, -4);
       scene.add(blueLight);
       const world = new THREE.Group();
-      const floor = new THREE.Mesh(new THREE.PlaneGeometry(32, 24), makeMaterial(0x112436, { roughness:.86, metalness:.22 }));
+      const makeFpsLabel = (text, color) => makeThreeLabel(THREE, text, color, { alwaysVisible:true, renderOrder:30 });
+      const floor = new THREE.Mesh(new THREE.PlaneGeometry(32, 24), makeMaterial(0x1c3b52, { roughness:.82, metalness:.24 }));
       floor.rotation.x = -Math.PI / 2;
       world.add(floor);
-      const grid = new THREE.GridHelper(32, 32, 0x315975, 0x173247);
+      const grid = new THREE.GridHelper(32, 32, 0x6097b9, 0x2a506a);
       grid.position.y = .012;
       world.add(grid);
-      const coldAisle = new THREE.Mesh(new THREE.PlaneGeometry(16.5, 2.4), new THREE.MeshBasicMaterial({ color:0x1f78b8, transparent:true, opacity:.18, depthWrite:false }));
+      const coldAisle = new THREE.Mesh(new THREE.PlaneGeometry(16.5, 2.4), new THREE.MeshBasicMaterial({ color:0x3aa6ea, transparent:true, opacity:.26, depthWrite:false }));
       coldAisle.rotation.x = -Math.PI / 2;
       coldAisle.position.set(0, .022, 1.25);
       world.add(coldAisle);
-      const hotAisle = new THREE.Mesh(new THREE.PlaneGeometry(16.5, 2.3), new THREE.MeshBasicMaterial({ color:0x963534, transparent:true, opacity:.13, depthWrite:false }));
+      const hotAisle = new THREE.Mesh(new THREE.PlaneGeometry(16.5, 2.3), new THREE.MeshBasicMaterial({ color:0xd95755, transparent:true, opacity:.18, depthWrite:false }));
       hotAisle.rotation.x = -Math.PI / 2;
       hotAisle.position.set(0, .027, -2.55);
       world.add(hotAisle);
-      const wallMaterial = makeMaterial(0x183044, { roughness:.74, metalness:.34 });
+      const wallMaterial = makeMaterial(0x2a5068, { roughness:.7, metalness:.34 });
       [[0, 3.55, -12, 32, 7.1, .32], [0, 3.55, 12, 32, 7.1, .32], [-16, 3.55, 0, .32, 7.1, 24], [16, 3.55, 0, .32, 7.1, 24]].forEach(item => {
         const wall = new THREE.Mesh(new THREE.BoxGeometry(item[3], item[4], item[5]), wallMaterial);
         wall.position.set(item[0], item[1], item[2]);
         world.add(wall);
       });
-      const ceiling = new THREE.Mesh(new THREE.BoxGeometry(32, .18, 24), makeMaterial(0x102232, { roughness:.78, metalness:.29 }));
+      const ceiling = new THREE.Mesh(new THREE.BoxGeometry(32, .18, 24), makeMaterial(0x23465d, { roughness:.74, metalness:.3 }));
       ceiling.position.set(0, 7.12, 0);
       world.add(ceiling);
-      for (let x = -12; x <= 12; x += 6) addBox(world, [.16, 6.8, 23], [x, 3.5, 0], 0x25445d, { metalness:.57 });
-      const roomLabel = makeThreeLabel(THREE, 'DATA HALL A · FICTIONAL TRAINING SIMULATION', '#6eb9ff');
+      for (let x = -12; x <= 12; x += 6) addBox(world, [.16, 6.8, 23], [x, 3.5, 0], 0x3d6680, { metalness:.57 });
+      const roomLabel = makeFpsLabel('DATA HALL A · FICTIONAL TRAINING SIMULATION', '#6eb9ff');
       roomLabel.position.set(0, 5.7, -11.72);
       roomLabel.scale.set(8.2, 1.3, 1);
       world.add(roomLabel);
       const rackGeometry = new THREE.BoxGeometry(1.15, 3.35, 1.25);
-      const rackMaterial = makeMaterial(0x203744, { metalness:.55, roughness:.58 });
+      const rackMaterial = makeMaterial(0x315463, { metalness:.52, roughness:.53 });
       const rackPositions = [];
       [-.75, 2.95].forEach(z => [-6,-4.5,-3,-1.5,0,1.5,3,4.5,6].forEach(x => rackPositions.push([x,z])));
       const racks = new THREE.InstancedMesh(rackGeometry, rackMaterial, rackPositions.length);
@@ -1642,7 +1658,7 @@
         racks.setMatrixAt(index, matrix);
       });
       world.add(racks);
-      const rackStripes = new THREE.Mesh(new THREE.BoxGeometry(13.5, .075, .075), makeMaterial(0x4b7189, { emissive:0x0b2840, emissiveIntensity:.35, metalness:.2 }));
+      const rackStripes = new THREE.Mesh(new THREE.BoxGeometry(13.5, .075, .075), makeMaterial(0x75a9c6, { emissive:0x17445f, emissiveIntensity:.55, metalness:.2 }));
       [-.75,2.95].forEach(z => {
         for (let y = .7; y < 3; y += .45) {
           const stripe = rackStripes.clone();
@@ -1661,7 +1677,7 @@
         ring.rotation.x = Math.PI / 2;
         ring.position.y = .06;
         group.add(ring);
-        const label = makeThreeLabel(THREE, definition.title, '#6eb9ff');
+        const label = makeFpsLabel(definition.title, '#6eb9ff');
         label.position.set(0,3.58,0);
         group.add(label);
         world.add(group);
@@ -1676,7 +1692,7 @@
         ring.rotation.x = Math.PI / 2;
         ring.position.y = .06;
         group.add(ring);
-        const label = makeThreeLabel(THREE, definition.title, '#6eb9ff');
+        const label = makeFpsLabel(definition.title, '#6eb9ff');
         label.position.set(0,definition.labelHeight || 3.7,0);
         group.add(label);
         world.add(group);
@@ -1721,11 +1737,11 @@
       const exitRingMaterial = new THREE.MeshBasicMaterial({color:0x546d80,transparent:true,opacity:.7,depthWrite:false});
       const exitRing = new THREE.Mesh(new THREE.TorusGeometry(2.45,.08,8,42),exitRingMaterial);
       exitRing.rotation.x = Math.PI/2; exitRing.position.y=.06; exitGroup.add(exitRing);
-      const exitLabel = makeThreeLabel(THREE,'EXIT INTERLOCK','#6eb9ff'); exitLabel.position.set(0,4.85,0); exitGroup.add(exitLabel);
+      const exitLabel = makeFpsLabel('EXIT INTERLOCK','#6eb9ff'); exitLabel.position.set(0,4.85,0); exitGroup.add(exitLabel);
       world.add(exitGroup);
       game.targets.push({ id:'exit', kind:'exit', title:'EXIT INTERLOCK', assetKeys:['exit'], group:exitGroup, ring:exitRing, ringMaterial:exitRingMaterial, accent:exitDoor.material, position:new THREE.Vector3(12,0,9.25) });
-      const cracTwo = new THREE.Group(); cracTwo.position.set(12.4,0,2.45); cracModel(cracTwo,0x55cdf4); const cracTwoLabel=makeThreeLabel(THREE,'CRAC-2','#6eb9ff');cracTwoLabel.position.set(0,4.58,0);cracTwo.add(cracTwoLabel);world.add(cracTwo);
-      const powerA = new THREE.Group(); powerA.position.set(-12.1,0,-.25);cabinetModel(powerA,0x42cf91);const powerALabel=makeThreeLabel(THREE,'PDU-A','#6eb9ff');powerALabel.position.set(0,3.72,0);powerA.add(powerALabel);world.add(powerA);
+      const cracTwo = new THREE.Group(); cracTwo.position.set(12.4,0,2.45); cracModel(cracTwo,0x55cdf4); const cracTwoLabel=makeFpsLabel('CRAC-2','#6eb9ff');cracTwoLabel.position.set(0,4.58,0);cracTwo.add(cracTwoLabel);world.add(cracTwo);
+      const powerA = new THREE.Group(); powerA.position.set(-12.1,0,-.25);cabinetModel(powerA,0x42cf91);const powerALabel=makeFpsLabel('PDU-A','#6eb9ff');powerALabel.position.set(0,3.72,0);powerA.add(powerALabel);world.add(powerA);
       const beacon = new THREE.Mesh(new THREE.ConeGeometry(.32,1.05,12),new THREE.MeshBasicMaterial({color:0x6eb9ff,transparent:true,opacity:.88,depthWrite:false}));
       beacon.rotation.x = Math.PI; beacon.visible=false; world.add(beacon); game.beacon=beacon;
       scene.add(world);
@@ -1733,6 +1749,10 @@
       terminalFrame.position.z = -4.40;
       terminalGlow.position.set(0,0,-2.7);
       terminalRoot.add(terminalFrame,terminalScreen,terminalGlow);
+      terminalRoot.renderOrder = 900;
+      terminalFrame.renderOrder = 900;
+      terminalScreen.renderOrder = 901;
+      terminalScreen.frustumCulled = false;
       terminalRoot.visible = false;
       camera.add(terminalRoot);
       scene.add(camera);
@@ -2105,15 +2125,15 @@
       game.terminalHitboxes = [];
       context.clearRect(0,0,width,height);
       const background = context.createLinearGradient(0,0,width,height);
-      background.addColorStop(0,'#0c2032');
-      background.addColorStop(.55,'#07131f');
-      background.addColorStop(1,'#030a11');
+      background.addColorStop(0,'#1a4561');
+      background.addColorStop(.55,'#0d2a3e');
+      background.addColorStop(1,'#071722');
       context.fillStyle = background;
       context.fillRect(0,0,width,height);
       context.strokeStyle = 'rgba(110,185,255,.7)';
       context.lineWidth = 5;
       context.strokeRect(10,10,width-20,height-20);
-      context.fillStyle = 'rgba(110,185,255,.12)';
+      context.fillStyle = 'rgba(150,212,255,.18)';
       for (let y=36;y<height;y+=38) context.fillRect(26,y,width-52,1);
       const addHitbox = (x,y,boxWidth,boxHeight,action,shortcut) => game.terminalHitboxes.push({x:x,y:y,width:boxWidth,height:boxHeight,action:action,shortcut:shortcut});
       const drawClose = () => {
