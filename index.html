@@ -184,10 +184,12 @@
     .fps-objective { position:absolute; z-index:4; top:16px; right:15px; width:min(390px,calc(100% - 440px)); margin:0; padding:9px 11px; color:#d8e9f8; background:rgba(4,13,22,.82); border:1px solid rgba(114,178,224,.34); border-left:3px solid var(--blue); border-radius:9px; box-shadow:0 8px 22px rgba(0,0,0,.18); backdrop-filter:blur(8px); font-size:.76rem; font-weight:750; pointer-events:none; }.fps-objective span { display:block; margin-top:4px; color:#a8c8dd; font-size:.7rem; }
     .fps-objective b { color:var(--blue); }.fps-crosshair { position:absolute; z-index:5; top:50%; left:50%; width:22px; height:22px; pointer-events:none; transform:translate(-50%,-50%); }.fps-crosshair::before,.fps-crosshair::after { content:""; position:absolute; background:rgba(235,247,255,.95); box-shadow:0 0 8px rgba(110,185,255,.8); }.fps-crosshair::before { top:10px; left:0; width:22px; height:2px; }.fps-crosshair::after { top:0; left:10px; width:2px; height:22px; }
     .fps-prompt { position:absolute; z-index:6; right:50%; bottom:25px; width:min(550px,calc(100% - 30px)); margin:0; padding:10px 13px; color:#e5f3ff; text-align:center; background:rgba(4,13,22,.86); border:1px solid rgba(110,185,255,.4); border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,.2); backdrop-filter:blur(8px); transform:translateX(50%); font-size:.83rem; font-weight:750; pointer-events:none; }.fps-prompt b { color:var(--green); }
+    .fps-mini-map { position:absolute; z-index:5; right:16px; bottom:16px; width:192px; padding:8px; color:#d8ebf8; background:linear-gradient(145deg,rgba(11,37,56,.93),rgba(3,14,24,.91)); border:1px solid rgba(110,185,255,.54); border-radius:11px; box-shadow:0 10px 28px rgba(0,0,0,.28); backdrop-filter:blur(8px); pointer-events:none; }.fps-mini-map-head { display:flex; justify-content:space-between; gap:8px; margin:0 1px 5px; color:#8db5cf; font-size:.59rem; font-weight:950; letter-spacing:.1em; text-transform:uppercase; }.fps-mini-map-head b { color:#87edbb; font-size:.59rem; }.fps-mini-map canvas { display:block; width:100%; height:auto; background:#071927; border:1px solid rgba(110,185,255,.28); border-radius:6px; }.fps-mini-map p { margin:5px 1px 0; color:#94b4c9; font-size:.57rem; font-weight:750; }
     .fps-enter-overlay { position:absolute; z-index:8; inset:0; display:grid; place-items:center; padding:20px; text-align:center; background:radial-gradient(circle at center,rgba(10,35,54,.32),rgba(2,8,14,.88)); }
     .fps-enter-overlay.hidden { display:none!important; }.fps-enter-panel { width:min(540px,100%); padding:28px; background:rgba(7,18,29,.9); border:1px solid rgba(110,185,255,.55); border-radius:16px; box-shadow:0 22px 65px rgba(0,0,0,.38); }.fps-enter-panel h2 { margin-bottom:7px; font-size:clamp(1.35rem,3.4vw,2rem); }.fps-enter-panel p { margin:8px auto; color:#b8cce0; }.fps-enter-panel button { margin-top:12px; }.fps-control-help { color:#87a8c1!important; font-size:.78rem; }
     .fps-touch-controls { position:absolute; z-index:9; inset:auto 0 0; display:none; justify-content:space-between; align-items:flex-end; padding:17px; pointer-events:none; }.fps-touch-pad { display:grid; grid-template-columns:repeat(3,48px); grid-template-rows:repeat(2,45px); gap:4px; pointer-events:auto; }.fps-touch-pad button,.fps-use-button { display:grid; min-width:0; min-height:0; place-items:center; padding:0; color:#e9f7ff; background:linear-gradient(145deg,rgba(18,47,70,.92),rgba(6,20,34,.9)); border:1px solid rgba(110,185,255,.62); border-radius:12px; box-shadow:0 8px 18px rgba(0,0,0,.22); font-size:1.1rem; touch-action:none; }.fps-touch-pad button:active,.fps-use-button:active { transform:translateY(1px) scale(.97); }.fps-touch-pad button:nth-child(1) { grid-column:2; }.fps-touch-pad button:nth-child(2) { grid-column:1; grid-row:2; }.fps-touch-pad button:nth-child(3) { grid-column:2; grid-row:2; }.fps-touch-pad button:nth-child(4) { grid-column:3; grid-row:2; }.fps-use-button { width:74px; height:74px; flex:0 0 auto; color:#05131d; background:var(--green); border-color:#8bf1c3; font-size:.8rem; font-weight:950; letter-spacing:.08em; pointer-events:auto; }
-    .fps-game.terminal-open .fps-crosshair { opacity:.18; }.fps-game.terminal-open .fps-prompt { opacity:0; }.fps-game.terminal-open .fps-touch-controls { display:none!important; }
+    .fps-game.terminal-open .fps-hud,.fps-game.terminal-open .fps-objective,.fps-game.terminal-open .fps-crosshair,.fps-game.terminal-open .fps-prompt,.fps-game.terminal-open .fps-mini-map { opacity:0; visibility:hidden; pointer-events:none; }
+    .fps-game.terminal-open .fps-touch-controls { display:none!important; }
     .map-caption { margin:12px 0 0; color:#aabbd0; font-size:.81rem; }
     .event-log { margin-top:15px; padding-top:14px; border-top:1px solid #2b3a4c; }
     .event-log h3 { margin-bottom:8px; }.event-log ul { display:grid; gap:7px; max-height:180px; margin:0; padding:0; overflow:auto; list-style:none; }
@@ -244,12 +246,13 @@
     @media (max-width:900px) {
       .hero,.game-grid { grid-template-columns:1fr; }.room-map { position:static; }.event-log { display:none; }.stage { min-height:auto; }
       .fps-objective { top:91px; left:15px; right:auto; width:calc(100% - 30px); }
+      .fps-mini-map { right:15px; bottom:92px; }
     }
     @media (max-width:680px) {
       .app { width:min(100% - 22px,1240px); padding-top:13px; }.topbar { align-items:flex-start; }.brand span { display:none; }.top-actions button { padding-inline:10px; }
       .card { padding:16px; }.alert-grid,.choice-grid,.scan-grid,.rack-wall,.difficulty-grid,.sequence-grid { grid-template-columns:1fr; }.challenge-head { align-items:flex-start; }.badge { display:none; }.code-box { flex-direction:column; }.code-box button { width:100%; }.result-grid,.team-roster,.join-fields { grid-template-columns:1fr; }.map-heading { display:block; }.map-legend { margin-top:11px; }
       .floor-plan.isometric { min-width:0; }.iso-zone.zone { min-height:40px; padding:6px 7px; }.iso-zone .zone-copy b { font-size:.67rem; }.iso-zone .zone-copy span { display:none; }.isometric .noc-zone,.isometric .diagnose-zone { width:96px; }.isometric .recovery-zone { width:113px; }.isometric .exit-zone { width:94px; }.isometric .rack-target { min-width:84px; }.three-navigation { grid-template-columns:repeat(2,minmax(0,1fr)); }.three-status { max-width:calc(100% - 128px); font-size:.58rem; }.map-view-reset { right:9px; padding-inline:7px; }
-      .fps-game { min-height:calc(100svh - 164px); border-radius:13px; }.fps-hud { top:10px; left:10px; gap:5px; }.fps-hud-card { min-width:72px; padding:6px 7px; }.fps-hud-card b { font-size:.83rem; }.fps-objective { top:91px; left:10px; right:auto; width:calc(100% - 20px); font-size:.7rem; }.fps-touch-controls { display:flex; }.fps-enter-panel { padding:22px 17px; }.fps-prompt { bottom:111px; font-size:.73rem; }
+      .fps-game { min-height:calc(100svh - 164px); border-radius:13px; }.fps-hud { top:10px; left:10px; gap:5px; }.fps-hud-card { min-width:72px; padding:6px 7px; }.fps-hud-card b { font-size:.83rem; }.fps-objective { top:91px; left:10px; right:auto; width:calc(100% - 20px); font-size:.7rem; }.fps-mini-map { right:10px; bottom:190px; width:140px; padding:6px; }.fps-mini-map-head { margin-bottom:3px; font-size:.5rem; }.fps-mini-map-head b { font-size:.5rem; }.fps-mini-map p { display:none; }.fps-touch-controls { display:flex; }.fps-enter-panel { padding:22px 17px; }.fps-prompt { bottom:111px; font-size:.73rem; }
     }
     @media (pointer:coarse) { .fps-touch-controls { display:flex; } }
     @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation:none!important; transition:none!important; } }
@@ -606,6 +609,11 @@
         <p id="fpsObjective" class="fps-objective"><b>Objective:</b> Preparing 3D training room…</p>
         <div class="fps-crosshair" aria-hidden="true"></div>
         <p id="fpsPrompt" class="fps-prompt">Loading fictional 3D training room…</p>
+        <aside id="fpsMiniMap" class="fps-mini-map" aria-label="Fictional data hall mini map">
+          <div class="fps-mini-map-head"><span>Hall map</span><b id="fpsMiniMapStatus">Ready</b></div>
+          <canvas id="fpsMiniMapCanvas" width="352" height="248" aria-label="Mini map. Blue marker is you; green marker is the current objective."></canvas>
+          <p>Blue: you · Green: objective</p>
+        </aside>
         <div id="fpsEnterOverlay" class="fps-enter-overlay">
           <div class="fps-enter-panel">
             <p class="eyebrow">First-person training mode</p>
@@ -976,7 +984,7 @@
       started:false, finished:false, difficulty:'medium', config:DIFFICULTIES.medium, seconds:DIFFICULTIES.medium.seconds, score:100, stage:0,
       clues:new Set(), scans:new Set(), timelineIndex:0, runbookIndex:0, validations:new Set(), hintsUsed:0, localPenaltySeconds:0, timer:null, log:['Simulation initialized.'],
       db:window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY) : null,
-      joined:false, player:null, sessionCode:'', lobbyTimer:null, isHost:false, hostName:'', sharedRunNumber:0, sharedStartedAt:null, lobbyRequestInFlight:false,
+      joined:false, player:null, sessionCode:'', lobbyTimer:null, isHost:false, hostName:'', sharedRunNumber:0, sharedStartedAt:null, joinedAtLocal:0, hostStartRequestedAt:0, lobbyRequestInFlight:false,
       pendingStartTimer:null, pendingCountdownTimer:null, pendingStartAt:null, pendingStartLocalMs:null,
       scenarioKey:null, scenario:null,
       fpsGame:null, fpsActive:false
@@ -1563,20 +1571,26 @@
       const terminalScreen = new THREE.Mesh(new THREE.PlaneGeometry(10.8, 6.75), terminalMaterial);
       const terminalFrame = new THREE.Mesh(new THREE.BoxGeometry(11.08, 7.03, .12), new THREE.MeshBasicMaterial({ color:0x122b3f, transparent:true, opacity:.95, depthTest:false, depthWrite:false, fog:false }));
       const terminalGlow = new THREE.PointLight(0x6eb9ff, 1.6, 10, 2);
+      const miniMapCanvas = $('#fpsMiniMapCanvas');
+      const miniMapContext = miniMapCanvas ? miniMapCanvas.getContext('2d') : null;
       const game = {
         THREE:THREE, holder:holder, renderer:renderer, scene:scene, camera:camera, player:player, raycaster:raycaster, pointer:pointer,
         terminalCanvas:terminalCanvas, terminalContext:terminalContext, terminalTexture:terminalTexture, terminalRoot:terminalRoot, terminalScreen:terminalScreen,
         terminalOpen:false, terminalTarget:null, terminalInput:false, codeBuffer:'', terminalHitboxes:[], targets:[], keys:new Set(), touchMoves:new Map(), listeners:[],
-        yaw:0, pitch:0, pointerLocked:false, entered:false, touchLook:null, dragLook:null, nearest:null, lastSignature:'', lastObjectiveMarkup:'', lastPrompt:'', lastUiAt:0, lastNearestAt:0, lastRenderAt:0, frame:null, resizeObserver:null,
-        canvas:renderer.domElement, isTouch:isTouch, quality:quality,
+        yaw:0, pitch:0, pointerLocked:false, entered:false, touchLook:null, dragLook:null, nearest:null, lastSignature:'', lastObjectiveMarkup:'', lastPrompt:'', lastUiAt:0, lastNearestAt:0, lastRenderAt:0, lastMapAt:0, frame:null, resizeObserver:null,
+        canvas:renderer.domElement, isTouch:isTouch, quality:quality, playerRadius:.42,
+        miniMapCanvas:miniMapCanvas, miniMapContext:miniMapContext,
         colliders:[
-          { minX:-6.8, maxX:6.8, minZ:-1.5, maxZ:.5 },
-          { minX:-6.8, maxX:6.8, minZ:2.05, maxZ:4.05 }
+          { minX:-6.8, maxX:6.8, minZ:-1.5, maxZ:.5, kind:'rack' },
+          { minX:-6.8, maxX:6.8, minZ:2.05, maxZ:4.05, kind:'rack' }
         ]
       };
       const addListener = (target, type, handler, options) => {
         target.addEventListener(type, handler, options);
         game.listeners.push({ target:target, type:type, handler:handler, options:options });
+      };
+      game.addCollider = (x, z, width, depth, kind) => {
+        game.colliders.push({ minX:x - width / 2, maxX:x + width / 2, minZ:z - depth / 2, maxZ:z + depth / 2, kind:kind || 'solid' });
       };
       const makeMaterial = (color, options) => new THREE.MeshStandardMaterial(Object.assign({ color:color, roughness:.67, metalness:.38, emissive:0x000000, emissiveIntensity:0 }, options || {}));
       const addBox = (parent, size, position, color, options) => {
@@ -1642,7 +1656,11 @@
       const ceiling = new THREE.Mesh(new THREE.BoxGeometry(32, .18, 24), makeMaterial(0x23465d, { roughness:.74, metalness:.3 }));
       ceiling.position.set(0, 7.12, 0);
       world.add(ceiling);
-      for (let x = -12; x <= 12; x += 6) addBox(world, [.16, 6.8, 23], [x, 3.5, 0], 0x3d6680, { metalness:.57 });
+      // Interior divider walls deliberately leave a north and south passage so every zone remains reachable.
+      [-12,-6,0,6,12].forEach(x => {
+        addBox(world, [.22, 6.8, 14.5], [x, 3.5, -.5], 0x3d6680, { metalness:.57 });
+        game.addCollider(x, -.5, .22, 14.5, 'wall');
+      });
       const roomLabel = makeFpsLabel('DATA HALL A · FICTIONAL TRAINING SIMULATION', '#6eb9ff');
       roomLabel.position.set(0, 5.7, -11.72);
       roomLabel.scale.set(8.2, 1.3, 1);
@@ -1669,6 +1687,7 @@
       const makeTerminal = (definition, color) => {
         const group = new THREE.Group();
         group.position.set(definition.position[0], 0, definition.position[1]);
+        game.addCollider(definition.position[0], definition.position[1], 3.55, 2.05, 'terminal');
         addBox(group, [3.45, .6, 1.85], [0, .62, 0], 0x28495f, { metalness:.54 });
         addBox(group, [2.75, 1.72, .12], [0, 1.78, -.73], color, { emissive:color, emissiveIntensity:.56, metalness:.19, rotation:[-.11,0,0] });
         [-1.22,1.22].forEach(x => addBox(group, [.18,1.1,.18], [x,.16,0], 0x415d70, { metalness:.62 }));
@@ -1686,6 +1705,8 @@
       const makeEquipment = (definition, color, model) => {
         const group = new THREE.Group();
         group.position.set(definition.position[0], 0, definition.position[1]);
+        const footprint = definition.footprint || [2.1, 1.75];
+        game.addCollider(definition.position[0], definition.position[1], footprint[0], footprint[1], 'equipment');
         const body = model(group, color);
         const ringMaterial = new THREE.MeshBasicMaterial({ color:0x546d80, transparent:true, opacity:.7, depthWrite:false });
         const ring = new THREE.Mesh(new THREE.TorusGeometry(definition.ring || 1.75,.07,8,40), ringMaterial);
@@ -1719,16 +1740,16 @@
       makeTerminal({ id:'noc', kind:'noc', title:'NOC CONSOLE', position:[-11.2,-7.25], assetKeys:['noc'] }, 0x2c7caa);
       makeTerminal({ id:'timeline', kind:'timeline', title:'TIMELINE DESK', position:[-5.4,-7.25], assetKeys:['noc'] }, 0x7f5caa);
       makeTerminal({ id:'incident', kind:'incident', title:'INCIDENT BOARD', position:[11.1,-7.25], assetKeys:['incident'] }, 0x9a5a3e);
-      makeEquipment({ id:'scan-pdu', kind:'scan', type:'pdu', title:'PDU-B · VIRTUAL', position:[10.4,-.25], assetKeys:['power-b'], ring:1.75 }, 0xe23c36, cabinetModel);
-      makeEquipment({ id:'scan-rack', kind:'scan', type:'rack', title:'RACK C14 · VIRTUAL', position:[7.8,1.25], assetKeys:['rack'], ring:1.75 }, 0xe23c36, rackModel);
-      makeEquipment({ id:'scan-crac', kind:'scan', type:'crac', title:'CRAC-1 · VIRTUAL', position:[-12.3,2.45], assetKeys:['cooling'], ring:2.15, labelHeight:4.58 }, 0x55cdf4, cracModel);
-      makeEquipment({ id:'scan-ups', kind:'scan', type:'ups', title:'UPS-A · VIRTUAL', position:[-12.0,7.45], assetKeys:['power-a'], ring:1.75 }, 0x42cf91, cabinetModel);
-      makeEquipment({ id:'scan-tor', kind:'scan', type:'tor', title:'TOR-07 · VIRTUAL', position:[6.2,6.25], assetKeys:['rack'], ring:1.75 }, 0x6eb9ff, rackModel);
+      makeEquipment({ id:'scan-pdu', kind:'scan', type:'pdu', title:'PDU-B · VIRTUAL', position:[10.4,-.25], assetKeys:['power-b'], ring:1.75, footprint:[2.05,1.55] }, 0xe23c36, cabinetModel);
+      makeEquipment({ id:'scan-rack', kind:'scan', type:'rack', title:'RACK C14 · VIRTUAL', position:[7.8,1.25], assetKeys:['rack'], ring:1.75, footprint:[1.8,1.75] }, 0xe23c36, rackModel);
+      makeEquipment({ id:'scan-crac', kind:'scan', type:'crac', title:'CRAC-1 · VIRTUAL', position:[-12.3,2.45], assetKeys:['cooling'], ring:2.15, labelHeight:4.58, footprint:[2.65,1.9] }, 0x55cdf4, cracModel);
+      makeEquipment({ id:'scan-ups', kind:'scan', type:'ups', title:'UPS-A · VIRTUAL', position:[-12.0,7.45], assetKeys:['power-a'], ring:1.75, footprint:[2.05,1.55] }, 0x42cf91, cabinetModel);
+      makeEquipment({ id:'scan-tor', kind:'scan', type:'tor', title:'TOR-07 · VIRTUAL', position:[6.2,6.25], assetKeys:['rack'], ring:1.75, footprint:[1.8,1.75] }, 0x6eb9ff, rackModel);
       makeTerminal({ id:'keypad', kind:'keypad', title:'RECOVERY KEY PAD', position:[.2,6.9], assetKeys:['rack'] }, 0xf6bd4d);
       makeTerminal({ id:'recovery', kind:'recovery', title:'RECOVERY CONSOLE', position:[-8.7,8.3], assetKeys:['recovery'] }, 0x42cf91);
-      makeEquipment({ id:'validation-power', kind:'validation', type:'power', title:'POWER VALIDATION', position:[10.9,6.9], assetKeys:['power-b'], ring:1.55 }, 0x42cf91, cabinetModel);
-      makeEquipment({ id:'validation-thermal', kind:'validation', type:'thermal', title:'THERMAL VALIDATION', position:[-8.8,2.9], assetKeys:['cooling-secondary'], ring:2.0, labelHeight:4.58 }, 0x58d6f8, cracModel);
-      makeEquipment({ id:'validation-workload', kind:'validation', type:'workload', title:'WORKLOAD VALIDATION', position:[1.7,8.1], assetKeys:['rack'], ring:1.55 }, 0x42cf91, rackModel);
+      makeEquipment({ id:'validation-power', kind:'validation', type:'power', title:'POWER VALIDATION', position:[10.9,6.9], assetKeys:['power-b'], ring:1.55, footprint:[2.05,1.55] }, 0x42cf91, cabinetModel);
+      makeEquipment({ id:'validation-thermal', kind:'validation', type:'thermal', title:'THERMAL VALIDATION', position:[-8.8,2.9], assetKeys:['cooling-secondary'], ring:2.0, labelHeight:4.58, footprint:[2.65,1.9] }, 0x58d6f8, cracModel);
+      makeEquipment({ id:'validation-workload', kind:'validation', type:'workload', title:'WORKLOAD VALIDATION', position:[3.8,8.1], assetKeys:['rack'], ring:1.55, footprint:[1.8,1.75] }, 0x42cf91, rackModel);
       const exitGroup = new THREE.Group();
       exitGroup.position.set(12.0,0,9.25);
       [-1.55,1.55].forEach(x => addBox(exitGroup,[.3,4.2,.5],[x,2.1,0],0x435c6e,{metalness:.6}));
@@ -1739,9 +1760,10 @@
       exitRing.rotation.x = Math.PI/2; exitRing.position.y=.06; exitGroup.add(exitRing);
       const exitLabel = makeFpsLabel('EXIT INTERLOCK','#6eb9ff'); exitLabel.position.set(0,4.85,0); exitGroup.add(exitLabel);
       world.add(exitGroup);
+      game.addCollider(12, 9.25, 3.65, .85, 'exit');
       game.targets.push({ id:'exit', kind:'exit', title:'EXIT INTERLOCK', assetKeys:['exit'], group:exitGroup, ring:exitRing, ringMaterial:exitRingMaterial, accent:exitDoor.material, position:new THREE.Vector3(12,0,9.25) });
-      const cracTwo = new THREE.Group(); cracTwo.position.set(12.4,0,2.45); cracModel(cracTwo,0x55cdf4); const cracTwoLabel=makeFpsLabel('CRAC-2','#6eb9ff');cracTwoLabel.position.set(0,4.58,0);cracTwo.add(cracTwoLabel);world.add(cracTwo);
-      const powerA = new THREE.Group(); powerA.position.set(-12.1,0,-.25);cabinetModel(powerA,0x42cf91);const powerALabel=makeFpsLabel('PDU-A','#6eb9ff');powerALabel.position.set(0,3.72,0);powerA.add(powerALabel);world.add(powerA);
+      const cracTwo = new THREE.Group(); cracTwo.position.set(12.4,0,2.45); game.addCollider(12.4, 2.45, 2.65, 1.9, 'equipment'); cracModel(cracTwo,0x55cdf4); const cracTwoLabel=makeFpsLabel('CRAC-2','#6eb9ff');cracTwoLabel.position.set(0,4.58,0);cracTwo.add(cracTwoLabel);world.add(cracTwo);
+      const powerA = new THREE.Group(); powerA.position.set(-12.1,0,-.25); game.addCollider(-12.1, -.25, 2.05, 1.55, 'equipment'); cabinetModel(powerA,0x42cf91);const powerALabel=makeFpsLabel('PDU-A','#6eb9ff');powerALabel.position.set(0,3.72,0);powerA.add(powerALabel);world.add(powerA);
       const beacon = new THREE.Mesh(new THREE.ConeGeometry(.32,1.05,12),new THREE.MeshBasicMaterial({color:0x6eb9ff,transparent:true,opacity:.88,depthWrite:false}));
       beacon.rotation.x = Math.PI; beacon.visible=false; world.add(beacon); game.beacon=beacon;
       scene.add(world);
@@ -1776,8 +1798,8 @@
         if (target) target.textContent = mode;
       };
       game.isBlocked = position => {
-        if (position.x < -15.1 || position.x > 15.1 || position.z < -11.1 || position.z > 11.1) return true;
-        return game.colliders.some(collider => position.x > collider.minX - .42 && position.x < collider.maxX + .42 && position.z > collider.minZ - .42 && position.z < collider.maxZ + .42);
+        if (position.x < -15.42 || position.x > 15.42 || position.z < -11.42 || position.z > 11.42) return true;
+        return game.colliders.some(collider => position.x > collider.minX - game.playerRadius && position.x < collider.maxX + game.playerRadius && position.z > collider.minZ - game.playerRadius && position.z < collider.maxZ + game.playerRadius);
       };
       game.move = dt => {
         if (!game.entered || game.terminalOpen || state.finished) return false;
@@ -1826,6 +1848,77 @@
           game.lastPrompt = message;
         }
       };
+      game.drawMiniMap = () => {
+        const context = game.miniMapContext;
+        const canvas = game.miniMapCanvas;
+        if (!context || !canvas || game.terminalOpen) return;
+        const width = canvas.width;
+        const height = canvas.height;
+        const pad = 18;
+        const mapX = value => pad + ((value + 16) / 32) * (width - pad * 2);
+        const mapY = value => pad + ((value + 12) / 24) * (height - pad * 2);
+        const mapWidth = mapX(16) - mapX(-16);
+        const mapHeight = mapY(12) - mapY(-12);
+        const gradient = context.createLinearGradient(0,0,width,height);
+        gradient.addColorStop(0,'#0e2a3d');
+        gradient.addColorStop(1,'#06131e');
+        context.clearRect(0,0,width,height);
+        context.fillStyle = gradient;
+        context.fillRect(0,0,width,height);
+        context.fillStyle = 'rgba(58,166,234,.14)';
+        context.fillRect(mapX(-8.25),mapY(.05),mapWidth * .516,mapY(2.45)-mapY(.05));
+        context.fillStyle = 'rgba(217,87,85,.11)';
+        context.fillRect(mapX(-8.25),mapY(-3.7),mapWidth * .516,mapY(-1.4)-mapY(-3.7));
+        context.strokeStyle = '#8ebbd7';
+        context.lineWidth = 2;
+        context.strokeRect(mapX(-16),mapY(-12),mapWidth,mapHeight);
+        game.colliders.forEach(collider => {
+          if (collider.kind !== 'wall' && collider.kind !== 'rack') return;
+          const x = mapX(collider.minX);
+          const y = mapY(collider.minZ);
+          const colliderWidth = mapX(collider.maxX) - x;
+          const colliderHeight = mapY(collider.maxZ) - y;
+          context.fillStyle = collider.kind === 'wall' ? '#6a9bb9' : '#315a72';
+          context.fillRect(x,y,colliderWidth,colliderHeight);
+        });
+        const objective = fpsDefaultTarget(game);
+        game.targets.forEach(target => {
+          const status = fpsTargetStatus(target);
+          const x = mapX(target.position.x);
+          const y = mapY(target.position.z);
+          context.beginPath();
+          context.arc(x,y,target === objective ? 6 : 3.2,0,Math.PI * 2);
+          context.fillStyle = target === objective ? '#5cf0aa' : (status.level === 'complete' ? '#55a97f' : '#6ca8d1');
+          context.fill();
+          if (target === game.nearest) {
+            context.strokeStyle = '#ffffff';
+            context.lineWidth = 1.5;
+            context.stroke();
+          }
+        });
+        const playerX = mapX(game.player.x);
+        const playerY = mapY(game.player.z);
+        context.save();
+        context.translate(playerX,playerY);
+        context.rotate(-game.yaw);
+        context.beginPath();
+        context.moveTo(0,-8);
+        context.lineTo(5.8,6);
+        context.lineTo(0,3.2);
+        context.lineTo(-5.8,6);
+        context.closePath();
+        context.fillStyle = '#6eb9ff';
+        context.shadowColor = '#6eb9ff';
+        context.shadowBlur = 8;
+        context.fill();
+        context.restore();
+        context.fillStyle = '#c5e2f4';
+        context.font = '800 13px Arial, sans-serif';
+        context.textAlign = 'center';
+        context.fillText('N',width / 2,13);
+        const status = $('#fpsMiniMapStatus');
+        if (status) status.textContent = objective ? objective.title.replace(' · VIRTUAL','').slice(0,18) : 'Exit ready';
+      };
       game.updateWorld = () => {
         const alerts = new Set(state.scenario && state.scenario.map ? state.scenario.map.alertAssets || [] : []);
         const focus = state.scenario && state.scenario.map ? state.scenario.map.focus : '';
@@ -1849,6 +1942,7 @@
           game.beacon.position.set(preferred.position.x,4.55 + Math.sin(performance.now()/350)*.12,preferred.position.z);
         } else game.beacon.visible = false;
         game.updateNearest(true);
+        game.drawMiniMap();
       };
       game.drawTerminal = () => drawFpsTerminal(game);
       game.openTerminal = target => {
@@ -2055,6 +2149,10 @@
         if (moved || now - game.lastNearestAt >= game.quality.nearInterval) {
           game.lastNearestAt = now;
           game.updateNearest();
+        }
+        if (!game.terminalOpen && (moved || now - game.lastMapAt >= 120)) {
+          game.lastMapAt = now;
+          game.drawMiniMap();
         }
         if (now - game.lastUiAt > 180) { game.lastUiAt = now; updateFpsExperience(); }
         if (now - game.lastRenderAt < 1000 / game.quality.targetFps) return;
@@ -2546,6 +2644,24 @@
         }
       }, Math.max(0, startMs - Date.now()) + 25);
     }
+    function shouldLaunchSharedRun(startMs, runNumber, scenarioKey, duration, secondsRemaining) {
+      if (!Number.isFinite(startMs) || !scenarioKey || Number(runNumber) < 1 || !Number.isFinite(duration) || duration <= 0 || !Number.isFinite(secondsRemaining) || secondsRemaining <= 0) return false;
+      const joinTime = Number(state.joinedAtLocal || 0);
+      const startRequestTime = Number(state.hostStartRequestedAt || 0);
+      const graceMs = 1500;
+      return !joinTime || startMs >= joinTime - graceMs || (startRequestTime && startMs >= startRequestTime - graceMs);
+    }
+    function showExistingRunMessage() {
+      const message = state.isHost
+        ? 'This session already has a running scenario. Select Restart for everyone to clear it, then press Start when your team is ready.'
+        : 'A scenario was already running before you joined. Waiting for the host to restart it for everyone.';
+      if (state.started || state.fpsGame) resetGame({ refresh:false });
+      clearPendingStart();
+      if (state.isHost) $('#resetButton').textContent = 'Clear previous session';
+      setLobbyStatus(message, state.isHost ? 'warn' : '');
+      $('#startMessage').textContent = message;
+      $('#hudMessage').textContent = message;
+    }
     function updateSessionControls() {
       const inSharedRun = Boolean(state.sharedStartedAt) || state.started;
       const hostCanStart = state.joined && state.isHost && !inSharedRun;
@@ -2625,18 +2741,23 @@
 
       updateSessionControls();
       const remaining = Number(game.seconds_remaining);
+      const duration = Number(game.duration_seconds);
       if (incomingStartedAt) {
         const newRun = incomingRun !== priorRun || incomingStartedAt !== priorStartedAt || scenarioOrDifficultyChanged;
         const isScheduledStart = Number.isFinite(localStartMs) && localStartMs > Date.now() + 50;
+        const derivedRemaining = Number.isFinite(localStartMs)
+          ? Math.max(0, state.config.seconds - Math.floor(Math.max(0, Date.now() - localStartMs) / 1000))
+          : state.config.seconds;
+        const initialRemaining = Number.isFinite(remaining) ? Math.min(remaining, derivedRemaining) : derivedRemaining;
+        if (!shouldLaunchSharedRun(localStartMs, incomingRun, incomingScenarioKey, duration, remaining) || initialRemaining <= 0) {
+          showExistingRunMessage();
+          return;
+        }
         if (isScheduledStart) {
           if (newRun || state.pendingStartAt !== incomingStartedAt) resetGame({ refresh:false });
           queueSharedStart(incomingStartedAt, localStartMs);
           return;
         }
-        const derivedRemaining = Number.isFinite(localStartMs)
-          ? Math.max(0, state.config.seconds - Math.floor(Math.max(0, Date.now() - localStartMs) / 1000))
-          : state.config.seconds;
-        const initialRemaining = Number.isFinite(remaining) ? Math.min(remaining, derivedRemaining) : derivedRemaining;
         if (!state.started || newRun) {
           resetGame({ refresh:false });
           beginLocalGame(initialRemaining);
@@ -2651,6 +2772,7 @@
           }
         }
       } else if (state.started || priorStartedAt || incomingRun !== priorRun) {
+        state.hostStartRequestedAt = 0;
         setGameConfiguration(incomingDifficulty, null);
         resetGame({ refresh:false });
       }
@@ -2693,6 +2815,8 @@
       state.joined = false;
       state.player = null;
       state.sessionCode = '';
+      state.joinedAtLocal = 0;
+      state.hostStartRequestedAt = 0;
       state.isHost = false;
       state.hostName = '';
       state.sharedRunNumber = 0;
@@ -2743,6 +2867,8 @@
         state.joined = true;
         state.player = data;
         state.sessionCode = data.session_code;
+        state.joinedAtLocal = Date.now();
+        state.hostStartRequestedAt = 0;
         const info = TEAM_INFO[Number(data.team_number)];
         $('#teamAssignmentName').textContent = info.label + ' · ' + info.specialty;
         $('#teamAssignment').classList.remove('hidden');
@@ -2822,6 +2948,7 @@
       const button = $('#startButton');
       button.disabled = true;
       button.textContent = 'Starting everyone…';
+      state.hostStartRequestedAt = Date.now();
       try {
         const { data, error } = await state.db.rpc('start_dc_escape_game', {
           p_session_code:state.sessionCode,
@@ -2832,6 +2959,7 @@
         applySharedSession(data);
         setLobbyStatus('Shared scenario started. Every joined player will launch automatically.', 'good');
       } catch (error) {
+        state.hostStartRequestedAt = 0;
         setLobbyStatus('Could not start the shared scenario: ' + (error.message || 'Unknown error'), 'bad');
         updateSessionControls();
       }
