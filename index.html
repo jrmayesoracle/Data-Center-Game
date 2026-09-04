@@ -83,6 +83,15 @@
     .team-assignment { display:flex; align-items:center; gap:9px; margin-top:11px; padding:10px; color:#dffbee; background:rgba(66,207,145,.1); border:1px solid rgba(66,207,145,.4); border-radius:10px; font-weight:800; }.team-assignment b { color:var(--green); }.team-assignment .team-dot { width:11px; height:11px; flex:0 0 auto; background:var(--green); border-radius:50%; box-shadow:0 0 10px var(--green); }
     .team-roster { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin-top:13px; }
     .team-card { min-width:0; padding:9px; background:rgba(255,255,255,.035); border:1px solid #30455b; border-radius:9px; }.team-card.current { border-color:var(--green); box-shadow:inset 3px 0 0 var(--green); }.team-card h3 { margin:0 0 4px; color:#deebf7; font-size:.78rem; }.team-card p { margin:0 0 5px; color:#8facbf; font-size:.69rem; }.team-card ul { display:grid; gap:3px; margin:0; padding:0; list-style:none; }.team-card li { overflow:hidden; color:#c6d5e2; font-size:.7rem; text-overflow:ellipsis; white-space:nowrap; }.team-card li.empty { color:#71879a; font-style:italic; }
+    .role-brief,.training-brief,.host-status-board { margin-top:13px; padding:12px; background:rgba(110,185,255,.06); border:1px solid rgba(110,185,255,.28); border-radius:10px; }
+    .role-brief h3,.training-brief h3,.host-status-board h3 { margin:0 0 4px; font-size:.9rem; }.role-brief p,.training-brief p,.host-status-board p { margin:0; color:#b7cbe0; font-size:.79rem; }
+    .role-task { margin-top:8px!important; color:#dff8ed!important; }.role-task b { color:var(--green); }
+    .training-brief { margin-top:16px; }.brief-progress { display:flex; gap:6px; margin:10px 0 8px; }.brief-progress i { width:100%; height:4px; background:#2c4256; border-radius:99px; }.brief-progress i.active { background:var(--green); box-shadow:0 0 8px rgba(66,207,145,.58); }.brief-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }.brief-actions button { min-height:34px; padding:6px 10px; font-size:.75rem; }
+    .reconnect-notice { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:10px; padding:9px 10px; color:#d9edf9; background:rgba(246,189,77,.08); border:1px solid rgba(246,189,77,.3); border-radius:9px; font-size:.78rem; font-weight:750; }.reconnect-notice button { min-height:32px; padding:5px 9px; font-size:.72rem; }
+    .drawer { position:fixed; z-index:70; top:72px; right:max(16px,calc((100vw - 1240px)/2)); width:min(390px,calc(100vw - 28px)); max-height:calc(100svh - 88px); overflow:auto; padding:16px; color:#e8f3fc; background:linear-gradient(145deg,rgba(16,33,48,.98),rgba(5,14,24,.98)); border:1px solid rgba(110,185,255,.52); border-radius:14px; box-shadow:0 22px 60px rgba(0,0,0,.46); }
+    .drawer-head { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }.drawer-head h2 { margin:0; font-size:1.04rem; }.drawer-head p { margin:4px 0 0; color:#a9c0d4; font-size:.76rem; }.drawer-close { min-height:30px; padding:4px 8px; font-size:.7rem; }
+    .setting-list { display:grid; gap:12px; margin:14px 0 0; }.setting-row { display:grid; grid-template-columns:1fr auto; gap:10px; align-items:center; padding:10px; background:rgba(255,255,255,.035); border:1px solid #2e465d; border-radius:9px; }.setting-row label { color:#dceaf5; font-size:.8rem; font-weight:800; }.setting-row small { display:block; margin-top:2px; color:#94acc0; font-size:.67rem; font-weight:600; }.setting-row input[type="range"] { width:142px; accent-color:var(--green); }.setting-row input[type="checkbox"] { width:20px; height:20px; accent-color:var(--green); }
+    .host-actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin:13px 0; }.host-actions button { min-height:38px; padding:7px 9px; font-size:.75rem; }.host-actions .wide { grid-column:1 / -1; }.host-status-board { margin-top:8px; }.host-status-board ul { display:grid; gap:5px; margin:8px 0 0; padding:0; list-style:none; }.host-status-board li { display:flex; align-items:center; justify-content:space-between; gap:8px; color:#bed0df; font-size:.72rem; }.status-chip { padding:2px 6px; color:#aeeece; background:rgba(66,207,145,.12); border:1px solid rgba(66,207,145,.28); border-radius:99px; font-size:.62rem; font-weight:900; }
     .status-card { display:grid; gap:13px; }
     .timer {
       padding:16px; text-align:center; color:#fff; background:#090f17; border:1px solid #2b4058; border-radius:13px;
@@ -177,11 +186,11 @@
     .fps-viewport { position:absolute; inset:0; background:radial-gradient(circle at 50% 45%,#1d3448 0,#07111b 68%); }
     .fps-viewport canvas { display:block; width:100%; height:100%; touch-action:none; outline:none; user-select:none; -webkit-user-select:none; cursor:crosshair; }
     .fps-vignette { position:absolute; inset:0; pointer-events:none; background:radial-gradient(ellipse at center,transparent 38%,rgba(0,0,0,.22) 73%,rgba(0,0,0,.62) 100%); }
-    .fps-hud { position:absolute; z-index:4; top:15px; left:15px; display:flex; flex-wrap:wrap; gap:8px; max-width:calc(100% - 30px); pointer-events:none; }
+    .fps-hud { position:absolute; z-index:4; top:15px; left:15px; display:grid; grid-template-columns:repeat(2,minmax(92px,1fr)); gap:8px; width:204px; pointer-events:none; }
     .fps-hud-card { position:relative; min-width:92px; padding:8px 10px; overflow:hidden; color:#d7e8f7; background:linear-gradient(145deg,rgba(13,34,52,.9),rgba(3,12,21,.87)); border:1px solid rgba(114,178,224,.42); border-radius:9px; box-shadow:0 8px 22px rgba(0,0,0,.22); backdrop-filter:blur(8px); }
     .fps-hud-card::before { content:""; position:absolute; inset:0 auto 0 0; width:2px; background:var(--blue); opacity:.9; }.fps-hud-card.mode-card::before { background:var(--yellow); }.fps-hud-card.mode-card b { color:#f6d07a; }
     .fps-hud-card span,.fps-hud-card b { display:block; }.fps-hud-card span { color:#8ba8be; font-size:.61rem; font-weight:900; letter-spacing:.1em; text-transform:uppercase; }.fps-hud-card b { margin-top:2px; color:#f2f9ff; font-size:1rem; }.fps-hud-card.timer-card b { color:var(--green); font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
-    .fps-objective { position:absolute; z-index:4; top:16px; right:15px; width:min(390px,calc(100% - 440px)); margin:0; padding:9px 11px; color:#d8e9f8; background:rgba(4,13,22,.82); border:1px solid rgba(114,178,224,.34); border-left:3px solid var(--blue); border-radius:9px; box-shadow:0 8px 22px rgba(0,0,0,.18); backdrop-filter:blur(8px); font-size:.76rem; font-weight:750; pointer-events:none; }.fps-objective span { display:block; margin-top:4px; color:#a8c8dd; font-size:.7rem; }
+    .fps-objective { position:absolute; z-index:4; top:16px; left:234px; right:15px; width:auto; max-width:430px; margin:0; padding:9px 11px; color:#d8e9f8; background:rgba(4,13,22,.82); border:1px solid rgba(114,178,224,.34); border-left:3px solid var(--blue); border-radius:9px; box-shadow:0 8px 22px rgba(0,0,0,.18); backdrop-filter:blur(8px); font-size:.76rem; font-weight:750; pointer-events:none; }.fps-objective span { display:block; margin-top:4px; color:#a8c8dd; font-size:.7rem; }
     .fps-objective b { color:var(--blue); }.fps-crosshair { position:absolute; z-index:5; top:50%; left:50%; width:22px; height:22px; pointer-events:none; transform:translate(-50%,-50%); }.fps-crosshair::before,.fps-crosshair::after { content:""; position:absolute; background:rgba(235,247,255,.95); box-shadow:0 0 8px rgba(110,185,255,.8); }.fps-crosshair::before { top:10px; left:0; width:22px; height:2px; }.fps-crosshair::after { top:0; left:10px; width:2px; height:22px; }
     .fps-prompt { position:absolute; z-index:6; right:50%; bottom:25px; width:min(550px,calc(100% - 30px)); margin:0; padding:10px 13px; color:#e5f3ff; text-align:center; background:rgba(4,13,22,.86); border:1px solid rgba(110,185,255,.4); border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,.2); backdrop-filter:blur(8px); transform:translateX(50%); font-size:.83rem; font-weight:750; pointer-events:none; }.fps-prompt b { color:var(--green); }
     .fps-mini-map { position:absolute; z-index:5; right:16px; bottom:16px; width:192px; padding:8px; color:#d8ebf8; background:linear-gradient(145deg,rgba(11,37,56,.93),rgba(3,14,24,.91)); border:1px solid rgba(110,185,255,.54); border-radius:11px; box-shadow:0 10px 28px rgba(0,0,0,.28); backdrop-filter:blur(8px); pointer-events:none; }.fps-mini-map-head { display:flex; justify-content:space-between; gap:8px; margin:0 1px 5px; color:#8db5cf; font-size:.59rem; font-weight:950; letter-spacing:.1em; text-transform:uppercase; }.fps-mini-map-head b { color:#87edbb; font-size:.59rem; }.fps-mini-map canvas { display:block; width:100%; height:auto; background:#071927; border:1px solid rgba(110,185,255,.28); border-radius:6px; }.fps-mini-map p { margin:5px 1px 0; color:#94b4c9; font-size:.57rem; font-weight:750; }
@@ -190,6 +199,12 @@
     .fps-touch-controls { position:absolute; z-index:9; inset:auto 0 0; display:none; justify-content:space-between; align-items:flex-end; padding:17px; pointer-events:none; }.fps-touch-pad { display:grid; grid-template-columns:repeat(3,48px); grid-template-rows:repeat(2,45px); gap:4px; pointer-events:auto; }.fps-touch-pad button,.fps-use-button { display:grid; min-width:0; min-height:0; place-items:center; padding:0; color:#e9f7ff; background:linear-gradient(145deg,rgba(18,47,70,.92),rgba(6,20,34,.9)); border:1px solid rgba(110,185,255,.62); border-radius:12px; box-shadow:0 8px 18px rgba(0,0,0,.22); font-size:1.1rem; touch-action:none; }.fps-touch-pad button:active,.fps-use-button:active { transform:translateY(1px) scale(.97); }.fps-touch-pad button:nth-child(1) { grid-column:2; }.fps-touch-pad button:nth-child(2) { grid-column:1; grid-row:2; }.fps-touch-pad button:nth-child(3) { grid-column:2; grid-row:2; }.fps-touch-pad button:nth-child(4) { grid-column:3; grid-row:2; }.fps-use-button { width:74px; height:74px; flex:0 0 auto; color:#05131d; background:var(--green); border-color:#8bf1c3; font-size:.8rem; font-weight:950; letter-spacing:.08em; pointer-events:auto; }
     .fps-game.terminal-open .fps-hud,.fps-game.terminal-open .fps-objective,.fps-game.terminal-open .fps-crosshair,.fps-game.terminal-open .fps-prompt,.fps-game.terminal-open .fps-mini-map { opacity:0; visibility:hidden; pointer-events:none; }
     .fps-game.terminal-open .fps-touch-controls { display:none!important; }
+    .fps-game.terminal-open .fps-comms,.fps-game.terminal-open .fps-caption { opacity:0; visibility:hidden; pointer-events:none; }
+    .fps-comms { position:absolute; z-index:7; left:16px; bottom:16px; width:min(310px,calc(100% - 225px)); padding:8px; color:#dcecf8; background:linear-gradient(145deg,rgba(11,37,56,.93),rgba(3,14,24,.91)); border:1px solid rgba(110,185,255,.48); border-radius:11px; box-shadow:0 10px 28px rgba(0,0,0,.26); backdrop-filter:blur(8px); }.fps-comms-head { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:6px; color:#90b6cf; font-size:.61rem; font-weight:950; letter-spacing:.1em; text-transform:uppercase; }.fps-comms-head b { color:#9fecc1; font-size:.61rem; }.fps-ping-actions { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:5px; }.fps-ping-actions button { min-height:31px; padding:5px; color:#d8ecfb; background:rgba(36,79,110,.66); border:1px solid rgba(110,185,255,.42); border-radius:7px; font-size:.62rem; }.fps-ping-actions button:hover:not(:disabled) { background:#214c6b; }.fps-ping-feed { display:grid; gap:3px; max-height:48px; margin-top:6px; overflow:hidden; color:#a9c4d7; font-size:.63rem; }.fps-ping-feed p { margin:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }.fps-ping-feed b { color:#f5d789; }
+    .fps-caption { position:absolute; z-index:7; left:50%; bottom:78px; max-width:min(600px,calc(100% - 32px)); margin:0; padding:7px 10px; color:#edf8ff; text-align:center; background:rgba(2,10,17,.76); border:1px solid rgba(142,201,239,.35); border-radius:8px; transform:translateX(-50%); font-size:.72rem; font-weight:750; pointer-events:none; }.fps-caption.hidden { display:none!important; }
+    .fps-paused { position:absolute; z-index:10; top:50%; left:50%; width:min(450px,calc(100% - 38px)); padding:20px; color:#eef8ff; text-align:center; background:rgba(4,14,23,.94); border:1px solid rgba(246,189,77,.64); border-radius:14px; box-shadow:0 20px 65px rgba(0,0,0,.48); transform:translate(-50%,-50%); }.fps-paused h2 { margin:0 0 6px; color:#f6d285; }.fps-paused p { margin:0; color:#bad0e1; font-size:.83rem; }
+    .debrief { margin:20px 0 0; padding-top:17px; border-top:1px solid rgba(139,183,213,.3); text-align:left; }.debrief h3 { margin:0 0 10px; text-align:center; }.debrief-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }.debrief-grid div { padding:9px; background:rgba(255,255,255,.055); border:1px solid rgba(110,185,255,.18); border-radius:8px; }.debrief-grid span,.debrief-grid b { display:block; }.debrief-grid span { color:#9fb7ca; font-size:.66rem; font-weight:850; text-transform:uppercase; }.debrief-grid b { margin-top:2px; color:#e6f4ff; font-size:.88rem; }.debrief-list { display:grid; gap:5px; max-height:155px; margin:12px 0 0; padding:0; overflow:auto; list-style:none; }.debrief-list li { padding:7px 8px; color:#c4d8e8; background:rgba(255,255,255,.035); border-radius:7px; font-size:.72rem; }.debrief-list time { margin-right:5px; color:#80c8f4; font-family:ui-monospace,SFMono-Regular,monospace; font-weight:800; }
+    body.high-contrast { --panel:#07131e; --panel-2:#0c1c2a; --line:#85c8ef; --ink:#fff; --muted:#d1e6f5; --blue:#7fceff; }.high-contrast .card,.high-contrast .fps-hud-card,.high-contrast .fps-objective,.high-contrast .fps-mini-map,.high-contrast .fps-comms { border-width:2px; }.reduced-motion *, .reduced-motion *::before, .reduced-motion *::after { animation:none!important; transition:none!important; }
     .map-caption { margin:12px 0 0; color:#aabbd0; font-size:.81rem; }
     .event-log { margin-top:15px; padding-top:14px; border-top:1px solid #2b3a4c; }
     .event-log h3 { margin-bottom:8px; }.event-log ul { display:grid; gap:7px; max-height:180px; margin:0; padding:0; overflow:auto; list-style:none; }
@@ -245,14 +260,14 @@
     .footer { margin:20px 0 0; color:#8e9eaf; font-size:.78rem; text-align:center; }
     @media (max-width:900px) {
       .hero,.game-grid { grid-template-columns:1fr; }.room-map { position:static; }.event-log { display:none; }.stage { min-height:auto; }
-      .fps-objective { top:91px; left:15px; right:auto; width:calc(100% - 30px); }
+      .fps-objective { top:91px; left:15px; right:15px; width:auto; max-width:none; }
       .fps-mini-map { right:15px; bottom:92px; }
     }
     @media (max-width:680px) {
       .app { width:min(100% - 22px,1240px); padding-top:13px; }.topbar { align-items:flex-start; }.brand span { display:none; }.top-actions button { padding-inline:10px; }
       .card { padding:16px; }.alert-grid,.choice-grid,.scan-grid,.rack-wall,.difficulty-grid,.sequence-grid { grid-template-columns:1fr; }.challenge-head { align-items:flex-start; }.badge { display:none; }.code-box { flex-direction:column; }.code-box button { width:100%; }.result-grid,.team-roster,.join-fields { grid-template-columns:1fr; }.map-heading { display:block; }.map-legend { margin-top:11px; }
       .floor-plan.isometric { min-width:0; }.iso-zone.zone { min-height:40px; padding:6px 7px; }.iso-zone .zone-copy b { font-size:.67rem; }.iso-zone .zone-copy span { display:none; }.isometric .noc-zone,.isometric .diagnose-zone { width:96px; }.isometric .recovery-zone { width:113px; }.isometric .exit-zone { width:94px; }.isometric .rack-target { min-width:84px; }.three-navigation { grid-template-columns:repeat(2,minmax(0,1fr)); }.three-status { max-width:calc(100% - 128px); font-size:.58rem; }.map-view-reset { right:9px; padding-inline:7px; }
-      .fps-game { min-height:calc(100svh - 164px); border-radius:13px; }.fps-hud { top:10px; left:10px; gap:5px; }.fps-hud-card { min-width:72px; padding:6px 7px; }.fps-hud-card b { font-size:.83rem; }.fps-objective { top:91px; left:10px; right:auto; width:calc(100% - 20px); font-size:.7rem; }.fps-mini-map { right:10px; bottom:190px; width:140px; padding:6px; }.fps-mini-map-head { margin-bottom:3px; font-size:.5rem; }.fps-mini-map-head b { font-size:.5rem; }.fps-mini-map p { display:none; }.fps-touch-controls { display:flex; }.fps-enter-panel { padding:22px 17px; }.fps-prompt { bottom:111px; font-size:.73rem; }
+      .fps-game { min-height:calc(100svh - 164px); border-radius:13px; }.fps-hud { top:10px; left:10px; grid-template-columns:repeat(4,minmax(68px,1fr)); width:auto; gap:5px; }.fps-hud-card { min-width:72px; padding:6px 7px; }.fps-hud-card b { font-size:.83rem; }.fps-objective { top:91px; left:10px; right:10px; width:auto; max-width:none; font-size:.7rem; }.fps-mini-map { right:10px; bottom:190px; width:140px; padding:6px; }.fps-mini-map-head { margin-bottom:3px; font-size:.5rem; }.fps-mini-map-head b { font-size:.5rem; }.fps-mini-map p { display:none; }.fps-touch-controls { display:flex; }.fps-enter-panel { padding:22px 17px; }.fps-prompt { bottom:111px; font-size:.73rem; }.fps-comms { left:10px; bottom:168px; width:145px; padding:6px; }.fps-ping-actions { grid-template-columns:1fr; }.fps-ping-actions button { min-height:26px; font-size:.57rem; }.fps-ping-feed { display:none; }.fps-caption { bottom:105px; font-size:.65rem; }.debrief-grid { grid-template-columns:1fr; }
     }
     @media (pointer:coarse) { .fps-touch-controls { display:flex; } }
     @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation:none!important; transition:none!important; } }
@@ -267,10 +282,41 @@
       </div>
       <div class="top-actions">
         <button id="fullscreenButton" class="ghost" type="button" aria-pressed="false">Fullscreen</button>
+        <button id="settingsButton" class="ghost" type="button" aria-expanded="false">Settings</button>
+        <button id="hostToolsButton" class="ghost hidden" type="button" aria-expanded="false">Host tools</button>
         <button id="hintButton" class="ghost" type="button" disabled>Hint <span id="hintCost">−10</span></button>
         <button id="resetButton" class="secondary" type="button">Restart</button>
       </div>
     </header>
+
+    <aside id="settingsDrawer" class="drawer hidden" aria-label="Comfort and performance settings">
+      <div class="drawer-head"><div><h2>Comfort &amp; performance</h2><p>Saved only on this device.</p></div><button class="ghost drawer-close" type="button" data-close-drawer="settingsDrawer">Close</button></div>
+      <div class="setting-list">
+        <div class="setting-row"><label for="settingSensitivity">Look sensitivity<small>Mouse and touch rotation speed</small></label><input id="settingSensitivity" type="range" min="0.55" max="1.8" step="0.05" value="1"></div>
+        <div class="setting-row"><label for="settingFov">Field of view<small>Wider view may feel faster</small></label><input id="settingFov" type="range" min="64" max="90" step="1" value="74"></div>
+        <div class="setting-row"><label for="settingBrightness">Room brightness<small>Adjust fictional-room exposure</small></label><input id="settingBrightness" type="range" min="0.85" max="1.8" step="0.05" value="1.3"></div>
+        <div class="setting-row"><label for="settingInvertY">Invert vertical look<small>Reverse up and down camera control</small></label><input id="settingInvertY" type="checkbox"></div>
+        <div class="setting-row"><label for="settingReduceMotion">Reduce motion<small>Stops bobbing and terminal-ring motion</small></label><input id="settingReduceMotion" type="checkbox"></div>
+        <div class="setting-row"><label for="settingHighContrast">High contrast<small>Stronger edges and text contrast</small></label><input id="settingHighContrast" type="checkbox"></div>
+        <div class="setting-row"><label for="settingLowGraphics">Performance mode<small>Reduces render quality for smoother play</small></label><input id="settingLowGraphics" type="checkbox"></div>
+        <div class="setting-row"><label for="settingSound">Training sound cues<small>Optional low-volume fictional cues</small></label><input id="settingSound" type="checkbox" checked></div>
+        <div class="setting-row"><label for="settingCaptions">On-screen cue captions<small>Show team pings and status cues</small></label><input id="settingCaptions" type="checkbox" checked></div>
+      </div>
+      <div class="brief-actions"><button id="replayTutorialButton" class="secondary" type="button">Replay quick briefing</button></div>
+    </aside>
+
+    <aside id="hostTools" class="drawer hidden" aria-label="Host command deck">
+      <div class="drawer-head"><div><h2>Host command deck</h2><p>Fictional training controls for the current session.</p></div><button class="ghost drawer-close" type="button" data-close-drawer="hostTools">Close</button></div>
+      <div class="host-actions">
+        <button id="hostPauseButton" class="secondary" type="button">Pause scenario</button>
+        <button id="hostResumeButton" class="secondary" type="button">Resume scenario</button>
+        <button id="hostPromptEvidence" class="ghost" type="button" data-instructor-prompt="Review evidence before deciding.">Prompt: evidence</button>
+        <button id="hostPromptCoordinate" class="ghost" type="button" data-instructor-prompt="Share your next fictional finding with the team.">Prompt: coordinate</button>
+        <button id="hostSpectateButton" class="ghost wide" type="button">Open team overview</button>
+        <button id="hostRestartButton" class="wide" type="button">Restart for everyone</button>
+      </div>
+      <section id="hostTeamBoard" class="host-status-board" aria-live="polite"><h3>Team status</h3><p>Join a session to view team availability.</p></section>
+    </aside>
 
     <section class="hero">
       <section class="card">
@@ -291,11 +337,14 @@
             <label>Your name<input id="playerName" maxlength="64" autocomplete="name" placeholder="First and last name" aria-label="Your name"></label>
             <button id="joinTeamButton" type="button">Join a team</button>
           </div>
+          <div id="reconnectNotice" class="reconnect-notice hidden"><span id="reconnectCopy">Resume your saved lobby reservation.</span><button id="reconnectButton" class="ghost" type="button">Reconnect</button></div>
           <p id="lobbyStatus" class="lobby-status">Enter your name, then join the session.</p>
           <div id="teamAssignment" class="team-assignment hidden"><span class="team-dot"></span><span>Assigned to <b id="teamAssignmentName">Team</b></span></div>
+          <section id="roleBrief" class="role-brief hidden" aria-live="polite"><h3 id="roleTitle">Team role</h3><p id="roleCopy">Your role gives your team a useful angle on the fictional incident.</p><p id="roleTask" class="role-task"></p></section>
           <p id="hostStatus" class="lobby-status hidden" aria-live="polite"></p>
           <div id="teamRoster" class="team-roster" aria-live="polite"></div>
         </section>
+        <section id="trainingBrief" class="training-brief" aria-live="polite"><h3>Quick-start briefing <span id="briefStepLabel">1 / 3</span></h3><p id="briefCopy">Look around with the mouse or drag; use the on-screen controls on touch devices.</p><div id="briefProgress" class="brief-progress" aria-hidden="true"><i class="active"></i><i></i><i></i></div><div class="brief-actions"><button id="briefBack" class="ghost" type="button">Back</button><button id="briefNext" class="secondary" type="button">Next</button></div></section>
         <section id="difficultyPicker" class="difficulty-picker" aria-labelledby="difficultyTitle">
           <div><h2 id="difficultyTitle">Host chooses scenario difficulty</h2><p>The host’s selection is shared with every player when the session starts.</p></div>
           <div class="difficulty-grid" role="group" aria-label="Scenario difficulty">
@@ -487,9 +536,19 @@
           <p id="diagnoseFeedback" class="feedback"></p>
         </section>
 
+        <section id="componentPanel" class="challenge hidden" data-panel="component">
+          <div class="challenge-head">
+            <div class="head-copy"><span class="stage-number">4</span><div><h2 id="componentPuzzleTitle">Component correlation</h2><p id="componentPuzzlePrompt">Prove the fictional component path before tracing recovery assets.</p></div></div>
+            <span class="badge">Correlate</span>
+          </div>
+          <p class="notice">This is a fictional component-path puzzle. Select the modeled path supported by the primary evidence and dependency map; it never represents a real operational action.</p>
+          <div id="componentChoices" class="choice-grid"></div>
+          <p id="componentFeedback" class="feedback"></p>
+        </section>
+
         <section id="aislePanel" class="challenge hidden" data-panel="aisle">
           <div class="challenge-head">
-            <div class="head-copy"><span class="stage-number">4</span><div><h2>Server aisle</h2><p>Trace the virtual equipment labels. Each difficulty needs a different amount of evidence for the recovery key.</p></div></div>
+            <div class="head-copy"><span class="stage-number">5</span><div><h2>Server aisle</h2><p>Trace the virtual equipment labels. Each difficulty needs a different amount of evidence for the recovery key.</p></div></div>
             <span class="badge">Trace</span>
           </div>
           <p class="notice">This is a fictional floor view. Inspect the simulated assets only—no physical switching or real reset steps are part of this game.</p>
@@ -510,7 +569,7 @@
 
         <section id="recoveryPanel" class="challenge hidden" data-panel="recovery">
           <div class="challenge-head">
-            <div class="head-copy"><span class="stage-number">5</span><div><h2>Recovery console</h2><p>Complete the virtual runbook sequence before you choose the approved recovery path.</p></div></div>
+            <div class="head-copy"><span class="stage-number">6</span><div><h2>Recovery console</h2><p>Complete the virtual runbook sequence before you choose the approved recovery path.</p></div></div>
             <span class="badge">Recover</span>
           </div>
           <p class="notice">Virtual procedure only: no physical equipment, live service, or real operational control is involved in this training scenario.</p>
@@ -541,7 +600,7 @@
 
         <section id="validationPanel" class="challenge hidden" data-panel="validation">
           <div class="challenge-head">
-            <div class="head-copy"><span class="stage-number">6</span><div><h2>Post-recovery validation</h2><p>Check that the virtual recovery produced the expected stable signals before you unlock the exit.</p></div></div>
+            <div class="head-copy"><span class="stage-number">7</span><div><h2>Post-recovery validation</h2><p>Check that the virtual recovery produced the expected stable signals before you unlock the exit.</p></div></div>
             <span class="badge">Validate</span>
           </div>
           <p class="notice">Inspect each required simulated signal. A recovery is not complete until the evidence supports it.</p>
@@ -556,7 +615,7 @@
 
         <section id="summaryPanel" class="challenge hidden" data-panel="summary">
           <div class="challenge-head">
-            <div class="head-copy"><span class="stage-number">7</span><div><h2>Hard-mode incident summary</h2><p>Confirm the correct fictional root cause before the exit interlock will unlock.</p></div></div>
+            <div class="head-copy"><span class="stage-number">8</span><div><h2>Hard-mode incident summary</h2><p>Confirm the correct fictional root cause before the exit interlock will unlock.</p></div></div>
             <span class="badge">Confirm</span>
           </div>
           <div class="choice-grid">
@@ -591,6 +650,11 @@
                 <div><span>Final score</span><b id="resultScore">0</b></div>
               </div>
               <p class="muted">Try again for a faster score, or use this as the base for more failure scenarios.</p>
+              <section id="debrief" class="debrief" aria-label="Training debrief">
+                <h3>After-action debrief</h3>
+                <div id="debriefGrid" class="debrief-grid"></div>
+                <ul id="debriefTimeline" class="debrief-list"></ul>
+              </section>
               <button id="playAgain" type="button">Play again</button>
             </div>
           </div>
@@ -612,14 +676,27 @@
         <aside id="fpsMiniMap" class="fps-mini-map" aria-label="Fictional data hall mini map">
           <div class="fps-mini-map-head"><span>Hall map</span><b id="fpsMiniMapStatus">Ready</b></div>
           <canvas id="fpsMiniMapCanvas" width="352" height="248" aria-label="Mini map. Blue marker is you; green marker is the current objective."></canvas>
-          <p>Blue: you · Green: objective</p>
+          <p>Blue: you · Green: objective · colored: teams</p>
         </aside>
+        <section id="fpsComms" class="fps-comms" aria-label="Team communication tools">
+          <div class="fps-comms-head"><span>Team comms</span><b id="fpsRoleHud">Role ready</b></div>
+          <div class="fps-ping-actions" role="group" aria-label="Send a fictional training ping">
+            <button type="button" data-ping="clue">Clue found</button>
+            <button type="button" data-ping="help">Need help</button>
+            <button type="button" data-ping="complete">Objective complete</button>
+            <button type="button" data-ping="meet">Meet here</button>
+          </div>
+          <div id="fpsPingFeed" class="fps-ping-feed" aria-live="polite"><p>Team pings will appear here.</p></div>
+        </section>
+        <p id="fpsCaption" class="fps-caption hidden" aria-live="polite"></p>
+        <div id="fpsPaused" class="fps-paused hidden" aria-live="assertive"><h2>Scenario paused</h2><p id="fpsPausedCopy">The host has paused the fictional training timer.</p></div>
         <div id="fpsEnterOverlay" class="fps-enter-overlay">
           <div class="fps-enter-panel">
             <p class="eyebrow">First-person training mode</p>
-            <h2>Enter the fictional data hall</h2>
-            <p>Every investigation, choice, recovery step, and exit action happens on 3D terminals in the room.</p>
-            <button id="fpsEnterButton" type="button">Enter 3D room</button>
+            <h2 id="fpsTutorialTitle">Enter the fictional data hall</h2>
+            <p id="fpsTutorialCopy">Every investigation, choice, recovery step, and exit action happens on 3D terminals in the room.</p>
+            <div class="brief-progress" aria-hidden="true"><i id="fpsTutorialDot1" class="active"></i><i id="fpsTutorialDot2"></i><i id="fpsTutorialDot3"></i></div>
+            <div class="brief-actions" style="justify-content:center"><button id="fpsTutorialBack" class="ghost" type="button">Back</button><button id="fpsTutorialNext" class="secondary" type="button">Next</button><button id="fpsTutorialSkip" class="ghost" type="button">Skip briefing</button><button id="fpsEnterButton" type="button">Enter 3D room</button></div>
             <p class="fps-control-help">Desktop: WASD / arrow keys to move · click-and-drag or move the mouse to freely look around · hold Shift to sprint · E to use. Mobile: drag to look, use the movement pad, then tap USE.</p>
           </div>
         </div>
@@ -917,6 +994,31 @@
           alert:index < 2
         };
       });
+      const puzzleProfiles = {
+        power_branch:['Virtual distribution path','Trace the modeled branch signal from the source component to the affected virtual rack.'],
+        ups_resilience:['Virtual resiliency path','Match the modeled UPS confidence signal to the protected virtual load it affects.'],
+        generator_readiness:['Virtual standby path','Correlate the modeled readiness component with the transfer-bay consequence.'],
+        cooling_airflow:['Virtual airflow path','Trace the modeled cooling component through the affected hot-aisle condition.'],
+        leak_detection:['Virtual sensor zone','Correlate the modeled moisture component with the correct fictional safety zone.'],
+        network_path:['Virtual network path','Trace the modeled route component to the simulated service impact.'],
+        compute_cluster:['Virtual compute dependency','Match the modeled cluster component to the affected virtual workload.'],
+        storage_replication:['Virtual replication chain','Trace the modeled storage component to the simulated data-service impact.'],
+        cabling_map:['Virtual connectivity map','Match the modeled physical-path representation to the affected virtual service.'],
+        monitoring_data:['Virtual telemetry chain','Correlate the modeled monitoring component with the correct fictional impact.'],
+        access_control:['Virtual access correlation','Match the fictional access component to the modeled secure-zone impact.'],
+        life_safety:['Virtual supervisory path','Correlate the fictional supervisory component with the correct modeled notification path.']
+      };
+      const profile = puzzleProfiles[seed.key] || ['Component correlation','Trace the fictional component path that best explains the modeled impact.'];
+      const componentPuzzle = {
+        title:profile[0],
+        prompt:profile[1] + ' The correct path must use the primary evidence—not one of the decoy signals.',
+        correct:'primary',
+        choices:[
+          { key:'primary', title:seed.primaryTitle + ' → ' + seed.location, summary:'Primary virtual evidence aligns with the modeled impact and dependency map.' },
+          { key:'decoy-one', title:decoyOne.title + ' → ' + seed.location, summary:'This independent virtual signal is a decoy and does not explain the modeled impact.' },
+          { key:'decoy-two', title:decoyTwo.title + ' → ' + seed.location, summary:'This virtual signal is present but does not match the dependency chain.' }
+        ]
+      };
       return {
         key:seed.key,
         title:seed.title,
@@ -946,6 +1048,7 @@
           {key:decoyOne.key, title:decoyOne.title, summary:decoyOne.detail},
           {key:decoyTwo.key, title:decoyTwo.title, summary:decoyTwo.detail}
         ],
+        componentPuzzle:componentPuzzle,
         scans:cards,
         validations:{
           power:{title:seed.category + ' signal', summary:'Confirm the primary virtual signal is stable.', detail:'The simulated ' + seed.rootTitle.toLowerCase() + ' signal is stable after the approved virtual response.'},
@@ -971,15 +1074,23 @@
       restart:{title:'Take an unapproved shortcut', summary:'Skip the safe fictional sequence and attempt a broad virtual restart.'}
     };
     const difficultyRank = { easy:1, medium:2, hard:3 };
-    const panels = ['noc','timeline','diagnose','aisle','recovery','validation','summary','exit','win'];
-    const panelRequirements = { noc:0, timeline:1, diagnose:2, aisle:3, recovery:4, validation:5, summary:6, exit:6, win:Infinity };
+    const panels = ['noc','timeline','diagnose','component','aisle','recovery','validation','summary','exit','win'];
+    const panelRequirements = { noc:0, timeline:1, diagnose:2, component:3, aisle:3, recovery:4, validation:5, summary:6, exit:6, win:Infinity };
     const zoneRequirements = { noc:0, diagnose:2, aisle:3, recovery:4, exit:6 };
     const TEAM_INFO = {
-      1:{ label:'Team 1', specialty:'Power' },
-      2:{ label:'Team 2', specialty:'Cooling' },
-      3:{ label:'Team 3', specialty:'Network' },
-      4:{ label:'Team 4', specialty:'Operations' }
+      1:{ label:'Team 1', specialty:'Power & resilience', role:'Facilities analyst', color:'#f6bd4d', task:'Compare the fictional power and resiliency signals; call out the evidence that is not a decoy.' },
+      2:{ label:'Team 2', specialty:'Cooling & safety', role:'Environment scout', color:'#6eb9ff', task:'Trace modeled environmental clues and report which fictional condition changes the impact picture.' },
+      3:{ label:'Team 3', specialty:'Network paths', role:'Topology analyst', color:'#b982ff', task:'Use virtual dependency clues to rule in or rule out the modeled path behind the incident.' },
+      4:{ label:'Team 4', specialty:'Incident coordination', role:'Sequence coordinator', color:'#42cf91', task:'Rebuild the fictional timeline and keep the team aligned on the next safe training checkpoint.' }
     };
+    const BRIEFING_STEPS = [
+      { title:'Look around', copy:'Move the mouse or drag on the screen to freely look around the fictional data hall. The highlighted ring shows the current training objective.' },
+      { title:'Move with purpose', copy:'Use WASD or the arrow keys to move. On a phone, use the movement pad. Hold Shift on desktop to sprint when the path is clear.' },
+      { title:'Use virtual terminals', copy:'Approach a highlighted terminal and press E or tap USE. Share non-blocking team pings whenever you find a useful fictional clue.' }
+    ];
+    const PING_COPY = { clue_found:'Clue found', need_help:'Need help', objective_complete:'Objective complete', meet_here:'Meet here', watch_out:'Watch out' };
+    const ZONE_NAMES = { noc:'NOC evidence', timeline:'Timeline desk', diagnose:'Incident board', aisle:'Virtual asset trace', recovery:'Recovery console', validation:'Validation', summary:'Incident summary', exit:'Exit interlock' };
+    const DEFAULT_SETTINGS = { sensitivity:1, fov:74, brightness:1.3, invertY:false, reducedMotion:false, highContrast:false, lowGraphics:false, sound:true, captions:true };
     const state = {
       started:false, finished:false, difficulty:'medium', config:DIFFICULTIES.medium, seconds:DIFFICULTIES.medium.seconds, score:100, stage:0,
       clues:new Set(), scans:new Set(), timelineIndex:0, runbookIndex:0, validations:new Set(), hintsUsed:0, localPenaltySeconds:0, timer:null, log:['Simulation initialized.'],
@@ -987,7 +1098,11 @@
       joined:false, player:null, sessionCode:'', lobbyTimer:null, isHost:false, hostName:'', sharedRunNumber:0, sharedStartedAt:null, joinedAtLocal:0, hostStartRequestedAt:0, lobbyRequestInFlight:false,
       pendingStartTimer:null, pendingCountdownTimer:null, pendingStartAt:null, pendingStartLocalMs:null,
       scenarioKey:null, scenario:null,
-      fpsGame:null, fpsActive:false
+      fpsGame:null, fpsActive:false,
+      paused:false, pauseReason:'', instructorPrompt:'', sharedPlayers:[], activePings:[], lastUpdatesAt:0, lastStateReportAt:0, currentZone:'', componentPuzzleSolved:false,
+      tutorialStep:0, briefingStep:0, settings:Object.assign({}, DEFAULT_SETTINGS), audio:null,
+      runStats:{ startedAt:0, stageStartedAt:0, stageDurations:{}, wrongChoices:0, penaltySeconds:0, hints:0, pings:0, events:[], bonusFound:false },
+      spectating:false
     };
     const $ = selector => document.querySelector(selector);
     const $$ = selector => [...document.querySelectorAll(selector)];
@@ -998,8 +1113,314 @@
     const logEvent = text => {
       state.log.unshift(text);
       $('#eventLog').innerHTML = state.log.slice(0,7).map(item => '<li>' + escapeHtml(item) + '</li>').join('');
+      recordRunEvent(text);
     };
     const escapeHtml = value => String(value).replace(/[&<>'"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
+    const getCurrentTeam = () => TEAM_INFO[Number(state.player && state.player.team_number)] || null;
+    const currentRoleCopy = () => {
+      const info = getCurrentTeam();
+      return info ? info.role + ' · ' + info.specialty : 'Join a team to receive a fictional training role.';
+    };
+    const currentZoneLabel = () => ZONE_NAMES[state.currentZone] || 'Fictional data hall';
+    function safeStorageGet(key) { try { return localStorage.getItem(key); } catch (error) { return null; } }
+    function safeStorageSet(key, value) { try { localStorage.setItem(key, value); } catch (error) {} }
+    function recordRunEvent(text, kind) {
+      if (!state.runStats || !state.runStats.startedAt) return;
+      const elapsed = Math.max(0, Math.floor((Date.now() - state.runStats.startedAt) / 1000));
+      state.runStats.events.unshift({ elapsed:elapsed, text:String(text || ''), kind:kind || 'event' });
+      state.runStats.events = state.runStats.events.slice(0,80);
+    }
+    function beginRunStats() {
+      const now = Date.now();
+      state.runStats = { startedAt:now, stageStartedAt:now, stageDurations:{}, wrongChoices:0, penaltySeconds:0, hints:0, pings:0, events:[], bonusFound:false, guidanceStage:null };
+      recordRunEvent('Scenario timer started.', 'start');
+    }
+    function stageName(stage) {
+      return ({0:'Evidence',1:'Timeline',2:'Diagnosis',3:'Asset trace',4:'Recovery',5:'Validation',6:'Summary',7:'Exit'})[stage] || 'Stage ' + stage;
+    }
+    function advanceStage(nextStage, text) {
+      const now = Date.now();
+      if (state.runStats && state.runStats.stageStartedAt) {
+        const current = stageName(state.stage);
+        state.runStats.stageDurations[current] = (state.runStats.stageDurations[current] || 0) + Math.max(0, Math.floor((now - state.runStats.stageStartedAt) / 1000));
+        state.runStats.stageStartedAt = now;
+      }
+      state.stage = nextStage;
+      if (text) recordRunEvent(text, 'stage');
+      reportPlayerState(true);
+    }
+    function finishRunStats(outcome) {
+      if (state.runStats && state.runStats.stageStartedAt) {
+        const current = stageName(state.stage);
+        state.runStats.stageDurations[current] = (state.runStats.stageDurations[current] || 0) + Math.max(0, Math.floor((Date.now() - state.runStats.stageStartedAt) / 1000));
+        state.runStats.stageStartedAt = 0;
+      }
+      recordRunEvent(outcome === 'completed' ? 'Fictional scenario resolved.' : 'Fictional scenario timer expired.', outcome);
+    }
+    function seededNumber(value) {
+      let hash = 2166136261;
+      for (let index = 0; index < String(value).length; index += 1) { hash ^= String(value).charCodeAt(index); hash = Math.imul(hash, 16777619); }
+      return hash >>> 0;
+    }
+    function stableShuffle(items, seed) {
+      const ordered = items.slice();
+      let value = seededNumber(seed);
+      for (let index = ordered.length - 1; index > 0; index -= 1) {
+        value = (Math.imul(value, 1664525) + 1013904223) >>> 0;
+        const target = value % (index + 1);
+        [ordered[index], ordered[target]] = [ordered[target], ordered[index]];
+      }
+      return ordered;
+    }
+    function updateRoleBrief() {
+      const info = getCurrentTeam();
+      const brief = $('#roleBrief');
+      if (!brief) return;
+      brief.classList.toggle('hidden', !info);
+      if (!info) return;
+      $('#roleTitle').textContent = info.label + ' · ' + info.role;
+      $('#roleCopy').textContent = info.specialty + ' perspective: this is an advisory role, so any team can complete every fictional objective.';
+      $('#roleTask').innerHTML = '<b>Suggested contribution:</b> ' + escapeHtml(info.task);
+      const fpsRole = $('#fpsRoleHud');
+      if (fpsRole) fpsRole.textContent = info.role;
+    }
+    function renderBriefing() {
+      const step = Math.max(0, Math.min(BRIEFING_STEPS.length - 1, state.briefingStep));
+      const item = BRIEFING_STEPS[step];
+      $('#briefStepLabel').textContent = (step + 1) + ' / ' + BRIEFING_STEPS.length;
+      $('#briefCopy').textContent = item.copy;
+      $$('#briefProgress i').forEach((dot, index) => dot.classList.toggle('active', index <= step));
+      $('#briefBack').disabled = step === 0;
+      $('#briefNext').textContent = step === BRIEFING_STEPS.length - 1 ? 'Ready' : 'Next';
+    }
+    function renderFpsTutorial() {
+      const step = Math.max(0, Math.min(BRIEFING_STEPS.length - 1, state.tutorialStep));
+      const item = BRIEFING_STEPS[step];
+      $('#fpsTutorialTitle').textContent = item.title;
+      $('#fpsTutorialCopy').textContent = item.copy;
+      [1,2,3].forEach(index => {
+        const dot = $('#fpsTutorialDot' + index);
+        if (dot) dot.classList.toggle('active', index - 1 <= step);
+      });
+      $('#fpsTutorialBack').disabled = step === 0;
+      $('#fpsTutorialNext').classList.toggle('hidden', step === BRIEFING_STEPS.length - 1);
+      $('#fpsEnterButton').classList.toggle('hidden', step !== BRIEFING_STEPS.length - 1);
+    }
+    function replayFpsTutorial() {
+      const game = state.fpsGame;
+      if (!game) {
+        showCaption('Start a fictional scenario to replay the in-room briefing.');
+        return;
+      }
+      if (game.terminalOpen) game.closeTerminal();
+      game.clearMotion();
+      if (document.pointerLockElement === game.canvas && document.exitPointerLock) document.exitPointerLock();
+      state.tutorialStep = 0;
+      game.entered = false;
+      $('#fpsEnterOverlay').classList.remove('hidden');
+      renderFpsTutorial();
+      game.updateMotionHud();
+    }
+    function loadSettings() {
+      try {
+        const stored = JSON.parse(safeStorageGet('dc-escape-settings-v2') || '{}');
+        state.settings = Object.assign({}, DEFAULT_SETTINGS, stored || {});
+      } catch (error) { state.settings = Object.assign({}, DEFAULT_SETTINGS); }
+    }
+    function syncSettingsControls() {
+      const mapping = { settingSensitivity:'sensitivity', settingFov:'fov', settingBrightness:'brightness', settingInvertY:'invertY', settingReduceMotion:'reducedMotion', settingHighContrast:'highContrast', settingLowGraphics:'lowGraphics', settingSound:'sound', settingCaptions:'captions' };
+      Object.entries(mapping).forEach(([id, key]) => {
+        const input = $('#' + id);
+        if (!input) return;
+        input.type === 'checkbox' ? input.checked = Boolean(state.settings[key]) : input.value = String(state.settings[key]);
+      });
+    }
+    function applySettings() {
+      document.body.classList.toggle('high-contrast', Boolean(state.settings.highContrast));
+      document.body.classList.toggle('reduced-motion', Boolean(state.settings.reducedMotion));
+      const game = state.fpsGame;
+      if (game) {
+        game.camera.fov = Number(state.settings.fov) || 74;
+        game.camera.updateProjectionMatrix();
+        game.renderer.toneMappingExposure = Number(state.settings.brightness) || 1.3;
+        const multiplier = state.settings.lowGraphics ? .78 : 1;
+        game.quality.pixelRatio = Math.min((game.quality.basePixelRatio || game.quality.pixelRatio || 1) * multiplier, state.settings.lowGraphics ? 1 : 1.35);
+        game.quality.targetFps = state.settings.lowGraphics ? 42 : (game.quality.baseTargetFps || game.quality.targetFps || 60);
+        resizeFpsExperience();
+        updateFpsExperience(true);
+      }
+      if (!state.settings.sound) stopTrainingAudio();
+      syncSettingsControls();
+      safeStorageSet('dc-escape-settings-v2', JSON.stringify(state.settings));
+    }
+    function updateSettingFromInput(event) {
+      const mapping = { settingSensitivity:'sensitivity', settingFov:'fov', settingBrightness:'brightness', settingInvertY:'invertY', settingReduceMotion:'reducedMotion', settingHighContrast:'highContrast', settingLowGraphics:'lowGraphics', settingSound:'sound', settingCaptions:'captions' };
+      const key = mapping[event.target.id];
+      if (!key) return;
+      state.settings[key] = event.target.type === 'checkbox' ? event.target.checked : Number(event.target.value);
+      applySettings();
+    }
+    function toggleDrawer(id) {
+      const target = $('#' + id);
+      if (!target) return;
+      const willOpen = target.classList.contains('hidden');
+      $$('.drawer').forEach(drawer => drawer.classList.add('hidden'));
+      target.classList.toggle('hidden', !willOpen);
+      $('#settingsButton').setAttribute('aria-expanded', String(id === 'settingsDrawer' && willOpen));
+      $('#hostToolsButton').setAttribute('aria-expanded', String(id === 'hostTools' && willOpen));
+    }
+    function showCaption(text, tone) {
+      const caption = $('#fpsCaption');
+      if (!caption || !state.settings.captions) return;
+      caption.textContent = text;
+      caption.className = 'fps-caption ' + (tone || '');
+      caption.classList.remove('hidden');
+      clearTimeout(showCaption.timer);
+      showCaption.timer = setTimeout(() => caption.classList.add('hidden'), 4600);
+    }
+    function ensureTrainingAudio() {
+      if (!state.settings.sound || state.audio) return state.audio;
+      const Context = window.AudioContext || window.webkitAudioContext;
+      if (!Context) return null;
+      try {
+        const context = new Context();
+        const master = context.createGain();
+        master.gain.value = .055;
+        master.connect(context.destination);
+        const ambient = context.createOscillator();
+        const ambientGain = context.createGain();
+        ambient.type = 'sine'; ambient.frequency.value = 56; ambientGain.gain.value = .024;
+        ambient.connect(ambientGain); ambientGain.connect(master); ambient.start();
+        state.audio = { context:context, master:master, ambient:ambient, ambientGain:ambientGain };
+      } catch (error) { state.audio = null; }
+      return state.audio;
+    }
+    function stopTrainingAudio() {
+      const audio = state.audio;
+      if (!audio) return;
+      try { if (audio.ambient) audio.ambient.stop(); if (audio.context) audio.context.close(); } catch (error) {}
+      state.audio = null;
+    }
+    function playTrainingCue(kind) {
+      const audio = ensureTrainingAudio();
+      if (!audio || !audio.context || audio.context.state === 'closed') return;
+      if (audio.context.state === 'suspended') audio.context.resume().catch(() => {});
+      const patterns = { correct:[620,.10], ping:[470,.08], alert:[185,.15], success:[760,.14] };
+      const pattern = patterns[kind] || patterns.ping;
+      try {
+        const oscillator = audio.context.createOscillator(); const gain = audio.context.createGain();
+        oscillator.type = kind === 'alert' ? 'square' : 'sine'; oscillator.frequency.value = pattern[0]; gain.gain.setValueAtTime(.0001, audio.context.currentTime); gain.gain.exponentialRampToValueAtTime(.16, audio.context.currentTime + .012); gain.gain.exponentialRampToValueAtTime(.0001, audio.context.currentTime + pattern[1]); oscillator.connect(gain); gain.connect(audio.master); oscillator.start(); oscillator.stop(audio.context.currentTime + pattern[1] + .03);
+      } catch (error) {}
+    }
+    function updatePausedUi() {
+      const paused = Boolean(state.paused);
+      const panel = $('#fpsPaused');
+      if (panel) panel.classList.toggle('hidden', !paused);
+      if (paused) $('#fpsPausedCopy').textContent = state.pauseReason || 'The host has paused the fictional training timer.';
+      if (paused && state.fpsGame) state.fpsGame.clearMotion();
+    }
+    function currentPlayerState() { return state.finished ? (state.seconds === 0 ? 'failed' : 'completed') : (document.hidden ? 'away' : 'active'); }
+    function currentFpsPosition() {
+      const game = state.fpsGame;
+      return game ? { x:Number(game.player.x.toFixed(2)), z:Number(game.player.z.toFixed(2)), yaw:Number(game.yaw.toFixed(3)) } : { x:null, z:null, yaw:null };
+    }
+    async function reportPlayerState(force) {
+      if (!state.db || !state.joined || !state.sharedStartedAt || !state.sharedRunNumber) return;
+      const now = Date.now();
+      if (!force && now - state.lastStateReportAt < 1400) return;
+      state.lastStateReportAt = now;
+      const position = currentFpsPosition();
+      try {
+        await state.db.rpc('report_dc_escape_player_state', {
+          p_session_code:state.sessionCode, p_client_token:playerToken(), p_player_state:currentPlayerState(), p_stage:Math.max(0, Math.min(10, state.stage)), p_score:Math.max(0, Math.min(1000, state.score)), p_zone:state.currentZone || null,
+          p_position_x:position.x, p_position_z:position.z, p_yaw:position.yaw
+        });
+      } catch (error) {}
+    }
+    function renderPingFeed() {
+      const feed = $('#fpsPingFeed');
+      if (!feed) return;
+      const pings = (state.activePings || []).slice(0,3).reverse();
+      feed.innerHTML = pings.length ? pings.map(ping => '<p><b>' + escapeHtml(ping.display_name || 'Team') + ':</b> ' + escapeHtml(PING_COPY[ping.ping_kind] || ping.ping_kind || 'Ping') + (ping.zone ? ' · ' + escapeHtml(ZONE_NAMES[ping.zone] || ping.zone) : '') + '</p>').join('') : '<p>Team pings will appear here.</p>';
+    }
+    function renderHostTeamBoard(players) {
+      const board = $('#hostTeamBoard');
+      if (!board) return;
+      const source = players || state.sharedPlayers || [];
+      const groups = [1,2,3,4].map(team => {
+        const info = TEAM_INFO[team];
+        const members = source.filter(player => Number(player.team_number) === team);
+        const status = members.length ? members.map(member => {
+          const label = member.player_state === 'completed' ? 'complete' : member.player_state === 'away' ? 'away' : 'active';
+          return '<li><span>' + escapeHtml(member.display_name || info.label) + '</span><span class="status-chip">' + escapeHtml(label) + (Number.isFinite(Number(member.stage)) ? ' · ' + escapeHtml(stageName(Number(member.stage))) : '') + '</span></li>';
+        }).join('') : '<li><span>Open slot</span><span class="status-chip">waiting</span></li>';
+        return '<section><p><b style="color:' + info.color + '">' + info.label + '</b> · ' + escapeHtml(info.role) + '</p><ul>' + status + '</ul></section>';
+      }).join('');
+      board.innerHTML = '<h3>Team status</h3><p>Last reported fictional-game state.</p>' + groups;
+    }
+    function rememberSession() {
+      if (!state.sessionCode || !state.player) return;
+      safeStorageSet('dc-escape-last-session-v2', JSON.stringify({ sessionCode:state.sessionCode, playerName:$('#playerName').value.trim(), savedAt:Date.now() }));
+    }
+    function saveLocalCheckpoint() {
+      if (!state.started || !state.sessionCode || !state.sharedRunNumber || state.finished) return;
+      const checkpoint = {
+        sessionCode:state.sessionCode, runNumber:state.sharedRunNumber, scenarioKey:state.scenarioKey, difficulty:state.difficulty,
+        stage:state.stage, score:state.score, clues:[...state.clues], scans:[...state.scans], timelineIndex:state.timelineIndex, runbookIndex:state.runbookIndex,
+        validations:[...state.validations], hintsUsed:state.hintsUsed, localPenaltySeconds:state.localPenaltySeconds, currentZone:state.currentZone,
+        componentPuzzleSolved:state.componentPuzzleSolved, bonusScan:state.bonusScan, runStats:state.runStats, savedAt:Date.now()
+      };
+      safeStorageSet('dc-escape-checkpoint-v2', JSON.stringify(checkpoint));
+    }
+    function clearLocalCheckpoint() { try { localStorage.removeItem('dc-escape-checkpoint-v2'); } catch (error) {} }
+    function checkpointPanel() {
+      if (state.stage === 0) return 'noc';
+      if (state.stage === 1) return 'timeline';
+      if (state.stage === 2) return 'diagnose';
+      if (state.stage === 3) return state.componentPuzzleSolved ? 'aisle' : 'component';
+      if (state.stage === 4) return 'recovery';
+      if (state.stage === 5) return 'validation';
+      if (state.difficulty === 'hard' && state.stage === 6) return 'summary';
+      return 'exit';
+    }
+    function hydrateCheckpointUi() {
+      state.clues.forEach(key => { const button = document.querySelector('[data-clue="' + key + '"]'); if (button) { button.disabled = true; button.classList.add('inspected'); } });
+      state.config.timeline.slice(0, state.timelineIndex).forEach(key => { const button = document.querySelector('[data-timeline-step="' + key + '"]'); if (button) { button.disabled = true; button.classList.add('correct'); } });
+      state.scans.forEach(key => { const button = document.querySelector('[data-scan="' + key + '"]'); if (button) { button.disabled = true; button.classList.add('inspected'); } });
+      state.config.runbook.slice(0, state.runbookIndex).forEach(key => { const button = document.querySelector('[data-runbook-step="' + key + '"]'); if (button) { button.disabled = true; button.classList.add('correct'); } });
+      state.validations.forEach(key => { const button = document.querySelector('[data-validation="' + key + '"]'); if (button) { button.disabled = true; button.classList.add('correct'); } });
+      if (completed(state.clues, state.config.clues)) $('#analyzeButton').disabled = false;
+      if (state.stage >= 3) $$('.choice[data-diagnosis]').forEach(button => { button.disabled = true; button.classList.toggle('correct', button.dataset.diagnosis === state.config.summaryCorrect); });
+      if (state.componentPuzzleSolved) $$('#componentChoices [data-component-choice]').forEach(button => { button.disabled = true; button.classList.toggle('correct', button.dataset.componentChoice === (state.scenario && state.scenario.componentPuzzle && state.scenario.componentPuzzle.correct)); });
+      if (completed(state.scans, state.config.scans)) { $('#recoveryCode').disabled = state.stage >= 4; $('#verifyCode').disabled = state.stage >= 4; }
+      if (state.runbookIndex === state.config.runbook.length) { $('#recoveryChoices').classList.remove('hidden'); $('#runbookStatus').innerHTML = '<b>Runbook complete.</b> Select the safe virtual recovery path.'; }
+      if (state.stage >= 5) { $$('.choice[data-recovery]').forEach(button => { button.disabled = true; button.classList.toggle('correct', button.dataset.recovery === state.config.recoveryCorrect); }); $('#recoveryResult').classList.remove('hidden'); }
+    }
+    function restoreLocalCheckpoint(runNumber, scenarioKey) {
+      try {
+        const checkpoint = JSON.parse(safeStorageGet('dc-escape-checkpoint-v2') || 'null');
+        if (!checkpoint || checkpoint.sessionCode !== state.sessionCode || Number(checkpoint.runNumber) !== Number(runNumber) || checkpoint.scenarioKey !== scenarioKey || checkpoint.difficulty !== state.difficulty) return false;
+        state.stage = Number(checkpoint.stage || 0); state.score = Number(checkpoint.score || 100); state.clues = new Set(checkpoint.clues || []); state.scans = new Set(checkpoint.scans || []);
+        state.timelineIndex = Number(checkpoint.timelineIndex || 0); state.runbookIndex = Number(checkpoint.runbookIndex || 0); state.validations = new Set(checkpoint.validations || []);
+        state.hintsUsed = Number(checkpoint.hintsUsed || 0); state.localPenaltySeconds = Number(checkpoint.localPenaltySeconds || 0); state.currentZone = checkpoint.currentZone || '';
+        state.componentPuzzleSolved = Boolean(checkpoint.componentPuzzleSolved); state.bonusScan = checkpoint.bonusScan || state.bonusScan;
+        state.runStats = Object.assign({ startedAt:Date.now(), stageStartedAt:Date.now(), stageDurations:{}, wrongChoices:0, penaltySeconds:0, hints:0, pings:0, events:[], bonusFound:false }, checkpoint.runStats || {});
+        state.checkpointRestored = true;
+        hydrateCheckpointUi();
+        showCaption('Same-device checkpoint restored. Your fictional puzzle progress is ready.');
+        return true;
+      } catch (error) { return false; }
+    }
+    function restoreReconnectOffer() {
+      try {
+        const saved = JSON.parse(safeStorageGet('dc-escape-last-session-v2') || 'null');
+        if (!saved || !saved.sessionCode || !saved.playerName || Date.now() - Number(saved.savedAt || 0) > 2 * 60 * 60 * 1000) return;
+        $('#sessionCode').value = saved.sessionCode;
+        $('#playerName').value = saved.playerName;
+        $('#reconnectCopy').textContent = 'Resume the saved lobby for ' + saved.playerName + ' (' + saved.sessionCode + ').';
+        $('#reconnectNotice').classList.remove('hidden');
+      } catch (error) {}
+    }
     const completed = (set, required) => required.every(item => set.has(item));
     const panelRequirement = panel => panel === 'exit' ? state.config.exitStage : panelRequirements[panel];
     const recoveryCodeFor = (scenario, level) => {
@@ -1435,21 +1856,26 @@
       };
     }
     function fpsObjectiveCopy() {
+      if (state.paused) return 'Scenario paused by the host. Review your fictional evidence and wait for the shared timer to resume.';
       if (state.finished) return state.seconds === 0 ? 'Simulation paused. Wait for the host to restart the fictional room.' : 'Simulation complete. Reach the exit screen to review your result.';
-      if (state.stage === 0) return 'Reach the NOC console and inspect every required fictional alert.';
-      if (state.stage === 1) return 'Reach the timeline desk and rebuild the fictional incident in the correct order.';
-      if (state.stage === 2) return 'Reach the incident board and identify the modeled root cause.';
-      if (state.stage === 3) return 'Explore the hall, scan every required virtual asset, then enter the recovery key.';
-      if (state.stage === 4) return 'Reach the recovery console and complete the approved virtual sequence.';
-      if (state.stage === 5) return 'Inspect the required virtual validation points before exiting.';
-      if (state.difficulty === 'hard' && state.stage === 6) return 'Return to the incident board and confirm the hard-mode fictional root cause.';
-      if (state.stage >= state.config.exitStage) return 'Reach the exit interlock and finish the simulation.';
+      const role = getCurrentTeam();
+      const suffix = role ? ' Team cue: ' + role.role + '.' : '';
+      if (state.stage === 0) return 'Reach the NOC console and inspect every required fictional alert.' + suffix;
+      if (state.stage === 1) return 'Reach the timeline desk and rebuild the fictional incident in the correct order.' + suffix;
+      if (state.stage === 2) return 'Reach the incident board and identify the modeled root cause.' + suffix;
+      if (state.stage === 3 && !state.componentPuzzleSolved) return 'Reach the component-link terminal and prove the fictional failure path before tracing recovery assets.' + suffix;
+      if (state.stage === 3) return 'Explore the hall, scan every required virtual asset, then enter the recovery key.' + suffix;
+      if (state.stage === 4) return 'Reach the recovery console and complete the approved virtual sequence.' + suffix;
+      if (state.stage === 5) return 'Inspect the required virtual validation points before exiting.' + suffix;
+      if (state.difficulty === 'hard' && state.stage === 6) return 'Return to the incident board and confirm the hard-mode fictional root cause.' + suffix;
+      if (state.stage >= state.config.exitStage) return 'Reach the exit interlock and finish the simulation.' + suffix;
       return 'Follow the highlighted virtual objective.';
     }
     function fpsTargetStatus(target) {
       const allClues = completed(state.clues, state.config.clues);
       const allScans = completed(state.scans, state.config.scans);
       const allValidations = completed(state.validations, state.config.validations);
+      if (state.paused) return { level:'locked', message:'The host has paused this fictional scenario.' };
       if (state.finished) return { level:'complete', message:state.seconds === 0 ? 'Simulation timed out.' : 'Simulation complete.' };
       switch (target.kind) {
         case 'noc': return state.stage === 0 ? { level:'available', message:'Inspect virtual NOC evidence.' } : { level:'complete', message:allClues ? 'Evidence collection complete.' : 'NOC console is not the current objective.' };
@@ -1458,8 +1884,13 @@
           if (state.stage === 2) return { level:'available', message:'Choose the modeled root cause.' };
           if (state.difficulty === 'hard' && state.stage === 6) return { level:'available', message:'Confirm the hard-mode incident summary.' };
           return { level:state.stage > 2 ? 'complete' : 'locked', message:state.stage > 2 ? 'Incident board complete.' : 'Complete the timeline first.' };
+        case 'correlation':
+          if (state.stage !== 3) return { level:state.stage > 3 ? 'complete' : 'locked', message:state.stage > 3 ? 'Component path confirmed.' : 'Identify the modeled root cause first.' };
+          return state.componentPuzzleSolved ? { level:'complete', message:'Fictional component path confirmed.' } : { level:'available', message:'Prove the modeled component-to-impact path.' };
         case 'scan':
           if (state.stage !== 3) return { level:state.stage > 3 ? 'complete' : 'locked', message:state.stage > 3 ? 'Virtual asset trace complete.' : 'Identify the root cause first.' };
+          if (!state.componentPuzzleSolved) return { level:'locked', message:'Confirm the fictional component path first.' };
+          if (target.type === state.bonusScan) return state.scans.has(target.type) ? { level:'complete', message:'Optional bonus evidence collected.' } : { level:'available', message:'Optional bonus: inspect this virtual evidence for +5.' };
           if (!state.config.scans.includes(target.type)) return { level:'locked', message:'This virtual asset is optional at the selected difficulty.' };
           return state.scans.has(target.type) ? { level:'complete', message:'Virtual label collected.' } : { level:'available', message:'Scan this virtual asset.' };
         case 'keypad': return state.stage === 3 && allScans ? { level:'available', message:'Enter the virtual recovery key.' } : { level:state.stage > 3 ? 'complete' : 'locked', message:state.stage > 3 ? 'Recovery key accepted.' : 'Collect every required virtual label first.' };
@@ -1475,6 +1906,8 @@
     function fpsDefaultTarget(game) {
       const available = game.targets.filter(target => fpsTargetStatus(target).level === 'available');
       if (state.stage === 3) {
+        const correlation = available.find(target => target.kind === 'correlation');
+        if (correlation) return correlation;
         const scan = available.find(target => target.kind === 'scan');
         return scan || available.find(target => target.kind === 'keypad') || available[0];
       }
@@ -1488,6 +1921,8 @@
       $('#fpsHudTimer').textContent = clock(state.seconds);
       $('#fpsHudScore').textContent = String(state.score);
       $('#fpsHudProgress').textContent = objectiveCount + ' / ' + state.config.objectiveTotal;
+      const role = getCurrentTeam();
+      if ($('#fpsRoleHud')) $('#fpsRoleHud').textContent = role ? role.role : 'Solo training';
       const hudNote = $('#hudMessage').textContent.trim();
       const objectiveMarkup = '<b>Objective:</b> ' + escapeHtml(fpsObjectiveCopy()) + (hudNote ? '<span>' + escapeHtml(hudNote) + '</span>' : '');
       if (force || game.lastObjectiveMarkup !== objectiveMarkup) {
@@ -1495,7 +1930,7 @@
         game.lastObjectiveMarkup = objectiveMarkup;
       }
       if (game.updateMotionHud) game.updateMotionHud();
-      const signature = [state.started,state.finished,state.stage,state.score,state.difficulty,state.scenarioKey,[...state.clues].sort().join(','),[...state.scans].sort().join(','),[...state.validations].sort().join(','),state.timelineIndex,state.runbookIndex,game.codeBuffer].join('|');
+      const signature = [state.started,state.finished,state.paused,state.stage,state.score,state.difficulty,state.scenarioKey,state.bonusScan,state.componentPuzzleSolved,[...state.clues].sort().join(','),[...state.scans].sort().join(','),[...state.validations].sort().join(','),state.timelineIndex,state.runbookIndex,game.codeBuffer,(state.activePings || []).length].join('|');
       if (!force && game.lastSignature === signature) return;
       game.lastSignature = signature;
       game.updateWorld();
@@ -1522,6 +1957,7 @@
       });
       if (game.renderer) game.renderer.dispose();
       if (game.holder) game.holder.replaceChildren();
+      stopTrainingAudio();
       $('#fpsGame').classList.add('hidden');
       $('#game').classList.remove('fps-mode');
       document.body.classList.remove('fps-playing');
@@ -1554,9 +1990,12 @@
         nearInterval:lowPowerDevice ? 125 : 80,
         antialias:!lowPowerDevice && !isTouch
       };
+      quality.basePixelRatio = quality.pixelRatio;
+      quality.baseTargetFps = quality.targetFps;
+      if (state.settings.lowGraphics) { quality.pixelRatio = Math.min(quality.pixelRatio * .78, 1); quality.targetFps = 42; }
       const renderer = new THREE.WebGLRenderer({ antialias:quality.antialias, alpha:false, powerPreference:'high-performance' });
       const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(74, 1, .1, 100);
+      const camera = new THREE.PerspectiveCamera(Number(state.settings.fov) || 74, 1, .1, 100);
       const player = new THREE.Vector3(0, 1.7, 10.1);
       const raycaster = new THREE.Raycaster();
       const pointer = new THREE.Vector2();
@@ -1611,7 +2050,7 @@
       renderer.setPixelRatio(quality.pixelRatio);
       if ('outputColorSpace' in renderer && THREE.SRGBColorSpace) renderer.outputColorSpace = THREE.SRGBColorSpace;
       if (THREE.ACESFilmicToneMapping) renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.3;
+      renderer.toneMappingExposure = Number(state.settings.brightness) || 1.3;
       renderer.domElement.tabIndex = 0;
       renderer.domElement.setAttribute('aria-label', 'First-person fictional data center training room.');
       holder.replaceChildren(renderer.domElement);
@@ -1739,6 +2178,7 @@
       };
       makeTerminal({ id:'noc', kind:'noc', title:'NOC CONSOLE', position:[-11.2,-7.25], assetKeys:['noc'] }, 0x2c7caa);
       makeTerminal({ id:'timeline', kind:'timeline', title:'TIMELINE DESK', position:[-5.4,-7.25], assetKeys:['noc'] }, 0x7f5caa);
+      makeTerminal({ id:'correlation', kind:'correlation', title:'COMPONENT LINK', position:[.5,-7.25], assetKeys:['incident'] }, 0xf6bd4d);
       makeTerminal({ id:'incident', kind:'incident', title:'INCIDENT BOARD', position:[11.1,-7.25], assetKeys:['incident'] }, 0x9a5a3e);
       makeEquipment({ id:'scan-pdu', kind:'scan', type:'pdu', title:'PDU-B · VIRTUAL', position:[10.4,-.25], assetKeys:['power-b'], ring:1.75, footprint:[2.05,1.55] }, 0xe23c36, cabinetModel);
       makeEquipment({ id:'scan-rack', kind:'scan', type:'rack', title:'RACK C14 · VIRTUAL', position:[7.8,1.25], assetKeys:['rack'], ring:1.75, footprint:[1.8,1.75] }, 0xe23c36, rackModel);
@@ -1779,6 +2219,15 @@
       camera.add(terminalRoot);
       scene.add(camera);
       game.updateCamera = () => {
+        if (state.spectating && state.spectateToken) {
+          const followed = (state.sharedPlayers || []).find(member => String(member.client_token || '') === String(state.spectateToken));
+          const x = Number(followed && followed.position_x); const z = Number(followed && followed.position_z); const yaw = Number(followed && followed.yaw);
+          if (Number.isFinite(x) && Number.isFinite(z)) {
+            camera.position.set(x, 1.72, z);
+            camera.rotation.order = 'YXZ'; camera.rotation.y = Number.isFinite(yaw) ? yaw : game.yaw; camera.rotation.x = game.pitch; camera.rotation.z = 0;
+            return;
+          }
+        }
         camera.position.copy(game.player);
         camera.rotation.order = 'YXZ';
         camera.rotation.y = game.yaw;
@@ -1786,12 +2235,14 @@
         camera.rotation.z = 0;
       };
       game.applyLook = (deltaX, deltaY, sensitivity) => {
-        if (!game.entered || game.terminalOpen) return;
-        game.yaw -= deltaX * sensitivity;
-        game.pitch = Math.max(-1.22,Math.min(1.22,game.pitch - deltaY * sensitivity * .92));
+        if (!game.entered || game.terminalOpen || state.paused) return;
+        const scale = (Number(state.settings.sensitivity) || 1) * sensitivity;
+        const vertical = state.settings.invertY ? -1 : 1;
+        game.yaw -= deltaX * scale;
+        game.pitch = Math.max(-1.22,Math.min(1.22,game.pitch - deltaY * scale * .92 * vertical));
       };
       game.updateMotionHud = () => {
-        const mode = game.terminalOpen ? 'TERMINAL' : (!game.entered ? 'READY' : (game.keys.has('sprint') ? 'SPRINT' : 'FREE LOOK'));
+        const mode = state.paused ? 'PAUSED' : (state.spectating ? 'SPECTATE' : (game.terminalOpen ? 'TERMINAL' : (!game.entered ? 'BRIEFING' : (game.keys.has('sprint') ? 'SPRINT' : 'FREE LOOK'))));
         if (game.lastMotionMode === mode) return;
         game.lastMotionMode = mode;
         const target = $('#fpsHudMode');
@@ -1802,7 +2253,7 @@
         return game.colliders.some(collider => position.x > collider.minX - game.playerRadius && position.x < collider.maxX + game.playerRadius && position.z > collider.minZ - game.playerRadius && position.z < collider.maxZ + game.playerRadius);
       };
       game.move = dt => {
-        if (!game.entered || game.terminalOpen || state.finished) return false;
+        if (!game.entered || game.terminalOpen || state.finished || state.paused || state.spectating) return false;
         const forwardValue = (game.keys.has('forward') ? 1 : 0) - (game.keys.has('back') ? 1 : 0);
         const sideValue = (game.keys.has('right') ? 1 : 0) - (game.keys.has('left') ? 1 : 0);
         if (!forwardValue && !sideValue) return false;
@@ -1896,6 +2347,25 @@
             context.stroke();
           }
         });
+        const now = Date.now();
+        (state.sharedPlayers || []).forEach(member => {
+          const xValue = Number(member.position_x);
+          const zValue = Number(member.position_z);
+          if (!Number.isFinite(xValue) || !Number.isFinite(zValue)) return;
+          if (state.player && member.client_token && String(member.client_token) === String(playerToken())) return;
+          const team = TEAM_INFO[Number(member.team_number)] || TEAM_INFO[1];
+          const x = mapX(xValue); const y = mapY(zValue);
+          context.beginPath(); context.arc(x,y,4.4,0,Math.PI * 2); context.fillStyle = team.color; context.shadowColor = team.color; context.shadowBlur = 7; context.fill(); context.shadowBlur = 0;
+        });
+        (state.activePings || []).forEach(ping => {
+          const age = Math.max(0, Math.min(1, (now - Date.parse(ping.created_at || '')) / 45000));
+          const member = (state.sharedPlayers || []).find(item => String(item.client_token || '') === String(ping.client_token || ''));
+          const xValue = Number(member && member.position_x); const zValue = Number(member && member.position_z);
+          if (!Number.isFinite(xValue) || !Number.isFinite(zValue)) return;
+          const team = TEAM_INFO[Number(ping.team_number)] || TEAM_INFO[1];
+          const radius = 5 + (1 - age) * 11;
+          context.beginPath(); context.arc(mapX(xValue),mapY(zValue),radius,0,Math.PI * 2); context.strokeStyle = team.color; context.globalAlpha = Math.max(.18,1-age); context.lineWidth = 1.8; context.stroke(); context.globalAlpha = 1;
+        });
         const playerX = mapX(game.player.x);
         const playerY = mapY(game.player.z);
         context.save();
@@ -1939,14 +2409,15 @@
         });
         if (preferred) {
           game.beacon.visible = true;
-          game.beacon.position.set(preferred.position.x,4.55 + Math.sin(performance.now()/350)*.12,preferred.position.z);
+          game.beacon.position.set(preferred.position.x,4.55 + (state.settings.reducedMotion ? 0 : Math.sin(performance.now()/350)*.12),preferred.position.z);
         } else game.beacon.visible = false;
         game.updateNearest(true);
         game.drawMiniMap();
       };
       game.drawTerminal = () => drawFpsTerminal(game);
       game.openTerminal = target => {
-        if (!target) return;
+        if (!target || state.paused) return;
+        $$('.drawer').forEach(drawer => drawer.classList.add('hidden'));
         game.terminalTarget = target;
         game.terminalOpen = true;
         game.terminalInput = target.kind === 'keypad' && fpsTargetStatus(target).level === 'available';
@@ -1971,13 +2442,23 @@
         if (game.nearest) game.openTerminal(game.nearest);
       };
       game.enterRoom = sourceEvent => {
+        if (state.tutorialStep < BRIEFING_STEPS.length - 1) {
+          $('#fpsEnterOverlay').classList.remove('hidden');
+          renderFpsTutorial();
+          showCaption('Complete or skip the quick briefing before entering the fictional room.', '');
+          return false;
+        }
         const firstEntry = !game.entered;
         game.entered = true;
         $('#fpsEnterOverlay').classList.add('hidden');
+        safeStorageSet('dc-escape-tutorial-v2', 'complete');
+        ensureTrainingAudio();
+        playTrainingCue('ping');
         try { renderer.domElement.focus({ preventScroll:true }); } catch (error) { renderer.domElement.focus(); }
         game.updateMotionHud();
         if (firstEntry) game.requestPointerLock(sourceEvent);
         game.updateNearest(true);
+        return true;
       };
       game.activateTerminalAction = action => activateFpsTerminalAction(game, action);
       game.getTerminalHit = event => {
@@ -2131,6 +2612,9 @@
       const enterFromButton = event => { game.enterRoom(event); event.preventDefault(); };
       addListener($('#fpsEnterButton'),'pointerdown',enterFromButton);
       addListener($('#fpsEnterButton'),'click',enterFromButton);
+      addListener($('#fpsTutorialNext'),'click',event => { state.tutorialStep = Math.min(BRIEFING_STEPS.length - 1, state.tutorialStep + 1); renderFpsTutorial(); event.preventDefault(); });
+      addListener($('#fpsTutorialBack'),'click',event => { state.tutorialStep = Math.max(0, state.tutorialStep - 1); renderFpsTutorial(); event.preventDefault(); });
+      addListener($('#fpsTutorialSkip'),'click',event => { state.tutorialStep = BRIEFING_STEPS.length - 1; renderFpsTutorial(); event.preventDefault(); });
       const resizeObserver = window.ResizeObserver ? new ResizeObserver(resizeFpsExperience) : null;
       if (resizeObserver) resizeObserver.observe(holder);
       else addListener(window,'resize',resizeFpsExperience);
@@ -2155,10 +2639,11 @@
           game.drawMiniMap();
         }
         if (now - game.lastUiAt > 180) { game.lastUiAt = now; updateFpsExperience(); }
+        if (moved || now - (game.lastStateAt || 0) > 1600) { game.lastStateAt = now; reportPlayerState(false); }
         if (now - game.lastRenderAt < 1000 / game.quality.targetFps) return;
         game.lastRenderAt = now;
-        game.targets.forEach(target => { if (target.ring.visible) target.ring.rotation.z = now / 1000; });
-        if (game.beacon && game.beacon.visible) game.beacon.position.y = 4.55 + Math.sin(now / 350) * .12;
+        if (!state.settings.reducedMotion) game.targets.forEach(target => { if (target.ring.visible) target.ring.rotation.z = now / 1000; });
+        if (game.beacon && game.beacon.visible) game.beacon.position.y = 4.55 + (state.settings.reducedMotion ? 0 : Math.sin(now / 350) * .12);
         renderer.render(scene,camera);
       };
       game.frame = requestAnimationFrame(loop);
@@ -2187,6 +2672,9 @@
       $('#resetMapViewButton').hidden = true;
       state.fpsGame = game;
       state.fpsActive = true;
+      state.tutorialStep = safeStorageGet('dc-escape-tutorial-v2') === 'complete' ? BRIEFING_STEPS.length - 1 : 0;
+      renderFpsTutorial();
+      applySettings();
       updateFpsExperience(true);
       requestAnimationFrame(resizeFpsExperience);
       requestAnimationFrame(() => $('#fpsGame').scrollIntoView({ block:'start' }));
@@ -2363,6 +2851,16 @@
           const copy = fpsButtonCopy('[data-summary="' + button.dataset.summary + '"]');
           y = drawTerminalButton(y,copy.title,copy.summary,{type:'dom',selector:'[data-summary="' + button.dataset.summary + '"]'},{disabled:copy.disabled});
         });
+      } else if (target.kind === 'correlation') {
+        const puzzle = state.scenario && state.scenario.componentPuzzle;
+        drawHeader(puzzle ? puzzle.title : 'COMPONENT LINK',puzzle ? puzzle.prompt : 'Trace the fictional component path that explains the modeled impact.','#f6bd4d');
+        (puzzle ? puzzle.choices : []).forEach(choice => {
+          y = drawTerminalButton(y,choice.title,choice.summary,{type:'component',key:choice.key},{good:state.componentPuzzleSolved && choice.key === puzzle.correct,disabled:state.componentPuzzleSolved});
+        });
+        if (state.componentPuzzleSolved) {
+          context.fillStyle = '#9de5be'; context.font = '800 18px Arial, sans-serif'; context.textAlign = 'left';
+          context.fillText('Fictional component path confirmed. Asset tracing is unlocked.',46,Math.min(y + 20,560));
+        }
       } else if (target.kind === 'scan') {
         const selector = '[data-scan="' + target.type + '"]';
         const copy = fpsButtonCopy(selector);
@@ -2437,6 +2935,7 @@
         input.value = game.codeBuffer;
         $('#verifyCode').click();
       } else if (action.type === 'restart') requestSessionReset();
+      else if (action.type === 'component') solveComponentPuzzle(action.key);
       else if (action.type === 'dom') {
         const button = document.querySelector(action.selector);
         if (button && !button.disabled) button.click();
@@ -2467,6 +2966,10 @@
         recoveryCorrect:'runbook',
         summaryCorrect:nextScenario ? nextScenario.rootCause : ''
       });
+      const variationSeed = [state.sessionCode || 'local', state.sharedRunNumber || 0, state.scenarioKey || 'preview', nextLevel].join('|');
+      state.scenarioVariant = seededNumber(variationSeed) % 3;
+      const optionalScans = nextScenario ? Object.keys(nextScenario.scans || {}).filter(key => !state.config.scans.includes(key)) : [];
+      state.bonusScan = optionalScans.length ? optionalScans[seededNumber(variationSeed + '|bonus') % optionalScans.length] : null;
     }
     function writeCard(button, card) {
       if (!button || !card) return;
@@ -2478,7 +2981,7 @@
       if (summary) summary.textContent = card.summary;
     }
     function writeChoiceCards(selector, choices, property) {
-      const ordered = state.difficulty === 'easy' ? choices : choices.slice().sort(() => Math.random() - .5);
+      const ordered = state.difficulty === 'easy' ? choices : stableShuffle(choices, [state.sessionCode || 'local', state.sharedRunNumber || 0, state.scenarioKey || 'preview', property, state.scenarioVariant || 0].join('|'));
       $$(selector).forEach((button, index) => {
         const choice = ordered[index] || choices[index];
         if (!choice) return;
@@ -2528,6 +3031,9 @@
         $('#mapTitle').textContent = 'Fictional Data Hall A';
         $('#mapSubtitle').textContent = 'The shared scenario highlights the relevant virtual area after the host starts.';
         $('#mapCaption').textContent = 'Rotate and zoom the 3D fictional data hall. Highlighted locations are game controls only; no real equipment is connected.';
+        $('#componentPuzzleTitle').textContent = 'Component correlation';
+        $('#componentPuzzlePrompt').textContent = 'A scenario-specific fictional component puzzle appears after the modeled root cause is identified.';
+        $('#componentChoices').replaceChildren();
         renderMapScenario(null);
         return;
       }
@@ -2535,7 +3041,9 @@
       $('#scenarioEyebrow').textContent = scenario.category + ' · Training simulation';
       $('#scenarioTitle').textContent = scenario.title;
       $('#missionCopy').textContent = scenario.incident;
-      $('#scenarioPreview').textContent = 'Shared incident: ' + scenario.title + '. Every team sees the same fictional fault this round.';
+      const variantLabel = ['Alpha','Bravo','Charlie'][state.scenarioVariant || 0];
+      const bonus = state.bonusScan && scenario.scans[state.bonusScan] ? ' Optional bonus evidence: ' + scenario.scans[state.bonusScan].title + ' (+5).' : '';
+      $('#scenarioPreview').textContent = 'Shared incident: ' + scenario.title + ' · Variant ' + variantLabel + '. Every team sees the same fictional fault this round.' + bonus;
       $('#scenarioHud').textContent = scenario.category;
       $('#mapTitle').textContent = 'Fictional Data Hall A · ' + scenario.category;
       $('#mapSubtitle').textContent = 'Highlighted: ' + scenario.location + '. Inspect only virtual game evidence.';
@@ -2561,6 +3069,10 @@
         restart:{title:'Restart every virtual system', summary:'Attempt a broad simulated restart without evidence or approved containment.'}
       };
       Object.entries(recoveryCards).forEach(([key, card]) => writeCard(document.querySelector('[data-recovery="' + key + '"]'), card));
+      const puzzle = scenario.componentPuzzle;
+      $('#componentPuzzleTitle').textContent = puzzle.title;
+      $('#componentPuzzlePrompt').textContent = puzzle.prompt;
+      $('#componentChoices').innerHTML = puzzle.choices.map(choice => '<button class="choice" type="button" data-component-choice="' + escapeHtml(choice.key) + '"><b>' + escapeHtml(choice.title) + '</b><span>' + escapeHtml(choice.summary) + '</span></button>').join('');
       renderMapScenario(scenario);
     }
     function updateDifficultyUi() {
@@ -2590,7 +3102,7 @@
       const grid = $('#timelineGrid');
       if (!grid) return;
       const cards = $$('.timeline-card').filter(card => !card.classList.contains('hidden'));
-      const ordered = state.difficulty === 'easy' ? cards.sort((a,b) => state.config.timeline.indexOf(a.dataset.timelineStep) - state.config.timeline.indexOf(b.dataset.timelineStep)) : cards.sort(() => Math.random() - .5);
+      const ordered = state.difficulty === 'easy' ? cards.sort((a,b) => state.config.timeline.indexOf(a.dataset.timelineStep) - state.config.timeline.indexOf(b.dataset.timelineStep)) : stableShuffle(cards, [state.sessionCode || 'local', state.sharedRunNumber || 0, state.scenarioKey || 'preview', 'timeline', state.scenarioVariant || 0].join('|'));
       ordered.forEach(card => grid.appendChild(card));
     }
     function selectDifficulty(level) {
@@ -2672,9 +3184,15 @@
       $('#joinTeamButton').disabled = state.joined;
       $('#startButton').disabled = !hostCanStart;
       $('#startButton').textContent = hostCanStart ? 'Start ' + state.config.label + ' for everyone' : 'Host starts the escape';
+      $('#hostToolsButton').classList.toggle('hidden', !(state.joined && state.isHost));
+      $('#hostPauseButton').disabled = !(state.joined && state.isHost && inSharedRun && !state.paused);
+      $('#hostResumeButton').disabled = !(state.joined && state.isHost && inSharedRun && state.paused);
+      $('#hostRestartButton').disabled = !(state.joined && state.isHost);
+      renderHostTeamBoard();
 
       if (!state.joined) {
         setHostStatus('');
+        $('#hostTools').classList.add('hidden');
         $('#startMessage').textContent = 'Join a team to see who is hosting the session.';
         $('#resetButton').textContent = 'Restart';
         $('#resetButton').disabled = false;
@@ -2683,7 +3201,7 @@
 
       if (state.isHost) {
         setHostStatus('You are the host. Your difficulty selection and Start button control everyone in this session.', 'good');
-        $('#startMessage').textContent = inSharedRun ? 'Shared scenario is running for every joined player.' : 'Choose a difficulty, then start the scenario for everyone.';
+        $('#startMessage').textContent = inSharedRun ? (state.paused ? 'Shared scenario is paused for every joined player.' : 'Shared scenario is running for every joined player.') : 'Choose a difficulty, then start the scenario for everyone.';
         $('#resetButton').textContent = inSharedRun ? 'Restart for everyone' : 'Reset screen';
         $('#resetButton').disabled = false;
       } else {
@@ -2721,6 +3239,9 @@
       state.hostName = data.host_name || '';
       state.sharedRunNumber = incomingRun;
       state.sharedStartedAt = incomingStartedAt;
+      state.paused = Boolean(game.paused_at || game.status === 'paused');
+      state.pauseReason = state.paused ? 'The host paused the fictional training timer.' : '';
+      updatePausedUi();
 
       if (incomingStartedAt && !incomingScenarioKey) {
         clearPendingStart();
@@ -2760,6 +3281,7 @@
         }
         if (!state.started || newRun) {
           resetGame({ refresh:false });
+          restoreLocalCheckpoint(incomingRun, incomingScenarioKey);
           beginLocalGame(initialRemaining);
         } else if (Number.isFinite(remaining) && !state.finished) {
           const syncedSeconds = Math.max(0, Math.min(state.config.seconds, remaining - state.localPenaltySeconds));
@@ -2776,6 +3298,7 @@
         setGameConfiguration(incomingDifficulty, null);
         resetGame({ refresh:false });
       }
+      updatePausedUi();
     }
     function setLobbyStatus(text, type) {
       const target = $('#lobbyStatus');
@@ -2805,8 +3328,9 @@
         const info = TEAM_INFO[team];
         const list = members.length ? members.map(member => '<li>' + escapeHtml(member.display_name) + '</li>').join('') : '<li class="empty">Open slot</li>';
         const current = state.player && Number(state.player.team_number) === team ? ' current' : '';
-        return '<article class="team-card' + current + '"><h3>' + info.label + '</h3><p>' + info.specialty + ' · ' + members.length + ' player' + (members.length === 1 ? '' : 's') + '</p><ul>' + list + '</ul></article>';
+        return '<article class="team-card' + current + '"><h3>' + info.label + '</h3><p>' + info.role + ' · ' + members.length + ' player' + (members.length === 1 ? '' : 's') + '</p><ul>' + list + '</ul></article>';
       }).join('');
+      renderHostTeamBoard();
     }
     function releaseExpiredSession() {
       clearInterval(state.lobbyTimer);
@@ -2821,11 +3345,67 @@
       state.hostName = '';
       state.sharedRunNumber = 0;
       state.sharedStartedAt = null;
+      state.paused = false;
+      state.pauseReason = '';
       $('#teamAssignment').classList.add('hidden');
       $('#teamMetric').classList.add('hidden');
       $('#teamHud').textContent = '—';
+      updateRoleBrief();
       resetGame({ refresh:false });
       setLobbyStatus('Your previous session reservation expired. Join the session again to continue.', 'bad');
+    }
+    function applyGameUpdates(data) {
+      if (!data) return;
+      const game = data.game || {};
+      const run = Number(game.run_number || state.sharedRunNumber || 0);
+      if (run && state.sharedRunNumber && run !== state.sharedRunNumber) return;
+      state.sharedPlayers = Array.isArray(data.players) ? data.players : state.sharedPlayers;
+      state.activePings = Array.isArray(data.pings) ? data.pings : state.activePings;
+      const wasPaused = state.paused;
+      state.paused = Boolean(game.paused_at || game.status === 'paused');
+      state.pauseReason = game.instructor_prompt || (state.paused ? 'The host paused the fictional training timer.' : '');
+      const nextPrompt = game.instructor_prompt || '';
+      if (nextPrompt && nextPrompt !== state.instructorPrompt) showCaption('Host prompt: ' + nextPrompt);
+      state.instructorPrompt = nextPrompt;
+      if (state.paused !== wasPaused) {
+        showCaption(state.paused ? 'Scenario paused by the host.' : 'Scenario resumed by the host.');
+        playTrainingCue(state.paused ? 'alert' : 'ping');
+      }
+      updatePausedUi();
+      renderPingFeed();
+      renderHostTeamBoard(state.sharedPlayers);
+      updateFpsExperience(true);
+    }
+    async function refreshGameUpdates(silent) {
+      if (!state.db || !state.joined || !state.sessionCode) return;
+      try {
+        const { data, error } = await state.db.rpc('get_dc_escape_game_updates', { p_session_code:state.sessionCode, p_client_token:playerToken(), p_since:null });
+        if (error) throw error;
+        state.lastUpdatesAt = Date.now();
+        applyGameUpdates(data);
+      } catch (error) {
+        if (!silent && !/get_dc_escape_game_updates|function|schema cache/i.test(error.message || '')) setLobbyStatus('Could not refresh shared game updates: ' + (error.message || 'Unknown error'), 'bad');
+      }
+    }
+    async function sendTeamPing(kind) {
+      if (!state.started || state.finished || state.paused) return;
+      const translated = { clue:'clue_found', help:'need_help', complete:'objective_complete', meet:'meet_here' }[kind] || kind;
+      const label = PING_COPY[translated] || 'Team ping';
+      state.runStats.pings += 1;
+      const localPing = { client_token:playerToken(), display_name:$('#playerName').value.trim() || 'You', team_number:state.player && state.player.team_number, ping_kind:translated, zone:state.currentZone || null, created_at:new Date().toISOString() };
+      state.activePings = [localPing].concat((state.activePings || []).filter(ping => !(ping.client_token === localPing.client_token && ping.ping_kind === localPing.ping_kind))).slice(0,40);
+      renderPingFeed();
+      showCaption('Team ping sent: ' + label);
+      playTrainingCue('ping');
+      recordRunEvent('Team ping: ' + label + '.', 'ping');
+      if (!state.db || !state.joined) return;
+      try {
+        const { data, error } = await state.db.rpc('send_dc_escape_team_ping', { p_session_code:state.sessionCode, p_client_token:playerToken(), p_ping_kind:translated, p_zone:state.currentZone || null });
+        if (error) throw error;
+        if (data) applyGameUpdates(data);
+      } catch (error) {
+        if (!/send_dc_escape_team_ping|function|schema cache/i.test(error.message || '')) setLobbyStatus('Could not send the training ping: ' + (error.message || 'Unknown error'), 'bad');
+      }
     }
     async function refreshLobby(silent) {
       if (!state.db || !state.sessionCode || state.lobbyRequestInFlight) return;
@@ -2839,6 +3419,7 @@
         }
         renderTeamRoster((data && data.players) || []);
         applySharedSession(data);
+        refreshGameUpdates(true);
       } catch (error) {
         if (!silent) setLobbyStatus('Could not refresh the team lobby: ' + (error.message || 'Unknown error'), 'bad');
       } finally {
@@ -2874,12 +3455,14 @@
         $('#teamAssignment').classList.remove('hidden');
         $('#teamMetric').classList.remove('hidden');
         $('#teamHud').textContent = info.label + ' · ' + info.specialty;
+        updateRoleBrief();
+        rememberSession();
         setLobbyStatus('Assigned automatically to ' + info.label + '.', 'good');
         logEvent(playerName + ' joined ' + info.label + '.');
         applySharedSession(data);
         await refreshLobby(true);
         clearInterval(state.lobbyTimer);
-        state.lobbyTimer = setInterval(() => refreshLobby(true), 3000);
+        state.lobbyTimer = setInterval(() => refreshLobby(true), 2200);
       } catch (error) {
         const detail = error.message || 'Unknown error';
         const setupMissing = /join_dc_escape_session|function|schema cache/i.test(detail);
@@ -2901,6 +3484,7 @@
       $('#hintButton').disabled = !state.started || state.finished || state.hintsUsed >= state.config.maxHints;
       $('#hintCost').textContent = state.hintsUsed >= state.config.maxHints ? 'used' : '−' + state.config.hintCost;
       $('#teamMetric').classList.toggle('hidden', !state.joined);
+      saveLocalCheckpoint();
       updateFpsExperience();
     }
     function updateMap(current) {
@@ -2922,12 +3506,14 @@
       updateFpsExperience();
     }
     function showPanel(panel) {
-      if (!state.started || state.finished) return;
+      if (!state.started || state.finished || state.paused) return;
       if (state.stage < panelRequirement(panel)) return;
       panels.forEach(name => $('#'+name+'Panel').classList.toggle('hidden', name !== panel));
       updateMap(zoneRequirements[panel] !== undefined ? panel : '');
-      const labels = { noc:'Reviewing NOC evidence.', timeline:'Rebuilding the incident timeline.', diagnose:'Analyzing the incident.', aisle:'Tracing virtual asset dependencies.', recovery:'Completing the virtual recovery runbook.', validation:'Verifying the simulated recovery.', summary:'Confirming the hard-mode incident summary.', exit:'Exit interlock ready.' };
+      const labels = { noc:'Reviewing NOC evidence.', timeline:'Rebuilding the incident timeline.', diagnose:'Analyzing the incident.', component:'Correlating the modeled component path.', aisle:'Tracing virtual asset dependencies.', recovery:'Completing the virtual recovery runbook.', validation:'Verifying the simulated recovery.', summary:'Confirming the hard-mode incident summary.', exit:'Exit interlock ready.' };
       $('#hudMessage').textContent = labels[panel] || '';
+      state.currentZone = zoneRequirements[panel] !== undefined ? panel : (panel === 'component' ? 'diagnose' : (panel === 'summary' ? 'summary' : ''));
+      reportPlayerState(true);
       updateFpsExperience();
     }
     async function startGame() {
@@ -2970,31 +3556,47 @@
       state.seconds = Math.max(0, Math.min(state.config.seconds, Math.floor(secondsRemaining) - state.localPenaltySeconds));
       state.started = true;
       state.finished = false;
+      if (!state.checkpointRestored) beginRunStats();
       $('#game').classList.remove('hidden');
       if (!enterFpsExperience()) requestAnimationFrame(resizeThreeScene);
       updateSessionControls();
       logEvent((state.scenario ? state.scenario.title : state.config.label) + ' shared timer started. NOC console unlocked.');
       updateHud();
-      showPanel('noc');
+      showPanel(state.checkpointRestored ? checkpointPanel() : 'noc');
+      state.checkpointRestored = false;
       if (state.seconds === 0) {
         finishFailure();
         return;
       }
       state.timer = setInterval(() => {
-        if (!state.started || state.finished) return;
+        if (!state.started || state.finished || state.paused) return;
         state.seconds -= 1;
         if (state.seconds <= 0) {
           state.seconds = 0;
           finishFailure();
         }
+        if (state.runStats && state.runStats.stageStartedAt && Date.now() - state.runStats.stageStartedAt > 85000 && state.runStats.guidanceStage !== state.stage) {
+          state.runStats.guidanceStage = state.stage;
+          const role = getCurrentTeam();
+          const guidance = role ? role.task : 'Follow the highlighted fictional terminal on the mini map.';
+          $('#hudMessage').textContent = 'Guidance: ' + guidance;
+          showCaption('Guidance: ' + guidance);
+          recordRunEvent('Contextual guidance shown.', 'guidance');
+        }
         updateHud();
       }, 1000);
     }
     function penalty(message) {
+      if (state.paused) return;
       state.localPenaltySeconds += state.config.penaltySeconds;
       state.seconds = Math.max(0, state.seconds - state.config.penaltySeconds);
       state.score = Math.max(0, state.score - state.config.scorePenalty);
+      state.runStats.wrongChoices += 1;
+      state.runStats.penaltySeconds += state.config.penaltySeconds;
+      playTrainingCue('alert');
+      showCaption('Time penalty: ' + message, '');
       logEvent('Time penalty: ' + message + ' (−' + state.config.penaltySeconds + ' seconds).');
+      reportPlayerState(true);
       if (state.seconds === 0) {
         finishFailure();
         return;
@@ -3007,13 +3609,14 @@
       target.className = 'feedback ' + (type || '');
     }
     function inspectClue(type, button) {
-      if (!state.started || state.finished || state.stage !== 0) return;
+      if (!state.started || state.finished || state.paused || state.stage !== 0) return;
       const details = state.scenario && state.scenario.clues ? state.scenario.clues : {};
       const detail = details[type] ? details[type].detail : 'No virtual evidence is available for that card.';
       state.clues.add(type);
       button.classList.add('inspected');
       $('#nocDetails').innerHTML = '<strong>Evidence found:</strong> ' + escapeHtml(detail);
       logEvent('Inspected ' + button.querySelector('b').textContent + '.');
+      playTrainingCue('correct');
       const inspected = state.config.clues.filter(item => state.clues.has(item)).length;
       if (completed(state.clues, state.config.clues)) {
         $('#analyzeButton').disabled = false;
@@ -3023,14 +3626,15 @@
       }
     }
     function analyzeEvidence() {
-      if (state.finished || !completed(state.clues, state.config.clues)) return;
-      state.stage = 1;
+      if (state.finished || state.paused || !completed(state.clues, state.config.clues)) return;
+      advanceStage(1, 'Evidence complete. Incident timeline unlocked.');
       logEvent('Evidence complete. Incident timeline unlocked.');
+      playTrainingCue('correct');
       updateHud();
       showPanel('timeline');
     }
     function selectTimelineStep(step, button) {
-      if (state.finished || state.stage !== 1) return;
+      if (state.finished || state.paused || state.stage !== 1) return;
       const expected = state.config.timeline[state.timelineIndex];
       if (step === expected) {
         state.timelineIndex += 1;
@@ -3038,8 +3642,9 @@
         button.classList.add('correct');
         $('#timelineDetails').innerHTML = '<strong>Timeline match:</strong> ' + escapeHtml(button.querySelector('b').textContent) + ' is in the correct position.';
         logEvent('Timeline event confirmed: ' + button.querySelector('b').textContent + '.');
+        playTrainingCue('correct');
         if (state.timelineIndex === state.config.timeline.length) {
-          state.stage = 2;
+          advanceStage(2, 'Timeline complete. Incident board unlocked.');
           setFeedback('timelineFeedback','Timeline complete. Use the incident board to identify the virtual root cause.','good');
           updateHud();
           setTimeout(() => showPanel('diagnose'), 500);
@@ -3054,15 +3659,16 @@
       }
     }
     function diagnose(answer, button) {
-      if (state.finished || state.stage !== 2) return;
+      if (state.finished || state.paused || state.stage !== 2) return;
       $$('.choice[data-diagnosis]').forEach(item => item.disabled = true);
       if (answer === state.config.summaryCorrect) {
         button.classList.add('correct');
-        state.stage = 3;
+        advanceStage(3, 'Root cause identified. Virtual asset trace unlocked.');
         setFeedback('diagnoseFeedback','Correct. ' + (state.scenario ? state.scenario.rootSummary : 'The fictional root cause is confirmed.') + '','good');
         logEvent('Root cause identified: ' + (state.scenario ? state.scenario.rootTitle : 'fictional incident') + '.');
+        playTrainingCue('correct');
         updateHud();
-        setTimeout(() => showPanel('aisle'), 650);
+        setTimeout(() => showPanel('component'), 650);
       } else {
         button.classList.add('wrong');
         penalty('Incorrect diagnosis');
@@ -3073,14 +3679,51 @@
         }, 750);
       }
     }
+    function solveComponentPuzzle(choice) {
+      if (state.finished || state.paused || state.stage !== 3 || state.componentPuzzleSolved) return;
+      const puzzle = state.scenario && state.scenario.componentPuzzle;
+      if (!puzzle) return;
+      if (choice === puzzle.correct) {
+        state.componentPuzzleSolved = true;
+        state.score += 5;
+        $$('#componentChoices [data-component-choice]').forEach(button => { button.disabled = true; button.classList.toggle('correct', button.dataset.componentChoice === choice); });
+        setFeedback('componentFeedback','Correct. The fictional component path matches the primary evidence and dependency map. Asset tracing is unlocked. +5 points','good');
+        $('#hudMessage').textContent = 'Component path confirmed. Virtual asset trace unlocked. +5 points';
+        logEvent('Component correlation puzzle solved: ' + puzzle.title + '.');
+        recordRunEvent('Component path confirmed for ' + (state.scenario ? state.scenario.category : 'the fictional component') + '.', 'puzzle');
+        showCaption('Component path confirmed. Asset trace unlocked. +5 points');
+        playTrainingCue('correct');
+        reportPlayerState(true);
+        setTimeout(() => showPanel('aisle'), 500);
+      } else {
+        const button = document.querySelector('#componentChoices [data-component-choice="' + choice + '"]');
+        if (button) { button.classList.add('wrong'); setTimeout(() => button.classList.remove('wrong'), 700); }
+        penalty('Incorrect fictional component path');
+        setFeedback('componentFeedback','That path uses an independent decoy. Recheck the primary component evidence and modeled dependency map.','bad');
+        $('#hudMessage').textContent = 'That path uses a decoy. Recheck the primary component evidence and modeled dependency map.';
+      }
+      updateHud();
+    }
     function inspectScan(type, button) {
-      if (state.finished || state.stage !== 3) return;
+      if (state.finished || state.paused || state.stage !== 3) return;
+      if (!state.componentPuzzleSolved) {
+        setFeedback('aisleFeedback','First confirm the fictional component path at the component-correlation terminal.','warn');
+        return;
+      }
       const details = state.scenario && state.scenario.scans ? state.scenario.scans : {};
       const detail = details[type] ? details[type].detail : 'No virtual asset detail is available for that card.';
       state.scans.add(type);
       button.classList.add('inspected');
       $('#aisleDetails').innerHTML = '<strong>Asset read:</strong> ' + escapeHtml(detail);
       logEvent('Scanned ' + button.querySelector('b').textContent + '.');
+      if (type === state.bonusScan && !state.runStats.bonusFound) {
+        state.runStats.bonusFound = true;
+        state.score += 5;
+        setFeedback('aisleFeedback','Optional virtual evidence collected. +5 points', 'good');
+        logEvent('Optional virtual evidence collected. +5 points.');
+        showCaption('Bonus fictional evidence collected. +5 points');
+      }
+      playTrainingCue('correct');
       const inspected = state.config.scans.filter(item => state.scans.has(item)).length;
       if (completed(state.scans, state.config.scans)) {
         $('#recoveryCode').disabled = false;
@@ -3091,14 +3734,15 @@
       }
     }
     function verifyCode() {
-      if (state.finished || state.stage !== 3) return;
+      if (state.finished || state.paused || state.stage !== 3) return;
       const code = $('#recoveryCode').value.trim().toUpperCase().replace(/\s+/g,'');
       if (code === state.config.code) {
-        state.stage = 4;
+        advanceStage(4, 'Virtual recovery key accepted. Recovery console unlocked.');
         $('#recoveryCode').disabled = true;
         $('#verifyCode').disabled = true;
         setFeedback('aisleFeedback','Recovery key accepted. The recovery console is unlocked.','good');
         logEvent('Virtual recovery key accepted.');
+        playTrainingCue('correct');
         updateHud();
         setTimeout(() => showPanel('recovery'), 650);
       } else {
@@ -3107,13 +3751,14 @@
       }
     }
     function selectRunbookStep(step, button) {
-      if (state.finished || state.stage !== 4) return;
+      if (state.finished || state.paused || state.stage !== 4) return;
       const expected = state.config.runbook[state.runbookIndex];
       if (step === expected) {
         state.runbookIndex += 1;
         button.disabled = true;
         button.classList.add('correct');
         logEvent('Virtual runbook step complete: ' + button.querySelector('b').textContent + '.');
+        playTrainingCue('correct');
         if (state.runbookIndex === state.config.runbook.length) {
           $('#recoveryChoices').classList.remove('hidden');
           $('#runbookStatus').innerHTML = '<b>Runbook complete.</b> Select the safe virtual recovery path.';
@@ -3130,15 +3775,16 @@
       }
     }
     function recover(choice, button) {
-      if (state.finished || state.stage !== 4 || state.runbookIndex !== state.config.runbook.length) return;
+      if (state.finished || state.paused || state.stage !== 4 || state.runbookIndex !== state.config.runbook.length) return;
       if (choice === state.config.recoveryCorrect) {
         $$('.choice[data-recovery]').forEach(item => item.disabled = true);
         button.classList.add('correct');
-        state.stage = 5;
+        advanceStage(5, 'Approved virtual response completed. Validation unlocked.');
         state.score += 10;
         $('#recoveryResult').classList.remove('hidden');
         setFeedback('recoveryFeedback','Approved virtual runbook selected. Continue to the validation gate. +10 points','good');
         logEvent('Approved virtual response completed. Fictional system stable.');
+        playTrainingCue('correct');
         updateHud();
         updateMap('recovery');
       } else {
@@ -3149,12 +3795,12 @@
       }
     }
     function openValidation() {
-      if (state.finished || state.stage !== 5) return;
+      if (state.finished || state.paused || state.stage !== 5) return;
       logEvent('Post-recovery validation unlocked.');
       showPanel('validation');
     }
     function inspectValidation(type, button) {
-      if (state.finished || state.stage !== 5) return;
+      if (state.finished || state.paused || state.stage !== 5) return;
       const details = state.scenario && state.scenario.validations ? state.scenario.validations : {};
       const detail = details[type] ? details[type].detail : 'No virtual validation detail is available for that card.';
       state.validations.add(type);
@@ -3162,16 +3808,17 @@
       button.disabled = true;
       $('#validationDetails').innerHTML = '<strong>Validation found:</strong> ' + escapeHtml(detail);
       logEvent('Validated ' + button.querySelector('b').textContent + '.');
+      playTrainingCue('correct');
       const inspected = state.config.validations.filter(item => state.validations.has(item)).length;
       if (completed(state.validations, state.config.validations)) {
         if (state.difficulty === 'hard') {
-          state.stage = 6;
+          advanceStage(6, 'Validation complete. Hard-mode incident summary unlocked.');
           setFeedback('validationFeedback','All virtual signals are stable. Complete the hard-mode incident summary to unlock the exit.','good');
           logEvent('Validation complete. Hard-mode incident summary unlocked.');
           updateHud();
           setTimeout(() => showPanel('summary'), 500);
         } else {
-          state.stage = state.config.exitStage;
+          advanceStage(state.config.exitStage, 'Validation complete. Exit interlock ready.');
           setFeedback('validationFeedback','All required virtual signals are stable. The exit interlock is ready.','good');
           logEvent('Validation complete. Exit interlock ready.');
           updateHud();
@@ -3182,13 +3829,14 @@
       }
     }
     function selectSummary(answer, button) {
-      if (state.finished || state.difficulty !== 'hard' || state.stage !== 6) return;
+      if (state.finished || state.paused || state.difficulty !== 'hard' || state.stage !== 6) return;
       if (answer === state.config.summaryCorrect) {
         $$('.choice[data-summary]').forEach(item => item.disabled = true);
         button.classList.add('correct');
-        state.stage = state.config.exitStage;
+        advanceStage(state.config.exitStage, 'Hard-mode incident summary confirmed. Exit interlock ready.');
         setFeedback('summaryFeedback','Correct. ' + (state.scenario ? state.scenario.rootTitle : 'The fictional root cause') + ' caused the modeled impact. Exit unlocked.','good');
         logEvent('Hard-mode incident summary confirmed. Exit interlock ready.');
+        playTrainingCue('correct');
         updateHud();
         setTimeout(() => showPanel('exit'), 500);
       } else {
@@ -3199,14 +3847,36 @@
       }
     }
     function openExit() {
-      if (state.finished || state.stage < state.config.exitStage) return;
+      if (state.finished || state.paused || state.stage < state.config.exitStage) return;
       logEvent('Exit interlock unlocked.');
       showPanel('exit');
+    }
+    function renderDebrief(outcome) {
+      const stats = state.runStats || { stageDurations:{}, wrongChoices:0, penaltySeconds:0, hints:0, pings:0, events:[] };
+      const grade = outcome === 'failed' ? 'Timed out' : state.score >= 110 ? 'Clean recovery' : state.score >= 90 ? 'Stable recovery' : 'Recovered after rework';
+      const stages = Object.entries(stats.stageDurations || {}).map(([name, seconds]) => name + ' ' + clock(Number(seconds || 0))).join(' · ') || 'No stage timing was recorded.';
+      $('#debriefGrid').innerHTML = [
+        ['Outcome', grade], ['Hints', String(stats.hints || 0)], ['Wrong attempts', String(stats.wrongChoices || 0)],
+        ['Penalty time', clock(stats.penaltySeconds || 0)], ['Team pings', String(stats.pings || 0)], ['Stage timing', stages]
+      ].map(item => '<div><span>' + escapeHtml(item[0]) + '</span><b>' + escapeHtml(item[1]) + '</b></div>').join('');
+      const events = (stats.events || []).slice().reverse();
+      $('#debriefTimeline').innerHTML = events.length ? events.map(event => '<li><time>' + escapeHtml(clock(event.elapsed || 0)) + '</time>' + escapeHtml(event.text) + '</li>').join('') : '<li>No event timeline was recorded.</li>';
+    }
+    async function submitRunDebrief(outcome) {
+      if (!state.db || !state.joined || !state.sharedRunNumber) return;
+      try {
+        await state.db.rpc('submit_dc_escape_debrief', {
+          p_session_code:state.sessionCode, p_client_token:playerToken(), p_outcome:outcome, p_final_score:Math.max(0, Math.min(1000, state.score)), p_seconds_remaining:Math.max(0, Math.min(3600, state.seconds)), p_hints_used:Math.max(0, Math.min(50, state.hintsUsed)), p_stage_times:state.runStats.stageDurations || {}
+        });
+      } catch (error) {}
     }
     function finishSuccess() {
       if (state.finished) return;
       state.finished = true;
       clearInterval(state.timer);
+      finishRunStats('completed');
+      renderDebrief('completed');
+      playTrainingCue('success');
       $('#resultTime').textContent = clock(state.seconds);
       $('#resultScore').textContent = state.score;
       const scenarioLabel = state.scenario ? state.scenario.title : 'Critical incident';
@@ -3219,11 +3889,17 @@
       updateHud();
       if (state.fpsGame) state.fpsGame.openTerminal(state.fpsGame.terminalTarget || state.fpsGame.targets.find(target => target.id === 'exit'));
       logEvent('Escape completed with ' + state.score + ' points.');
+      reportPlayerState(true);
+      submitRunDebrief('completed');
+      clearLocalCheckpoint();
     }
     function finishFailure() {
       if (state.finished) return;
       state.finished = true;
       clearInterval(state.timer);
+      finishRunStats('failed');
+      renderDebrief('failed');
+      playTrainingCue('alert');
       const hostCanRestart = !state.joined || state.isHost;
       $('#hudMessage').textContent = hostCanRestart ? 'Time expired. Restart the shared simulation to try again.' : 'Time expired. Waiting for the host to restart the shared simulation.';
       $('#startMessage').textContent = hostCanRestart ? 'Time expired — use Restart for everyone to reset the room.' : 'Time expired — waiting for the host to restart everyone.';
@@ -3238,9 +3914,12 @@
       updateHud();
       if (state.fpsGame) state.fpsGame.openTerminal(state.fpsGame.terminalTarget || state.fpsGame.targets.find(target => target.id === 'exit'));
       logEvent('Simulation timed out.');
+      reportPlayerState(true);
+      submitRunDebrief('failed');
+      clearLocalCheckpoint();
     }
     function giveHint() {
-      if (!state.started || state.finished || state.hintsUsed >= state.config.maxHints) return;
+      if (!state.started || state.finished || state.paused || state.hintsUsed >= state.config.maxHints) return;
       const hints = state.scenario ? state.scenario.hints : [
         'Open all virtual NOC alerts before deciding what failed.',
         'Build the fictional timeline from cause to impact, then scope the decoys.',
@@ -3248,10 +3927,58 @@
         'A simulation is complete only after all required validation signals are stable.'
       ];
       state.hintsUsed += 1;
+      state.runStats.hints += 1;
       state.score = Math.max(0, state.score - state.config.hintCost);
       $('#hudMessage').textContent = 'Hint ' + state.hintsUsed + ' of ' + state.config.maxHints + ': ' + hints[Math.min(state.stage,hints.length - 1)];
       logEvent('Hint requested (' + state.hintsUsed + ' of ' + state.config.maxHints + ').');
+      showCaption($('#hudMessage').textContent);
+      playTrainingCue('ping');
       updateHud();
+    }
+    async function hostGameControl(action) {
+      if (!state.joined || !state.isHost || !state.db) return;
+      const button = action === 'pause' ? $('#hostPauseButton') : $('#hostResumeButton');
+      const original = button.textContent;
+      button.disabled = true;
+      button.textContent = action === 'pause' ? 'Pausing…' : 'Resuming…';
+      try {
+        const { data, error } = await state.db.rpc(action === 'pause' ? 'pause_dc_escape_game' : 'resume_dc_escape_game', { p_session_code:state.sessionCode, p_client_token:playerToken() });
+        if (error) throw error;
+        applySharedSession(data);
+        await refreshGameUpdates(true);
+        setLobbyStatus(action === 'pause' ? 'Shared fictional scenario paused for every player.' : 'Shared fictional scenario resumed for every player.', 'good');
+      } catch (error) {
+        const missing = /pause_dc_escape_game|resume_dc_escape_game|function|schema cache/i.test(error.message || '');
+        setLobbyStatus(missing ? 'Host controls need the newest Data Center Escape SQL update. Run it once, then refresh.' : 'Could not ' + action + ' the shared scenario: ' + (error.message || 'Unknown error'), 'bad');
+      } finally {
+        button.textContent = original;
+        updateSessionControls();
+      }
+    }
+    async function sendInstructorPrompt(text) {
+      if (!state.joined || !state.isHost || !state.db || !text) return;
+      try {
+        const { data, error } = await state.db.rpc('set_dc_escape_instructor_prompt', { p_session_code:state.sessionCode, p_client_token:playerToken(), p_prompt:String(text).slice(0,180) });
+        if (error) throw error;
+        if (data) applyGameUpdates(data);
+        showCaption('Host prompt sent: ' + text);
+      } catch (error) {
+        const missing = /set_dc_escape_instructor_prompt|function|schema cache/i.test(error.message || '');
+        setLobbyStatus(missing ? 'Instructor prompts need the newest Data Center Escape SQL update. Run it once, then refresh.' : 'Could not send the host prompt: ' + (error.message || 'Unknown error'), 'bad');
+      }
+    }
+    function toggleSpectator() {
+      if (!state.isHost) return;
+      const candidates = (state.sharedPlayers || []).filter(player => String(player.client_token || '') !== String(playerToken()) && Number.isFinite(Number(player.position_x)) && Number.isFinite(Number(player.position_z)));
+      if (!state.spectating && !candidates.length) {
+        showCaption('No teammate position is available yet. Ask a player to move in the fictional room.');
+        return;
+      }
+      state.spectating = !state.spectating;
+      state.spectateToken = state.spectating ? candidates[0].client_token : null;
+      $('#hostSpectateButton').textContent = state.spectating ? 'Leave team overview' : 'Open team overview';
+      showCaption(state.spectating ? 'Spectator overview: following a fictional player position.' : 'Spectator overview closed.');
+      if (state.fpsGame) state.fpsGame.clearMotion();
     }
     async function requestSessionReset() {
       if (!state.joined || (!state.sharedStartedAt && !state.started)) {
@@ -3299,6 +4026,14 @@
       state.validations = new Set();
       state.hintsUsed = 0;
       state.localPenaltySeconds = 0;
+      state.componentPuzzleSolved = false;
+      state.currentZone = '';
+      state.checkpointRestored = false;
+      state.spectating = false;
+      state.spectateToken = null;
+      state.activePings = [];
+      state.runStats = { startedAt:0, stageStartedAt:0, stageDurations:{}, wrongChoices:0, penaltySeconds:0, hints:0, pings:0, events:[], bonusFound:false };
+      if (!state.sharedStartedAt) { state.paused = false; state.pauseReason = ''; }
       state.log = [state.scenario ? 'Simulation reset. Scenario ready: ' + state.scenario.title + '.' : 'Simulation reset.'];
       $$('.timeout-notice').forEach(notice => notice.remove());
       $('#game').classList.add('hidden');
@@ -3321,12 +4056,17 @@
       $('#playAgain').disabled = false;
       $('#validationDetails').innerHTML = '<strong>Validation ready.</strong> Inspect the required virtual signals.';
       $$('.clue,.scan,.choice').forEach(item => { item.disabled = false; item.classList.remove('inspected','correct','wrong'); });
-      ['nocFeedback','timelineFeedback','diagnoseFeedback','aisleFeedback','runbookFeedback','recoveryFeedback','validationFeedback','summaryFeedback'].forEach(id => setFeedback(id,'',''));
+      ['nocFeedback','timelineFeedback','diagnoseFeedback','componentFeedback','aisleFeedback','runbookFeedback','recoveryFeedback','validationFeedback','summaryFeedback'].forEach(id => setFeedback(id,'',''));
       $('#eventLog').innerHTML = '<li>Simulation reset.</li>';
+      $('#debriefGrid').innerHTML = '';
+      $('#debriefTimeline').innerHTML = '';
       panels.forEach(name => $('#'+name+'Panel').classList.add('hidden'));
       if (refresh && state.sessionCode) refreshLobby(true);
       else if (!state.sessionCode) renderTeamRoster([]);
       updateHud();
+      updateRoleBrief();
+      renderPingFeed();
+      updatePausedUi();
       updateMap('');
     }
     function updateFullscreenButton() {
@@ -3346,18 +4086,40 @@
     }
     $('#startButton').addEventListener('click', startGame);
     $('#joinTeamButton').addEventListener('click', joinTeam);
+    $('#reconnectButton').addEventListener('click', joinTeam);
     $('#playerName').addEventListener('keydown', event => { if (event.key === 'Enter') joinTeam(); });
     $('#resetButton').addEventListener('click', requestSessionReset);
     $('#playAgain').addEventListener('click', requestSessionReset);
     $('#hintButton').addEventListener('click', giveHint);
     $('#fullscreenButton').addEventListener('click', toggleFullscreen);
+    $('#settingsButton').addEventListener('click', () => toggleDrawer('settingsDrawer'));
+    $('#hostToolsButton').addEventListener('click', () => toggleDrawer('hostTools'));
+    $$('[data-close-drawer]').forEach(button => button.addEventListener('click', () => {
+      const drawer = $('#' + button.dataset.closeDrawer);
+      if (drawer) drawer.classList.add('hidden');
+      $('#settingsButton').setAttribute('aria-expanded','false');
+      $('#hostToolsButton').setAttribute('aria-expanded','false');
+    }));
+    ['settingSensitivity','settingFov','settingBrightness','settingInvertY','settingReduceMotion','settingHighContrast','settingLowGraphics','settingSound','settingCaptions'].forEach(id => {
+      const input = $('#' + id);
+      input.addEventListener(input.type === 'range' ? 'input' : 'change', updateSettingFromInput);
+    });
+    $('#replayTutorialButton').addEventListener('click', replayFpsTutorial);
+    $('#briefBack').addEventListener('click', () => { state.briefingStep = Math.max(0, state.briefingStep - 1); renderBriefing(); });
+    $('#briefNext').addEventListener('click', () => { state.briefingStep = Math.min(BRIEFING_STEPS.length - 1, state.briefingStep + 1); renderBriefing(); });
+    $('#hostPauseButton').addEventListener('click', () => hostGameControl('pause'));
+    $('#hostResumeButton').addEventListener('click', () => hostGameControl('resume'));
+    $('#hostRestartButton').addEventListener('click', requestSessionReset);
+    $('#hostSpectateButton').addEventListener('click', toggleSpectator);
+    $$('[data-instructor-prompt]').forEach(button => button.addEventListener('click', () => sendInstructorPrompt(button.dataset.instructorPrompt)));
+    $$('[data-ping]').forEach(button => button.addEventListener('click', () => sendTeamPing(button.dataset.ping)));
     $('#resetMapViewButton').addEventListener('click', resetThreeSceneView);
     document.addEventListener('fullscreenchange', () => {
       updateFullscreenButton();
       requestAnimationFrame(resizeThreeScene);
       requestAnimationFrame(resizeFpsExperience);
     });
-    document.addEventListener('visibilitychange', () => { if (!document.hidden) refreshLobby(true); });
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) { refreshLobby(true); refreshGameUpdates(true); } else reportPlayerState(true); });
     $$('.difficulty-option').forEach(button => button.addEventListener('click', () => selectDifficulty(button.dataset.difficulty)));
     $$('.zone').forEach(button => button.addEventListener('click', () => showPanel(button.dataset.zone)));
     $$('.clue').forEach(button => button.addEventListener('click', () => inspectClue(button.dataset.clue, button)));
@@ -3372,7 +4134,16 @@
     $('#openValidation').addEventListener('click', openValidation);
     $$('.validation-check').forEach(button => button.addEventListener('click', () => inspectValidation(button.dataset.validation, button)));
     $$('.choice[data-summary]').forEach(button => button.addEventListener('click', () => selectSummary(button.dataset.summary, button)));
+    $('#componentChoices').addEventListener('click', event => {
+      const button = event.target.closest('[data-component-choice]');
+      if (button) solveComponentPuzzle(button.dataset.componentChoice);
+    });
     $('#escapeButton').addEventListener('click', finishSuccess);
+    loadSettings();
+    syncSettingsControls();
+    applySettings();
+    renderBriefing();
+    restoreReconnectOffer();
     initThreeScene();
     resetGame();
   </script>
