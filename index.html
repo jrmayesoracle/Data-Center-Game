@@ -251,10 +251,11 @@
           </div>
           <p id="lobbyStatus" class="lobby-status">Enter your name, then join the session.</p>
           <div id="teamAssignment" class="team-assignment hidden"><span class="team-dot"></span><span>Assigned to <b id="teamAssignmentName">Team</b></span></div>
+          <p id="hostStatus" class="lobby-status hidden" aria-live="polite"></p>
           <div id="teamRoster" class="team-roster" aria-live="polite"></div>
         </section>
         <section id="difficultyPicker" class="difficulty-picker" aria-labelledby="difficultyTitle">
-          <div><h2 id="difficultyTitle">Choose scenario difficulty</h2><p>Difficulty changes the amount of evidence, the number of recovery checks, hints, and time penalties.</p></div>
+          <div><h2 id="difficultyTitle">Host chooses scenario difficulty</h2><p>The host’s selection is shared with every player when the session starts.</p></div>
           <div class="difficulty-grid" role="group" aria-label="Scenario difficulty">
             <button class="difficulty-option" data-difficulty="easy" type="button" aria-pressed="false"><b>Easy</b><span>Guided sequence · extra hints</span></button>
             <button class="difficulty-option active" data-difficulty="medium" type="button" aria-pressed="true"><b>Medium</b><span>Full investigation · balanced pressure</span></button>
@@ -263,8 +264,8 @@
           <p id="difficultyMessage" class="difficulty-note" aria-live="polite"></p>
         </section>
         <div class="mission-actions">
-          <button id="startButton" type="button" disabled>Start the escape</button>
-          <span id="startMessage" class="muted">Join a team to unlock the escape room.</span>
+          <button id="startButton" type="button" disabled>Host starts the escape</button>
+          <span id="startMessage" class="muted">Join a team to see who is hosting the session.</span>
         </div>
         <p class="safety"><strong>Simulation only:</strong> this game does not replace real site procedures. In a real data center, follow approved SOPs and use authorized, trained personnel.</p>
       </section>
@@ -578,9 +579,9 @@
     };
     const state = {
       started:false, finished:false, difficulty:'medium', config:DIFFICULTIES.medium, seconds:DIFFICULTIES.medium.seconds, score:100, stage:0,
-      clues:new Set(), scans:new Set(), timelineIndex:0, runbookIndex:0, validations:new Set(), hintsUsed:0, timer:null, log:['Simulation initialized.'],
+      clues:new Set(), scans:new Set(), timelineIndex:0, runbookIndex:0, validations:new Set(), hintsUsed:0, localPenaltySeconds:0, timer:null, log:['Simulation initialized.'],
       db:window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY) : null,
-      joined:false, player:null, sessionCode:'', lobbyTimer:null
+      joined:false, player:null, sessionCode:'', lobbyTimer:null, isHost:false, hostName:'', sharedRunNumber:0, sharedStartedAt:null, lobbyRequestInFlight:false
     };
     const $ = selector => document.querySelector(selector);
     const $$ = selector => [...document.querySelectorAll(selector)];
@@ -626,10 +627,89 @@
       ordered.forEach(card => grid.appendChild(card));
     }
     function selectDifficulty(level) {
-      if (!DIFFICULTIES[level] || state.started) return;
+      if (!DIFFICULTIES[level] || state.started || (state.joined && !state.isHost)) return;
       state.difficulty = level;
       state.config = DIFFICULTIES[level];
       resetGame();
+    }
+    function setHostStatus(text, type) {
+      const target = $('#hostStatus');
+      target.textContent = text;
+      target.className = 'lobby-status ' + (type || '');
+      target.classList.toggle('hidden', !text);
+    }
+    function updateSessionControls() {
+      const inSharedRun = Boolean(state.sharedStartedAt) || state.started;
+      const hostCanStart = state.joined && state.isHost && !inSharedRun;
+      const canChooseDifficulty = !state.joined || (state.isHost && !inSharedRun);
+      $$('.difficulty-option').forEach(button => { button.disabled = !canChooseDifficulty; });
+      $('#sessionCode').disabled = state.joined;
+      $('#playerName').disabled = state.joined;
+      $('#joinTeamButton').disabled = state.joined;
+      $('#startButton').disabled = !hostCanStart;
+      $('#startButton').textContent = hostCanStart ? 'Start ' + state.config.label + ' for everyone' : 'Host starts the escape';
+
+      if (!state.joined) {
+        setHostStatus('');
+        $('#startMessage').textContent = 'Join a team to see who is hosting the session.';
+        $('#resetButton').textContent = 'Restart';
+        $('#resetButton').disabled = false;
+        return;
+      }
+
+      if (state.isHost) {
+        setHostStatus('You are the host. Your difficulty selection and Start button control everyone in this session.', 'good');
+        $('#startMessage').textContent = inSharedRun ? 'Shared scenario is running for every joined player.' : 'Choose a difficulty, then start the scenario for everyone.';
+        $('#resetButton').textContent = inSharedRun ? 'Restart for everyone' : 'Reset selection';
+        $('#resetButton').disabled = false;
+      } else {
+        const host = state.hostName || 'the host';
+        setHostStatus('Waiting for ' + host + ' to choose the difficulty and start the shared scenario.');
+        $('#startMessage').textContent = inSharedRun ? 'The shared scenario has started. Loading your synchronized timer…' : 'Only ' + host + ' can start this session.';
+        $('#resetButton').textContent = 'Host controls restart';
+        $('#resetButton').disabled = true;
+      }
+    }
+    function applySharedSession(data) {
+      if (!data) return;
+      const game = data.game || {};
+      const incomingDifficulty = DIFFICULTIES[game.difficulty] ? game.difficulty : 'medium';
+      const incomingRun = Number(game.run_number || 0);
+      const incomingStartedAt = game.started_at || null;
+      const priorRun = state.sharedRunNumber;
+      const priorStartedAt = state.sharedStartedAt;
+      state.isHost = Boolean(data.is_host);
+      state.hostName = data.host_name || '';
+      state.sharedRunNumber = incomingRun;
+      state.sharedStartedAt = incomingStartedAt;
+
+      if (incomingStartedAt || !state.isHost) {
+        state.difficulty = incomingDifficulty;
+        state.config = DIFFICULTIES[incomingDifficulty];
+        updateDifficultyUi();
+        arrangeTimelineCards();
+      }
+
+      updateSessionControls();
+      const remaining = Number(game.seconds_remaining);
+      if (incomingStartedAt) {
+        const newRun = incomingRun !== priorRun || incomingStartedAt !== priorStartedAt;
+        if (!state.started || newRun) {
+          resetGame({ refresh:false });
+          beginLocalGame(Number.isFinite(remaining) ? remaining : state.config.seconds);
+        } else if (Number.isFinite(remaining) && !state.finished) {
+          const syncedSeconds = Math.max(0, Math.min(state.config.seconds, remaining - state.localPenaltySeconds));
+          if (syncedSeconds === 0) {
+            state.seconds = 0;
+            finishFailure();
+          } else if (Math.abs(state.seconds - syncedSeconds) > 1) {
+            state.seconds = syncedSeconds;
+            updateHud();
+          }
+        }
+      } else if (state.started || priorStartedAt || incomingRun !== priorRun) {
+        resetGame({ refresh:false });
+      }
     }
     function setLobbyStatus(text, type) {
       const target = $('#lobbyStatus');
@@ -663,16 +743,21 @@
       }).join('');
     }
     async function refreshLobby(silent) {
-      if (!state.db || !state.sessionCode) return;
-      const { data, error } = await state.db.rpc('get_dc_escape_lobby', { p_session_code:state.sessionCode, p_client_token:playerToken() });
-      if (error) {
-        if (!silent) setLobbyStatus('Could not refresh the team lobby: ' + error.message, 'bad');
-        return;
+      if (!state.db || !state.sessionCode || state.lobbyRequestInFlight) return;
+      state.lobbyRequestInFlight = true;
+      try {
+        const { data, error } = await state.db.rpc('get_dc_escape_lobby', { p_session_code:state.sessionCode, p_client_token:playerToken() });
+        if (error) throw error;
+        renderTeamRoster((data && data.players) || []);
+        applySharedSession(data);
+      } catch (error) {
+        if (!silent) setLobbyStatus('Could not refresh the team lobby: ' + (error.message || 'Unknown error'), 'bad');
+      } finally {
+        state.lobbyRequestInFlight = false;
       }
-      renderTeamRoster((data && data.players) || []);
     }
     async function joinTeam() {
-      if (state.started) return setLobbyStatus('Restart the scenario before changing your team or session.', 'bad');
+      if (state.joined) return setLobbyStatus('You are already assigned to this session. The host controls the shared start.', 'bad');
       const sessionCode = $('#sessionCode').value.trim();
       const playerName = $('#playerName').value.trim();
       if (!sessionCode || !playerName) return setLobbyStatus('Enter a session code and your name first.', 'bad');
@@ -698,19 +783,18 @@
         $('#teamAssignment').classList.remove('hidden');
         $('#teamMetric').classList.remove('hidden');
         $('#teamHud').textContent = info.label + ' · ' + info.specialty;
-        $('#startButton').disabled = false;
-        $('#startMessage').textContent = 'You are ready to enter the room with ' + info.label + '.';
         setLobbyStatus('Assigned automatically to ' + info.label + '.', 'good');
         logEvent(playerName + ' joined ' + info.label + '.');
+        applySharedSession(data);
         await refreshLobby(true);
         clearInterval(state.lobbyTimer);
-        state.lobbyTimer = setInterval(() => refreshLobby(true), 12000);
+        state.lobbyTimer = setInterval(() => refreshLobby(true), 3000);
       } catch (error) {
         const detail = error.message || 'Unknown error';
         const setupMissing = /join_dc_escape_session|function|schema cache/i.test(detail);
         setLobbyStatus(setupMissing ? 'The game lobby setup is missing. Run the Data Center Escape team SQL file once, then refresh. Details: ' + detail : 'Could not join: ' + detail, 'bad');
       } finally {
-        button.disabled = false;
+        button.disabled = state.joined;
         button.textContent = original;
       }
     }
@@ -751,26 +835,52 @@
       const labels = { noc:'Reviewing NOC evidence.', timeline:'Rebuilding the incident timeline.', diagnose:'Analyzing the incident.', aisle:'Tracing virtual asset dependencies.', recovery:'Completing the virtual recovery runbook.', validation:'Verifying the simulated recovery.', summary:'Confirming the hard-mode incident summary.', exit:'Exit interlock ready.' };
       $('#hudMessage').textContent = labels[panel] || '';
     }
-    function startGame() {
+    async function startGame() {
       if (state.started) return;
       if (!state.joined) {
         setLobbyStatus('Join a four-team session before starting the escape room.', 'bad');
         $('#playerName').focus();
         return;
       }
-      state.seconds = state.config.seconds;
+      if (!state.isHost) {
+        setLobbyStatus('Only the host can start the shared scenario.', 'bad');
+        return;
+      }
+      if (!state.db) {
+        setLobbyStatus('The shared game lobby could not load. Refresh the page and try again.', 'bad');
+        return;
+      }
+      const button = $('#startButton');
+      button.disabled = true;
+      button.textContent = 'Starting everyone…';
+      try {
+        const { data, error } = await state.db.rpc('start_dc_escape_game', {
+          p_session_code:state.sessionCode,
+          p_client_token:playerToken(),
+          p_difficulty:state.difficulty
+        });
+        if (error) throw error;
+        applySharedSession(data);
+        setLobbyStatus('Shared scenario started. Every joined player will launch automatically.', 'good');
+      } catch (error) {
+        setLobbyStatus('Could not start the shared scenario: ' + (error.message || 'Unknown error'), 'bad');
+        updateSessionControls();
+      }
+    }
+    function beginLocalGame(secondsRemaining) {
+      clearInterval(state.timer);
+      state.seconds = Math.max(0, Math.min(state.config.seconds, Math.floor(secondsRemaining) - state.localPenaltySeconds));
       state.started = true;
-      $$('.difficulty-option').forEach(button => { button.disabled = true; });
-      $('#sessionCode').disabled = true;
-      $('#playerName').disabled = true;
-      $('#joinTeamButton').disabled = true;
+      state.finished = false;
       $('#game').classList.remove('hidden');
-      $('#startButton').textContent = state.config.label + ' simulation running';
-      $('#startButton').disabled = true;
-      $('#startMessage').textContent = state.config.label + ' scenario locked. Find the root cause before the timer reaches zero.';
-      logEvent(state.config.label + ' timer started. NOC console unlocked.');
+      updateSessionControls();
+      logEvent(state.config.label + ' shared timer started. NOC console unlocked.');
       updateHud();
       showPanel('noc');
+      if (state.seconds === 0) {
+        finishFailure();
+        return;
+      }
       state.timer = setInterval(() => {
         if (!state.started || state.finished) return;
         state.seconds -= 1;
@@ -782,6 +892,7 @@
       }, 1000);
     }
     function penalty(message) {
+      state.localPenaltySeconds += state.config.penaltySeconds;
       state.seconds = Math.max(0, state.seconds - state.config.penaltySeconds);
       state.score = Math.max(0, state.score - state.config.scorePenalty);
       logEvent('Time penalty: ' + message + ' (−' + state.config.penaltySeconds + ' seconds).');
@@ -1051,7 +1162,37 @@
       logEvent('Hint requested (' + state.hintsUsed + ' of ' + state.config.maxHints + ').');
       updateHud();
     }
-    function resetGame() {
+    async function requestSessionReset() {
+      if (!state.joined || (!state.sharedStartedAt && !state.started)) {
+        resetGame();
+        return;
+      }
+      if (!state.isHost) {
+        setLobbyStatus('Only the host can restart the shared scenario.', 'bad');
+        return;
+      }
+      if (!state.db) {
+        setLobbyStatus('The shared game lobby could not load. Refresh the page and try again.', 'bad');
+        return;
+      }
+      const button = $('#resetButton');
+      button.disabled = true;
+      button.textContent = 'Restarting everyone…';
+      try {
+        const { data, error } = await state.db.rpc('reset_dc_escape_game', {
+          p_session_code:state.sessionCode,
+          p_client_token:playerToken()
+        });
+        if (error) throw error;
+        applySharedSession(data);
+        setLobbyStatus('Shared scenario reset. Choose a difficulty and start everyone again when ready.', 'good');
+      } catch (error) {
+        setLobbyStatus('Could not restart the shared scenario: ' + (error.message || 'Unknown error'), 'bad');
+        updateSessionControls();
+      }
+    }
+    function resetGame(options) {
+      const refresh = !options || options.refresh !== false;
       clearInterval(state.timer);
       state.started = false;
       state.finished = false;
@@ -1064,19 +1205,14 @@
       state.runbookIndex = 0;
       state.validations = new Set();
       state.hintsUsed = 0;
+      state.localPenaltySeconds = 0;
       state.log = ['Simulation reset.'];
       $$('.timeout-notice').forEach(notice => notice.remove());
       $('#game').classList.add('hidden');
-      $$('.difficulty-option').forEach(button => { button.disabled = false; });
-      $('#sessionCode').disabled = false;
-      $('#playerName').disabled = false;
-      $('#joinTeamButton').disabled = false;
       updateDifficultyUi();
       arrangeTimelineCards();
-      $('#startButton').textContent = 'Start ' + state.config.label + ' escape';
-      $('#startButton').disabled = !state.joined;
-      $('#startMessage').textContent = state.joined ? 'Ready for the ' + state.config.label + ' scenario with ' + TEAM_INFO[Number(state.player.team_number)].label + '.' : 'Join a team to unlock the escape room.';
-      $('#hudMessage').textContent = state.joined ? state.config.label + ' scenario selected. Start when your team is ready.' : 'Join a team, choose a difficulty, then begin the simulation.';
+      updateSessionControls();
+      $('#hudMessage').textContent = state.joined ? 'Waiting for the host to launch the shared scenario.' : 'Join a team to enter a shared session.';
       $('#nocDetails').innerHTML = '<strong>Console ready.</strong> Select an alert to inspect its simulated telemetry.';
       $('#timelineDetails').innerHTML = '<strong>Timeline ready.</strong> Choose the event that happened first.';
       $('#aisleDetails').innerHTML = '<strong>Aisle access granted.</strong> Inspect the required virtual assets to assemble the recovery key.';
@@ -1092,8 +1228,8 @@
       ['nocFeedback','timelineFeedback','diagnoseFeedback','aisleFeedback','runbookFeedback','recoveryFeedback','validationFeedback','summaryFeedback'].forEach(id => setFeedback(id,'',''));
       $('#eventLog').innerHTML = '<li>Simulation reset.</li>';
       panels.forEach(name => $('#'+name+'Panel').classList.add('hidden'));
-      if (state.sessionCode) refreshLobby(true);
-      else renderTeamRoster([]);
+      if (refresh && state.sessionCode) refreshLobby(true);
+      else if (!state.sessionCode) renderTeamRoster([]);
       updateHud();
       updateMap('');
     }
@@ -1115,11 +1251,12 @@
     $('#startButton').addEventListener('click', startGame);
     $('#joinTeamButton').addEventListener('click', joinTeam);
     $('#playerName').addEventListener('keydown', event => { if (event.key === 'Enter') joinTeam(); });
-    $('#resetButton').addEventListener('click', resetGame);
-    $('#playAgain').addEventListener('click', resetGame);
+    $('#resetButton').addEventListener('click', requestSessionReset);
+    $('#playAgain').addEventListener('click', requestSessionReset);
     $('#hintButton').addEventListener('click', giveHint);
     $('#fullscreenButton').addEventListener('click', toggleFullscreen);
     document.addEventListener('fullscreenchange', updateFullscreenButton);
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) refreshLobby(true); });
     $$('.difficulty-option').forEach(button => button.addEventListener('click', () => selectDifficulty(button.dataset.difficulty)));
     $$('.zone').forEach(button => button.addEventListener('click', () => showPanel(button.dataset.zone)));
     $$('.clue').forEach(button => button.addEventListener('click', () => inspectClue(button.dataset.clue, button)));
