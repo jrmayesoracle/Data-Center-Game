@@ -68,6 +68,13 @@
     .brief-list li { display:flex; gap:10px; align-items:flex-start; color:#dce5ef; }
     .brief-list b { display:grid; place-items:center; width:24px; height:24px; flex:0 0 auto; color:#06111d; background:var(--green); border-radius:50%; font-size:.78rem; }
     .mission-actions { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .difficulty-picker { margin:18px 0; padding:14px; background:rgba(6,14,23,.52); border:1px solid #314861; border-radius:13px; }
+    .difficulty-picker h2 { margin:0; font-size:1.02rem; }.difficulty-picker p { margin:4px 0 0; color:var(--muted); font-size:.84rem; }
+    .difficulty-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:9px; margin-top:12px; }
+    .difficulty-option { min-height:96px; padding:12px; color:#dce9f7; text-align:left; background:rgba(255,255,255,.035); border:1px solid #30465d; border-radius:11px; }
+    .difficulty-option:hover:not(:disabled) { border-color:var(--blue); background:#16283a; }.difficulty-option.active { border-color:var(--green); background:linear-gradient(145deg,rgba(24,62,51,.88),rgba(13,37,32,.88)); box-shadow:inset 3px 0 0 var(--green); }
+    .difficulty-option b,.difficulty-option span { display:block; }.difficulty-option b { margin-bottom:3px; font-size:.94rem; }.difficulty-option span { color:#adbed0; font-size:.76rem; font-weight:650; }.difficulty-option.active span { color:#c9edda; }
+    .difficulty-note { min-height:22px; margin:10px 0 0!important; color:#d8e8f6!important; font-weight:750; }
     .join-lobby { margin-top:18px; padding:15px; background:rgba(6,14,23,.52); border:1px solid #314861; border-radius:13px; }
     .join-lobby h2 { margin:0; font-size:1.05rem; }.lobby-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }.lobby-head p { margin:4px 0 0; color:var(--muted); font-size:.84rem; }
     .join-fields { display:grid; grid-template-columns:130px minmax(150px,1fr) auto; gap:10px; align-items:end; margin-top:13px; }
@@ -174,6 +181,11 @@
     }
     .details strong { color:var(--blue); }.feedback { min-height:24px; margin:14px 0 0; font-weight:750; }
     .feedback.good { color:var(--green); }.feedback.bad { color:#ff8f86; }.feedback.warn { color:#fed58a; }
+    .sequence-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }.timeline-card,.runbook-step,.validation-check { position:relative; }
+    .step-cue { display:inline-grid; place-items:center; width:24px; height:24px; margin-bottom:11px; color:#06111d; background:var(--yellow); border-radius:50%; font-size:.76rem; font-weight:950; }
+    .sequence-status { margin-top:14px; color:#b8cada; font-size:.84rem; font-weight:750; }.sequence-status b { color:var(--green); }
+    .runbook-choices { margin-top:18px; padding-top:18px; border-top:1px solid #2b3d51; }
+    .runbook-choices h3 { margin-bottom:4px; }.runbook-choices p { margin-bottom:12px; color:var(--muted); }
     .action-row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:16px; }
     .rack-wall { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-top:8px; }
     .rack {
@@ -198,7 +210,7 @@
     }
     @media (max-width:680px) {
       .app { width:min(100% - 22px,1240px); padding-top:13px; }.topbar { align-items:flex-start; }.brand span { display:none; }.top-actions button { padding-inline:10px; }
-      .card { padding:16px; }.alert-grid,.choice-grid,.scan-grid,.rack-wall { grid-template-columns:1fr; }.challenge-head { align-items:flex-start; }.badge { display:none; }.code-box { flex-direction:column; }.code-box button { width:100%; }.result-grid,.team-roster,.join-fields { grid-template-columns:1fr; }.map-heading { display:block; }.map-legend { margin-top:11px; }
+      .card { padding:16px; }.alert-grid,.choice-grid,.scan-grid,.rack-wall,.difficulty-grid,.sequence-grid { grid-template-columns:1fr; }.challenge-head { align-items:flex-start; }.badge { display:none; }.code-box { flex-direction:column; }.code-box button { width:100%; }.result-grid,.team-roster,.join-fields { grid-template-columns:1fr; }.map-heading { display:block; }.map-legend { margin-top:11px; }
       .floor-plan.isometric { min-width:0; }.iso-zone.zone { min-height:40px; padding:6px 7px; }.iso-zone .zone-copy b { font-size:.67rem; }.iso-zone .zone-copy span { display:none; }.isometric .noc-zone,.isometric .diagnose-zone { width:96px; }.isometric .recovery-zone { width:113px; }.isometric .exit-zone { width:94px; }.isometric .rack-target { min-width:84px; }
     }
     @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation:none!important; transition:none!important; } }
@@ -212,6 +224,7 @@
         <div><strong>Data Center Escape</strong><span>Critical Path · Interactive troubleshooting simulation</span></div>
       </div>
       <div class="top-actions">
+        <button id="fullscreenButton" class="ghost" type="button" aria-pressed="false">Fullscreen</button>
         <button id="hintButton" class="ghost" type="button" disabled>Hint <span id="hintCost">−10</span></button>
         <button id="resetButton" class="secondary" type="button">Restart</button>
       </div>
@@ -221,11 +234,11 @@
       <section class="card">
         <p class="eyebrow">Scenario DC-01 · Training simulation</p>
         <h1>Restore the room before the clock runs out.</h1>
-        <p class="mission-copy">A critical alert is affecting a simulated data hall. Read the evidence, diagnose the fault, choose the approved virtual recovery path, and unlock the exit.</p>
+        <p class="mission-copy">A critical alert is affecting a simulated data hall. Correlate the evidence, rebuild the incident timeline, identify the virtual dependency failure, then verify the safe recovery before you unlock the exit.</p>
         <ul class="brief-list">
           <li><b>1</b><span>Inspect every alert before you decide what failed.</span></li>
-          <li><b>2</b><span>Find the matching equipment clue in the simulated data hall.</span></li>
-          <li><b>3</b><span>Use the safe virtual recovery procedure to clear the incident.</span></li>
+          <li><b>2</b><span>Rebuild the incident sequence and trace the matching virtual equipment clues.</span></li>
+          <li><b>3</b><span>Complete the virtual containment, recovery, and validation checkpoints.</span></li>
         </ul>
         <section class="join-lobby" aria-labelledby="lobbyTitle">
           <div class="lobby-head">
@@ -240,6 +253,15 @@
           <div id="teamAssignment" class="team-assignment hidden"><span class="team-dot"></span><span>Assigned to <b id="teamAssignmentName">Team</b></span></div>
           <div id="teamRoster" class="team-roster" aria-live="polite"></div>
         </section>
+        <section id="difficultyPicker" class="difficulty-picker" aria-labelledby="difficultyTitle">
+          <div><h2 id="difficultyTitle">Choose scenario difficulty</h2><p>Difficulty changes the amount of evidence, the number of recovery checks, hints, and time penalties.</p></div>
+          <div class="difficulty-grid" role="group" aria-label="Scenario difficulty">
+            <button class="difficulty-option" data-difficulty="easy" type="button" aria-pressed="false"><b>Easy</b><span>Guided sequence · extra hints</span></button>
+            <button class="difficulty-option active" data-difficulty="medium" type="button" aria-pressed="true"><b>Medium</b><span>Full investigation · balanced pressure</span></button>
+            <button class="difficulty-option" data-difficulty="hard" type="button" aria-pressed="false"><b>Hard</b><span>Deep trace · strict penalties</span></button>
+          </div>
+          <p id="difficultyMessage" class="difficulty-note" aria-live="polite"></p>
+        </section>
         <div class="mission-actions">
           <button id="startButton" type="button" disabled>Start the escape</button>
           <span id="startMessage" class="muted">Join a team to unlock the escape room.</span>
@@ -251,9 +273,10 @@
         <div id="timerBox" class="timer"><span>Time remaining</span><b id="timer">12:00</b></div>
         <div class="scoreline">
           <div class="metric"><b id="score">100</b><span>Score</span></div>
-          <div class="metric"><b id="progress">0 / 4</b><span>Objectives</span></div>
+          <div class="metric"><b id="progress">0 / 6</b><span>Objectives</span></div>
         </div>
         <div id="teamMetric" class="metric team-metric hidden"><b id="teamHud">—</b><span>Your team</span></div>
+        <div class="metric"><b id="difficultyHud">Medium</b><span>Scenario level</span></div>
         <div><div class="progress-track" aria-label="Progress"><div id="progressFill" class="progress-fill"></div></div></div>
         <p id="hudMessage" class="muted">Join a team, then begin the simulation.</p>
       </aside>
@@ -363,7 +386,7 @@
       <section class="card stage">
         <section id="nocPanel" class="challenge hidden" data-panel="noc">
           <div class="challenge-head">
-            <div class="head-copy"><span class="stage-number">1</span><div><h2>NOC console</h2><p>Open all three alerts. The evidence is the key to the next room.</p></div></div>
+            <div class="head-copy"><span class="stage-number">1</span><div><h2>NOC console</h2><p>Open every required alert. The evidence is the key to the next room.</p></div></div>
             <span class="badge">Investigate</span>
           </div>
           <p class="notice"><strong>Incoming incident:</strong> Temperature warning at Rack C14. No human injury is simulated; your goal is to identify the virtual dependency failure.</p>
@@ -371,15 +394,34 @@
             <button class="clue" data-clue="power" type="button"><span class="icon">⚡</span><b>PDU-B protection</b><span>Open the power alarm details.</span></button>
             <button class="clue" data-clue="cooling" type="button"><span class="icon">❄</span><b>CRAC-1 telemetry</b><span>Open the cooling sensor details.</span></button>
             <button class="clue" data-clue="network" type="button"><span class="icon">⌁</span><b>Network fabric</b><span>Open the connectivity details.</span></button>
+            <button class="clue" data-clue="change" data-min-difficulty="medium" type="button"><span class="icon">↻</span><b>Virtual change record</b><span>Review the simulated maintenance history.</span></button>
+            <button class="clue" data-clue="inventory" data-min-difficulty="hard" type="button"><span class="icon">⌘</span><b>Dependency map</b><span>Inspect the virtual power-to-rack relationship.</span></button>
           </div>
           <div id="nocDetails" class="details"><strong>Console ready.</strong> Select an alert to inspect its simulated telemetry.</div>
           <button id="analyzeButton" type="button" disabled>Analyze the evidence</button>
           <p id="nocFeedback" class="feedback"></p>
         </section>
 
+        <section id="timelinePanel" class="challenge hidden" data-panel="timeline">
+          <div class="challenge-head">
+            <div class="head-copy"><span class="stage-number">2</span><div><h2>Incident timeline</h2><p>Put the simulated evidence in the order it occurred. The first event is the cause; the rest are effects and checks.</p></div></div>
+            <span class="badge">Correlate</span>
+          </div>
+          <p class="notice">This is a fictional incident record. Select the next event in order; an incorrect selection costs time but does not end the scenario.</p>
+          <div id="timelineGrid" class="sequence-grid">
+            <button class="choice timeline-card" data-timeline-step="power" type="button"><span class="step-cue timeline-order hidden"></span><b>PDU-B protection opens</b><span>A virtual branch-protection event is recorded at 09:42.</span></button>
+            <button class="choice timeline-card" data-timeline-step="impact" type="button"><span class="step-cue timeline-order hidden"></span><b>Rack C14 inlet rises</b><span>The affected virtual rack begins showing elevated inlet temperature.</span></button>
+            <button class="choice timeline-card" data-timeline-step="scope" type="button"><span class="step-cue timeline-order hidden"></span><b>Room telemetry is scoped</b><span>Cooling and network signals are confirmed normal elsewhere.</span></button>
+            <button class="choice timeline-card" data-timeline-step="change" data-min-difficulty="medium" type="button"><span class="step-cue timeline-order hidden"></span><b>Change record is checked</b><span>The virtual change window is correlated to the affected branch.</span></button>
+            <button class="choice timeline-card" data-timeline-step="inventory" data-min-difficulty="hard" type="button"><span class="step-cue timeline-order hidden"></span><b>Dependency map is confirmed</b><span>The simulated map confirms PDU-B is the direct feed to Rack C14.</span></button>
+          </div>
+          <div id="timelineDetails" class="details"><strong>Timeline ready.</strong> Choose the event that happened first.</div>
+          <p id="timelineFeedback" class="feedback"></p>
+        </section>
+
         <section id="diagnosePanel" class="challenge hidden" data-panel="diagnose">
           <div class="challenge-head">
-            <div class="head-copy"><span class="stage-number">2</span><div><h2>Incident board</h2><p>Choose the system that actually failed. Avoid guessing before evidence supports it.</p></div></div>
+            <div class="head-copy"><span class="stage-number">3</span><div><h2>Incident board</h2><p>Choose the system that actually failed. Avoid guessing before evidence supports it.</p></div></div>
             <span class="badge">Diagnose</span>
           </div>
           <div class="choice-grid">
@@ -392,16 +434,18 @@
 
         <section id="aislePanel" class="challenge hidden" data-panel="aisle">
           <div class="challenge-head">
-            <div class="head-copy"><span class="stage-number">3</span><div><h2>Server aisle</h2><p>Trace the virtual equipment labels. You need both pieces of the recovery key.</p></div></div>
+            <div class="head-copy"><span class="stage-number">4</span><div><h2>Server aisle</h2><p>Trace the virtual equipment labels. Each difficulty needs a different amount of evidence for the recovery key.</p></div></div>
             <span class="badge">Trace</span>
           </div>
           <p class="notice">This is a fictional floor view. Inspect the simulated assets only—no physical switching or real reset steps are part of this game.</p>
           <div class="rack-wall">
             <button class="rack warning scan" data-scan="pdu" type="button"><span class="led"></span><b>PDU-B</b><span>Protection indicator is red. Read the virtual label.</span></button>
             <button class="rack warning scan" data-scan="rack" type="button"><span class="led"></span><b>Rack C14</b><span>Inlet temperature is high. Read the cabinet tag.</span></button>
-            <button class="rack scan" data-scan="crac" type="button"><span class="led"></span><b>CRAC-1</b><span>Cooling unit telemetry is within normal range.</span></button>
+            <button class="rack scan" data-scan="crac" data-min-difficulty="medium" type="button"><span class="led"></span><b>CRAC-1</b><span>Cooling telemetry is normal. Read its correlation marker.</span></button>
+            <button class="rack scan" data-scan="ups" data-min-difficulty="hard" type="button"><span class="led"></span><b>UPS-A</b><span>Virtual UPS output is stable. Inspect its recovery marker.</span></button>
+            <button class="rack scan" data-scan="tor" data-min-difficulty="hard" type="button"><span class="led"></span><b>ToR-07</b><span>Virtual top-of-rack paths are healthy. Read the route marker.</span></button>
           </div>
-          <div id="aisleDetails" class="details"><strong>Aisle access granted.</strong> Inspect PDU-B and Rack C14 to assemble the virtual recovery key.</div>
+          <div id="aisleDetails" class="details"><strong>Aisle access granted.</strong> Inspect the required virtual assets to assemble the recovery key.</div>
           <div class="code-box">
             <input id="recoveryCode" autocomplete="off" inputmode="text" placeholder="Enter recovery key" aria-label="Recovery key" disabled>
             <button id="verifyCode" type="button" disabled>Verify key</button>
@@ -411,20 +455,61 @@
 
         <section id="recoveryPanel" class="challenge hidden" data-panel="recovery">
           <div class="challenge-head">
-            <div class="head-copy"><span class="stage-number">4</span><div><h2>Recovery console</h2><p>Choose the approved simulated path. The wrong action costs time.</p></div></div>
+            <div class="head-copy"><span class="stage-number">5</span><div><h2>Recovery console</h2><p>Complete the virtual runbook sequence before you choose the approved recovery path.</p></div></div>
             <span class="badge">Recover</span>
           </div>
+          <p class="notice">Virtual procedure only: no physical equipment, live service, or real operational control is involved in this training scenario.</p>
+          <div id="runbookGrid" class="sequence-grid">
+            <button class="choice runbook-step" data-runbook-step="notify" data-min-difficulty="medium" type="button"><b>Record the virtual incident</b><span>Acknowledge the simulation and preserve the incident timeline.</span></button>
+            <button class="choice runbook-step" data-runbook-step="migrate" type="button"><b>Move simulated workload</b><span>Shift the virtual workload away from Rack C14 before recovery.</span></button>
+            <button class="choice runbook-step" data-runbook-step="protect" data-min-difficulty="medium" type="button"><b>Protect the virtual feed</b><span>Place the simulated affected feed in its approved protected state.</span></button>
+            <button class="choice runbook-step" data-runbook-step="validate" data-min-difficulty="hard" type="button"><b>Confirm virtual recovery window</b><span>Confirm the simulated scope is ready for the recovery step.</span></button>
+            <button class="choice runbook-step" data-runbook-step="restart" type="button"><b>Restart the virtual aisle</b><span>Skip the containment sequence and restart every simulated asset.</span></button>
+          </div>
+          <p id="runbookFeedback" class="feedback"></p>
+          <p id="runbookStatus" class="sequence-status">Complete the virtual runbook in the approved order.</p>
+          <div id="recoveryChoices" class="runbook-choices hidden">
+            <h3>Apply the virtual recovery path</h3><p>Select the safe simulated action after the runbook is complete.</p>
           <div class="choice-grid">
             <button class="choice" data-recovery="reset" type="button"><b>Force a breaker reset</b><span>Skip safeguards and reset the simulated PDU while the load is still present.</span></button>
             <button class="choice" data-recovery="runbook" type="button"><b>Use the virtual runbook</b><span>Notify the simulated NOC, migrate virtual workload, then validate the thermal trend.</span></button>
             <button class="choice" data-recovery="restart" type="button"><b>Restart all equipment</b><span>Cycle the entire simulated aisle and hope the alert clears.</span></button>
           </div>
+          </div>
           <div id="recoveryResult" class="recovery-panel hidden">
             <h3>Virtual recovery complete</h3>
             <p class="muted">The simulated workload has been moved, PDU-B protection is cleared through the approved virtual path, and Rack C14 is trending back to normal.</p>
-            <button id="openExit" type="button">Open the exit interlock</button>
+            <button id="openValidation" type="button">Continue to validation</button>
           </div>
           <p id="recoveryFeedback" class="feedback"></p>
+        </section>
+
+        <section id="validationPanel" class="challenge hidden" data-panel="validation">
+          <div class="challenge-head">
+            <div class="head-copy"><span class="stage-number">6</span><div><h2>Post-recovery validation</h2><p>Check that the virtual recovery produced the expected stable signals before you unlock the exit.</p></div></div>
+            <span class="badge">Validate</span>
+          </div>
+          <p class="notice">Inspect each required simulated signal. A recovery is not complete until the evidence supports it.</p>
+          <div class="sequence-grid">
+            <button class="choice validation-check" data-validation="power" type="button"><b>PDU-B state</b><span>Confirm the virtual protection event is cleared and the affected feed is stable.</span></button>
+            <button class="choice validation-check" data-validation="thermal" type="button"><b>Rack C14 thermal trend</b><span>Confirm the simulated inlet trend is returning to normal.</span></button>
+            <button class="choice validation-check" data-validation="workload" data-min-difficulty="medium" type="button"><b>Virtual workload health</b><span>Confirm the migrated simulated workload is healthy on its alternate path.</span></button>
+          </div>
+          <div id="validationDetails" class="details"><strong>Validation ready.</strong> Inspect the required virtual signals.</div>
+          <p id="validationFeedback" class="feedback"></p>
+        </section>
+
+        <section id="summaryPanel" class="challenge hidden" data-panel="summary">
+          <div class="challenge-head">
+            <div class="head-copy"><span class="stage-number">7</span><div><h2>Hard-mode incident summary</h2><p>Confirm the correct fictional root cause before the exit interlock will unlock.</p></div></div>
+            <span class="badge">Confirm</span>
+          </div>
+          <div class="choice-grid">
+            <button class="choice" data-summary="cooling" type="button"><b>Cooling failure</b><span>CRAC-1 created the elevated virtual inlet temperature.</span></button>
+            <button class="choice" data-summary="power" type="button"><b>PDU-B protection event</b><span>The virtual protection event interrupted Rack C14's simulated feed.</span></button>
+            <button class="choice" data-summary="network" type="button"><b>Network fabric failure</b><span>The virtual top-of-rack network disconnected the simulated workload.</span></button>
+          </div>
+          <p id="summaryFeedback" class="feedback"></p>
         </section>
 
         <section id="exitPanel" class="challenge hidden" data-panel="exit">
@@ -464,9 +549,27 @@
   <script>
     const SUPABASE_URL = 'https://ajmlylmvtialzkrgijcs.supabase.co';
     const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_22X8p2ulxSaGtzEKUwTQiA_GyqkrsgV';
-    const TOTAL_SECONDS = 12 * 60;
-    const panels = ['noc','diagnose','aisle','recovery','exit','win'];
-    const zoneRequirements = { noc:0, diagnose:1, aisle:2, recovery:3, exit:4 };
+    const DIFFICULTIES = {
+      easy:{
+        label:'Easy', seconds:22 * 60, objectiveTotal:6, exitStage:6, penaltySeconds:15, scorePenalty:3, hintCost:5, maxHints:3,
+        clues:['power','cooling','network'], timeline:['power','impact','scope'], scans:['pdu','rack'], code:'BLUE-14',
+        runbook:['migrate'], validations:['power','thermal'], description:'Guided sequence · 22 minutes · three hints available.'
+      },
+      medium:{
+        label:'Medium', seconds:24 * 60, objectiveTotal:6, exitStage:6, penaltySeconds:25, scorePenalty:5, hintCost:10, maxHints:2,
+        clues:['power','cooling','network','change'], timeline:['power','impact','scope','change'], scans:['pdu','rack','crac'], code:'BLUE-14-42',
+        runbook:['notify','migrate','protect'], validations:['power','thermal','workload'], description:'Full investigation · 24 minutes · balanced pressure.'
+      },
+      hard:{
+        label:'Hard', seconds:26 * 60, objectiveTotal:7, exitStage:7, penaltySeconds:35, scorePenalty:8, hintCost:15, maxHints:1,
+        clues:['power','cooling','network','change','inventory'], timeline:['power','impact','scope','change','inventory'], scans:['pdu','rack','crac','ups','tor'], code:'BLUE-14-42-GREEN-7',
+        runbook:['notify','migrate','protect','validate'], validations:['power','thermal','workload'], description:'Deep trace · 26 minutes · strict penalties and one hint.'
+      }
+    };
+    const difficultyRank = { easy:1, medium:2, hard:3 };
+    const panels = ['noc','timeline','diagnose','aisle','recovery','validation','summary','exit','win'];
+    const panelRequirements = { noc:0, timeline:1, diagnose:2, aisle:3, recovery:4, validation:5, summary:6, exit:6, win:Infinity };
+    const zoneRequirements = { noc:0, diagnose:2, aisle:3, recovery:4, exit:6 };
     const TEAM_INFO = {
       1:{ label:'Team 1', specialty:'Power' },
       2:{ label:'Team 2', specialty:'Cooling' },
@@ -474,8 +577,8 @@
       4:{ label:'Team 4', specialty:'Operations' }
     };
     const state = {
-      started:false, finished:false, seconds:TOTAL_SECONDS, score:100, stage:0,
-      clues:new Set(), scans:new Set(), timer:null, log:['Simulation initialized.'],
+      started:false, finished:false, difficulty:'medium', config:DIFFICULTIES.medium, seconds:DIFFICULTIES.medium.seconds, score:100, stage:0,
+      clues:new Set(), scans:new Set(), timelineIndex:0, runbookIndex:0, validations:new Set(), hintsUsed:0, timer:null, log:['Simulation initialized.'],
       db:window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY) : null,
       joined:false, player:null, sessionCode:'', lobbyTimer:null
     };
@@ -490,6 +593,44 @@
       $('#eventLog').innerHTML = state.log.slice(0,7).map(item => '<li>' + escapeHtml(item) + '</li>').join('');
     };
     const escapeHtml = value => String(value).replace(/[&<>'"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
+    const completed = (set, required) => required.every(item => set.has(item));
+    const panelRequirement = panel => panel === 'exit' ? state.config.exitStage : panelRequirements[panel];
+    function updateDifficultyUi() {
+      const config = state.config;
+      $$('.difficulty-option').forEach(button => {
+        const active = button.dataset.difficulty === state.difficulty;
+        button.classList.toggle('active', active);
+        button.setAttribute('aria-pressed', String(active));
+      });
+      $$('[data-min-difficulty]').forEach(element => {
+        element.classList.toggle('hidden', difficultyRank[element.dataset.minDifficulty] > difficultyRank[state.difficulty]);
+      });
+      $$('.timeline-card').forEach(card => {
+        const index = config.timeline.indexOf(card.dataset.timelineStep);
+        const cue = card.querySelector('.timeline-order');
+        if (cue) {
+          cue.textContent = index >= 0 ? String(index + 1) : '';
+          cue.classList.toggle('hidden', state.difficulty !== 'easy' || index < 0);
+        }
+      });
+      $('#difficultyMessage').textContent = config.description;
+      $('#difficultyHud').textContent = config.label;
+      $('#recoveryCode').placeholder = 'Enter ' + config.scans.length + '-part recovery key';
+      $('#hintCost').textContent = '−' + config.hintCost;
+    }
+    function arrangeTimelineCards() {
+      const grid = $('#timelineGrid');
+      if (!grid) return;
+      const cards = $$('.timeline-card').filter(card => !card.classList.contains('hidden'));
+      const ordered = state.difficulty === 'easy' ? cards.sort((a,b) => state.config.timeline.indexOf(a.dataset.timelineStep) - state.config.timeline.indexOf(b.dataset.timelineStep)) : cards.sort(() => Math.random() - .5);
+      ordered.forEach(card => grid.appendChild(card));
+    }
+    function selectDifficulty(level) {
+      if (!DIFFICULTIES[level] || state.started) return;
+      state.difficulty = level;
+      state.config = DIFFICULTIES[level];
+      resetGame();
+    }
     function setLobbyStatus(text, type) {
       const target = $('#lobbyStatus');
       target.textContent = text;
@@ -531,6 +672,7 @@
       renderTeamRoster((data && data.players) || []);
     }
     async function joinTeam() {
+      if (state.started) return setLobbyStatus('Restart the scenario before changing your team or session.', 'bad');
       const sessionCode = $('#sessionCode').value.trim();
       const playerName = $('#playerName').value.trim();
       if (!sessionCode || !playerName) return setLobbyStatus('Enter a session code and your name first.', 'bad');
@@ -575,20 +717,20 @@
     function updateHud() {
       $('#timer').textContent = clock(state.seconds);
       $('#score').textContent = state.score;
-      const objectives = Math.min(4, state.stage);
-      $('#progress').textContent = objectives + ' / 4';
-      $('#progressFill').style.width = (objectives * 25) + '%';
+      const objectives = Math.min(state.config.objectiveTotal, state.stage);
+      $('#progress').textContent = objectives + ' / ' + state.config.objectiveTotal;
+      $('#progressFill').style.width = ((objectives / state.config.objectiveTotal) * 100) + '%';
       const timerBox = $('#timerBox');
       timerBox.classList.toggle('urgent', state.seconds <= 120 && state.seconds > 0);
       timerBox.classList.toggle('failed', state.seconds === 0);
-      $('#hintButton').disabled = !state.started || state.finished;
-      $('#hintCost').textContent = state.score <= 10 ? 'free' : '−10';
+      $('#hintButton').disabled = !state.started || state.finished || state.hintsUsed >= state.config.maxHints;
+      $('#hintCost').textContent = state.hintsUsed >= state.config.maxHints ? 'used' : '−' + state.config.hintCost;
       $('#teamMetric').classList.toggle('hidden', !state.joined);
     }
     function updateMap(current) {
       $$('.zone').forEach(button => {
         const zone = button.dataset.zone;
-        const requirement = zoneRequirements[zone];
+        const requirement = zone === 'exit' ? state.config.exitStage : zoneRequirements[zone];
         const unlocked = state.started && state.stage >= requirement && !state.finished;
         button.disabled = !unlocked;
         button.classList.toggle('active', zone === current);
@@ -598,15 +740,15 @@
       if (plan) {
         plan.dataset.activeZone = current || '';
         plan.dataset.stage = String(state.stage);
-        plan.classList.toggle('recovered', state.stage >= 4);
+        plan.classList.toggle('recovered', state.stage >= state.config.exitStage);
       }
     }
     function showPanel(panel) {
       if (!state.started || state.finished) return;
-      if (state.stage < zoneRequirements[panel]) return;
+      if (state.stage < panelRequirement(panel)) return;
       panels.forEach(name => $('#'+name+'Panel').classList.toggle('hidden', name !== panel));
-      updateMap(panel);
-      const labels = { noc:'Reviewing NOC evidence.', diagnose:'Analyzing the incident.', aisle:'Tracing the virtual power path.', recovery:'Selecting the virtual recovery plan.', exit:'Exit interlock ready.' };
+      updateMap(zoneRequirements[panel] !== undefined ? panel : '');
+      const labels = { noc:'Reviewing NOC evidence.', timeline:'Rebuilding the incident timeline.', diagnose:'Analyzing the incident.', aisle:'Tracing virtual asset dependencies.', recovery:'Completing the virtual recovery runbook.', validation:'Verifying the simulated recovery.', summary:'Confirming the hard-mode incident summary.', exit:'Exit interlock ready.' };
       $('#hudMessage').textContent = labels[panel] || '';
     }
     function startGame() {
@@ -616,12 +758,17 @@
         $('#playerName').focus();
         return;
       }
+      state.seconds = state.config.seconds;
       state.started = true;
+      $$('.difficulty-option').forEach(button => { button.disabled = true; });
+      $('#sessionCode').disabled = true;
+      $('#playerName').disabled = true;
+      $('#joinTeamButton').disabled = true;
       $('#game').classList.remove('hidden');
-      $('#startButton').textContent = 'Simulation running';
+      $('#startButton').textContent = state.config.label + ' simulation running';
       $('#startButton').disabled = true;
-      $('#startMessage').textContent = 'Find the root cause before the timer reaches zero.';
-      logEvent('Timer started. NOC console unlocked.');
+      $('#startMessage').textContent = state.config.label + ' scenario locked. Find the root cause before the timer reaches zero.';
+      logEvent(state.config.label + ' timer started. NOC console unlocked.');
       updateHud();
       showPanel('noc');
       state.timer = setInterval(() => {
@@ -635,9 +782,13 @@
       }, 1000);
     }
     function penalty(message) {
-      state.seconds = Math.max(0, state.seconds - 20);
-      state.score = Math.max(0, state.score - 5);
-      logEvent('Time penalty: ' + message);
+      state.seconds = Math.max(0, state.seconds - state.config.penaltySeconds);
+      state.score = Math.max(0, state.score - state.config.scorePenalty);
+      logEvent('Time penalty: ' + message + ' (−' + state.config.penaltySeconds + ' seconds).');
+      if (state.seconds === 0) {
+        finishFailure();
+        return;
+      }
       updateHud();
     }
     function setFeedback(id, text, type) {
@@ -646,36 +797,63 @@
       target.className = 'feedback ' + (type || '');
     }
     function inspectClue(type, button) {
-      if (!state.started || state.stage !== 0) return;
+      if (!state.started || state.finished || state.stage !== 0) return;
       const details = {
         power:'PDU-B: simulated branch protection opened at 09:42. Rack C14 is the only affected load. Utility and UPS telemetry are normal.',
         cooling:'CRAC-1: supply temperature and fan speed are within normal operating range. The elevated rack inlet is localized, not room-wide.',
-        network:'Fabric: upstream links and application routes are healthy. No simulated network packet loss is present.'
+        network:'Fabric: upstream links and application routes are healthy. No simulated network packet loss is present.',
+        change:'Virtual change record: a simulated change window opened at 09:39. Correlation marker: 42. The record narrows the timeline but does not replace the approved recovery path.',
+        inventory:'Virtual dependency map: PDU-B is the simulated feed for Rack C14. The dependency is direct; cooling and network are unaffected.'
       };
       state.clues.add(type);
       button.classList.add('inspected');
       $('#nocDetails').innerHTML = '<strong>Evidence found:</strong> ' + escapeHtml(details[type]);
       logEvent('Inspected ' + button.querySelector('b').textContent + '.');
-      if (state.clues.size === 3) {
+      const inspected = state.config.clues.filter(item => state.clues.has(item)).length;
+      if (completed(state.clues, state.config.clues)) {
         $('#analyzeButton').disabled = false;
-        setFeedback('nocFeedback','All alert evidence is collected. You can now analyze the incident.','good');
+        setFeedback('nocFeedback','All required alert evidence is collected. You can now rebuild the incident timeline.','good');
       } else {
-        setFeedback('nocFeedback', state.clues.size + ' of 3 alerts inspected.','warn');
+        setFeedback('nocFeedback', inspected + ' of ' + state.config.clues.length + ' required alerts inspected.','warn');
       }
     }
     function analyzeEvidence() {
-      if (state.clues.size !== 3) return;
+      if (state.finished || !completed(state.clues, state.config.clues)) return;
       state.stage = 1;
-      logEvent('Evidence complete. Incident board unlocked.');
+      logEvent('Evidence complete. Incident timeline unlocked.');
       updateHud();
-      showPanel('diagnose');
+      showPanel('timeline');
+    }
+    function selectTimelineStep(step, button) {
+      if (state.finished || state.stage !== 1) return;
+      const expected = state.config.timeline[state.timelineIndex];
+      if (step === expected) {
+        state.timelineIndex += 1;
+        button.disabled = true;
+        button.classList.add('correct');
+        $('#timelineDetails').innerHTML = '<strong>Timeline match:</strong> ' + escapeHtml(button.querySelector('b').textContent) + ' is in the correct position.';
+        logEvent('Timeline event confirmed: ' + button.querySelector('b').textContent + '.');
+        if (state.timelineIndex === state.config.timeline.length) {
+          state.stage = 2;
+          setFeedback('timelineFeedback','Timeline complete. Use the incident board to identify the virtual root cause.','good');
+          updateHud();
+          setTimeout(() => showPanel('diagnose'), 500);
+        } else {
+          setFeedback('timelineFeedback','Correct. Choose the next event in the incident sequence.','good');
+        }
+      } else {
+        button.classList.add('wrong');
+        penalty('Timeline event selected out of order');
+        setFeedback('timelineFeedback','That event happened later in the simulated incident. Trace cause, impact, then scope.','bad');
+        setTimeout(() => button.classList.remove('wrong'), 700);
+      }
     }
     function diagnose(answer, button) {
-      if (state.stage !== 1) return;
+      if (state.finished || state.stage !== 2) return;
       $$('.choice[data-diagnosis]').forEach(item => item.disabled = true);
       if (answer === 'power') {
         button.classList.add('correct');
-        state.stage = 2;
+        state.stage = 3;
         setFeedback('diagnoseFeedback','Correct. Cooling and network are healthy; PDU-B protection interrupted the virtual feed to Rack C14.','good');
         logEvent('Root cause identified: simulated PDU-B protection event.');
         updateHud();
@@ -685,34 +863,38 @@
         penalty('Incorrect diagnosis');
         setFeedback('diagnoseFeedback','That evidence does not match the alerts. Review the NOC console and try again.','bad');
         setTimeout(() => {
+          if (state.finished) return;
           $$('.choice[data-diagnosis]').forEach(item => { item.disabled = false; item.classList.remove('wrong'); });
         }, 750);
       }
     }
     function inspectScan(type, button) {
-      if (state.stage !== 2) return;
+      if (state.finished || state.stage !== 3) return;
       const details = {
         pdu:'PDU-B virtual label: protection event recorded. Recovery key color fragment: BLUE. Approved path: use the recovery console after workload migration.',
         rack:'Rack C14 cabinet tag: virtual recovery key number fragment: 14. Its inlet temperature is elevated because its simulated feed was removed.',
-        crac:'CRAC-1 virtual display: normal supply air and normal fan speed. This confirms the data hall cooling simulation is not the failed dependency.'
+        crac:'CRAC-1 virtual display: normal supply air and normal fan speed. Correlation marker: 42. This confirms cooling is not the failed virtual dependency.',
+        ups:'UPS-A virtual display: output is stable and unaffected. Recovery marker: GREEN.',
+        tor:'ToR-07 virtual display: alternate workload path is healthy. Route marker: 7.'
       };
       state.scans.add(type);
       button.classList.add('inspected');
       $('#aisleDetails').innerHTML = '<strong>Asset read:</strong> ' + escapeHtml(details[type]);
       logEvent('Scanned ' + button.querySelector('b').textContent + '.');
-      if (state.scans.has('pdu') && state.scans.has('rack')) {
+      const inspected = state.config.scans.filter(item => state.scans.has(item)).length;
+      if (completed(state.scans, state.config.scans)) {
         $('#recoveryCode').disabled = false;
         $('#verifyCode').disabled = false;
-        setFeedback('aisleFeedback','Both recovery-key fragments found. Combine the color and number with a hyphen.','good');
+        setFeedback('aisleFeedback','All ' + state.config.scans.length + ' recovery-key fragments found. Enter them in the order shown by your investigation.','good');
       } else {
-        setFeedback('aisleFeedback','Find the virtual labels on PDU-B and Rack C14.','warn');
+        setFeedback('aisleFeedback', inspected + ' of ' + state.config.scans.length + ' required virtual assets inspected.','warn');
       }
     }
     function verifyCode() {
-      if (state.stage !== 2) return;
+      if (state.finished || state.stage !== 3) return;
       const code = $('#recoveryCode').value.trim().toUpperCase().replace(/\s+/g,'');
-      if (code === 'BLUE-14') {
-        state.stage = 3;
+      if (code === state.config.code) {
+        state.stage = 4;
         $('#recoveryCode').disabled = true;
         $('#verifyCode').disabled = true;
         setFeedback('aisleFeedback','Recovery key accepted. The recovery console is unlocked.','good');
@@ -724,15 +906,38 @@
         setFeedback('aisleFeedback','That key did not match the simulated equipment labels. Check the color and cabinet number again.','bad');
       }
     }
+    function selectRunbookStep(step, button) {
+      if (state.finished || state.stage !== 4) return;
+      const expected = state.config.runbook[state.runbookIndex];
+      if (step === expected) {
+        state.runbookIndex += 1;
+        button.disabled = true;
+        button.classList.add('correct');
+        logEvent('Virtual runbook step complete: ' + button.querySelector('b').textContent + '.');
+        if (state.runbookIndex === state.config.runbook.length) {
+          $('#recoveryChoices').classList.remove('hidden');
+          $('#runbookStatus').innerHTML = '<b>Runbook complete.</b> Select the safe virtual recovery path.';
+          setFeedback('runbookFeedback','Virtual containment sequence complete. You may now choose the recovery path.','good');
+        } else {
+          $('#runbookStatus').textContent = state.runbookIndex + ' of ' + state.config.runbook.length + ' required virtual runbook steps complete.';
+          setFeedback('runbookFeedback','Correct. Continue with the next approved virtual step.','good');
+        }
+      } else {
+        button.classList.add('wrong');
+        penalty('Virtual runbook step out of sequence');
+        setFeedback('runbookFeedback','That is not the next approved simulation step. Keep the workload protected and follow the evidence.','bad');
+        setTimeout(() => button.classList.remove('wrong'), 700);
+      }
+    }
     function recover(choice, button) {
-      if (state.stage !== 3) return;
+      if (state.finished || state.stage !== 4 || state.runbookIndex !== state.config.runbook.length) return;
       if (choice === 'runbook') {
         $$('.choice[data-recovery]').forEach(item => item.disabled = true);
         button.classList.add('correct');
-        state.stage = 4;
+        state.stage = 5;
         state.score += 10;
         $('#recoveryResult').classList.remove('hidden');
-        setFeedback('recoveryFeedback','Approved virtual runbook selected. Incident containment is complete. +10 points','good');
+        setFeedback('recoveryFeedback','Approved virtual runbook selected. Continue to the validation gate. +10 points','good');
         logEvent('Approved virtual runbook completed. System stable.');
         updateHud();
         updateMap('recovery');
@@ -743,8 +948,61 @@
         setTimeout(() => button.classList.remove('wrong'), 700);
       }
     }
+    function openValidation() {
+      if (state.finished || state.stage !== 5) return;
+      logEvent('Post-recovery validation unlocked.');
+      showPanel('validation');
+    }
+    function inspectValidation(type, button) {
+      if (state.finished || state.stage !== 5) return;
+      const details = {
+        power:'PDU-B virtual state is stable and the simulated protection event is cleared.',
+        thermal:'Rack C14 virtual inlet trend is returning to its normal range.',
+        workload:'The migrated simulated workload is healthy on its alternate virtual path.'
+      };
+      state.validations.add(type);
+      button.classList.add('correct');
+      button.disabled = true;
+      $('#validationDetails').innerHTML = '<strong>Validation found:</strong> ' + escapeHtml(details[type]);
+      logEvent('Validated ' + button.querySelector('b').textContent + '.');
+      const inspected = state.config.validations.filter(item => state.validations.has(item)).length;
+      if (completed(state.validations, state.config.validations)) {
+        if (state.difficulty === 'hard') {
+          state.stage = 6;
+          setFeedback('validationFeedback','All virtual signals are stable. Complete the hard-mode incident summary to unlock the exit.','good');
+          logEvent('Validation complete. Hard-mode incident summary unlocked.');
+          updateHud();
+          setTimeout(() => showPanel('summary'), 500);
+        } else {
+          state.stage = state.config.exitStage;
+          setFeedback('validationFeedback','All required virtual signals are stable. The exit interlock is ready.','good');
+          logEvent('Validation complete. Exit interlock ready.');
+          updateHud();
+          setTimeout(() => showPanel('exit'), 500);
+        }
+      } else {
+        setFeedback('validationFeedback', inspected + ' of ' + state.config.validations.length + ' required virtual checks complete.','warn');
+      }
+    }
+    function selectSummary(answer, button) {
+      if (state.finished || state.difficulty !== 'hard' || state.stage !== 6) return;
+      if (answer === 'power') {
+        $$('.choice[data-summary]').forEach(item => item.disabled = true);
+        button.classList.add('correct');
+        state.stage = state.config.exitStage;
+        setFeedback('summaryFeedback','Correct. The fictional PDU-B protection event caused the simulated Rack C14 impact. Exit unlocked.','good');
+        logEvent('Hard-mode incident summary confirmed. Exit interlock ready.');
+        updateHud();
+        setTimeout(() => showPanel('exit'), 500);
+      } else {
+        button.classList.add('wrong');
+        penalty('Incorrect hard-mode incident summary');
+        setFeedback('summaryFeedback','That does not match the complete simulated evidence trail. Recheck the root cause.','bad');
+        setTimeout(() => button.classList.remove('wrong'), 700);
+      }
+    }
     function openExit() {
-      if (state.stage !== 4) return;
+      if (state.finished || state.stage < state.config.exitStage) return;
       logEvent('Exit interlock unlocked.');
       showPanel('exit');
     }
@@ -754,7 +1012,7 @@
       clearInterval(state.timer);
       $('#resultTime').textContent = clock(state.seconds);
       $('#resultScore').textContent = state.score;
-      $('#resultTitle').textContent = state.score >= 100 ? 'Perfect recovery path' : 'Critical incident resolved';
+      $('#resultTitle').textContent = state.score >= 100 ? state.config.label + ' mode: perfect recovery path' : state.config.label + ' mode: critical incident resolved';
       panels.forEach(name => $('#'+name+'Panel').classList.toggle('hidden', name !== 'win'));
       $$('.zone').forEach(button => { button.disabled = true; button.classList.remove('active'); });
       $('#hudMessage').textContent = 'Simulation complete.';
@@ -768,50 +1026,70 @@
       $('#hudMessage').textContent = 'Time expired. Restart the simulation to try again.';
       $('#startMessage').textContent = 'Time expired — restart to reset the room.';
       $$('.zone').forEach(button => button.disabled = true);
+      $$('.clue,.scan,.choice,#analyzeButton,#verifyCode,#openValidation,#escapeButton').forEach(button => { button.disabled = true; });
+      $('#recoveryCode').disabled = true;
       const current = document.querySelector('.challenge:not(.hidden)');
       if (current) {
-        current.insertAdjacentHTML('afterbegin','<p class="notice" style="border-color:rgba(226,60,54,.6);color:#ffd1ce"><strong>Simulation paused:</strong> time expired. Use Restart to begin again.</p>');
+        current.insertAdjacentHTML('afterbegin','<p class="notice timeout-notice" style="border-color:rgba(226,60,54,.6);color:#ffd1ce"><strong>Simulation paused:</strong> time expired. Use Restart to begin again.</p>');
       }
       updateHud();
       logEvent('Simulation timed out.');
     }
     function giveHint() {
-      if (!state.started || state.finished) return;
+      if (!state.started || state.finished || state.hintsUsed >= state.config.maxHints) return;
       const hints = [
         'Open all NOC alerts. The localized heat signal is an effect, not the failed system.',
-        'The normal cooling and network telemetry eliminate two possible root causes.',
-        'The virtual recovery key combines a color from PDU-B and a number from Rack C14.',
-        'Choose the option that protects workload and follows the approved virtual runbook.'
+        'Build the virtual timeline from cause, to rack impact, to scope confirmation, then any added correlation checks.',
+        'The normal cooling and network telemetry eliminate two possible virtual root causes.',
+        'The recovery key follows the fragments found in the required virtual assets.',
+        'Complete the virtual runbook in sequence before selecting its final recovery path.',
+        'A simulated recovery is only complete after every required validation signal is stable.'
       ];
-      if (state.score > 10) state.score -= 10;
-      $('#hudMessage').textContent = 'Hint: ' + hints[Math.min(state.stage,3)];
-      logEvent('Hint requested.');
+      state.hintsUsed += 1;
+      state.score = Math.max(0, state.score - state.config.hintCost);
+      $('#hudMessage').textContent = 'Hint ' + state.hintsUsed + ' of ' + state.config.maxHints + ': ' + hints[Math.min(state.stage,hints.length - 1)];
+      logEvent('Hint requested (' + state.hintsUsed + ' of ' + state.config.maxHints + ').');
       updateHud();
     }
     function resetGame() {
       clearInterval(state.timer);
       state.started = false;
       state.finished = false;
-      state.seconds = TOTAL_SECONDS;
+      state.seconds = state.config.seconds;
       state.score = 100;
       state.stage = 0;
       state.clues = new Set();
       state.scans = new Set();
+      state.timelineIndex = 0;
+      state.runbookIndex = 0;
+      state.validations = new Set();
+      state.hintsUsed = 0;
       state.log = ['Simulation reset.'];
+      $$('.timeout-notice').forEach(notice => notice.remove());
       $('#game').classList.add('hidden');
-      $('#startButton').textContent = 'Start the escape';
+      $$('.difficulty-option').forEach(button => { button.disabled = false; });
+      $('#sessionCode').disabled = false;
+      $('#playerName').disabled = false;
+      $('#joinTeamButton').disabled = false;
+      updateDifficultyUi();
+      arrangeTimelineCards();
+      $('#startButton').textContent = 'Start ' + state.config.label + ' escape';
       $('#startButton').disabled = !state.joined;
-      $('#startMessage').textContent = state.joined ? 'Ready to enter with ' + TEAM_INFO[Number(state.player.team_number)].label + '.' : 'Join a team to unlock the escape room.';
-      $('#hudMessage').textContent = state.joined ? 'Team assigned. Start when you are ready.' : 'Join a team, then begin the simulation.';
+      $('#startMessage').textContent = state.joined ? 'Ready for the ' + state.config.label + ' scenario with ' + TEAM_INFO[Number(state.player.team_number)].label + '.' : 'Join a team to unlock the escape room.';
+      $('#hudMessage').textContent = state.joined ? state.config.label + ' scenario selected. Start when your team is ready.' : 'Join a team, choose a difficulty, then begin the simulation.';
       $('#nocDetails').innerHTML = '<strong>Console ready.</strong> Select an alert to inspect its simulated telemetry.';
-      $('#aisleDetails').innerHTML = '<strong>Aisle access granted.</strong> Inspect PDU-B and Rack C14 to assemble the virtual recovery key.';
+      $('#timelineDetails').innerHTML = '<strong>Timeline ready.</strong> Choose the event that happened first.';
+      $('#aisleDetails').innerHTML = '<strong>Aisle access granted.</strong> Inspect the required virtual assets to assemble the recovery key.';
       $('#recoveryCode').value = '';
       $('#recoveryCode').disabled = true;
       $('#verifyCode').disabled = true;
       $('#analyzeButton').disabled = true;
       $('#recoveryResult').classList.add('hidden');
+      $('#recoveryChoices').classList.add('hidden');
+      $('#runbookStatus').textContent = 'Complete the virtual runbook in the approved order.';
+      $('#validationDetails').innerHTML = '<strong>Validation ready.</strong> Inspect the required virtual signals.';
       $$('.clue,.scan,.choice').forEach(item => { item.disabled = false; item.classList.remove('inspected','correct','wrong'); });
-      ['nocFeedback','diagnoseFeedback','aisleFeedback','recoveryFeedback'].forEach(id => setFeedback(id,'',''));
+      ['nocFeedback','timelineFeedback','diagnoseFeedback','aisleFeedback','runbookFeedback','recoveryFeedback','validationFeedback','summaryFeedback'].forEach(id => setFeedback(id,'',''));
       $('#eventLog').innerHTML = '<li>Simulation reset.</li>';
       panels.forEach(name => $('#'+name+'Panel').classList.add('hidden'));
       if (state.sessionCode) refreshLobby(true);
@@ -819,21 +1097,43 @@
       updateHud();
       updateMap('');
     }
+    function updateFullscreenButton() {
+      const button = $('#fullscreenButton');
+      const active = Boolean(document.fullscreenElement);
+      button.textContent = active ? 'Exit fullscreen' : 'Fullscreen';
+      button.setAttribute('aria-pressed', String(active));
+    }
+    async function toggleFullscreen() {
+      try {
+        if (document.fullscreenElement) await document.exitFullscreen();
+        else if (document.documentElement.requestFullscreen) await document.documentElement.requestFullscreen();
+        else throw new Error('Fullscreen is unavailable');
+      } catch (error) {
+        $('#hudMessage').textContent = 'Fullscreen is unavailable in this browser. You can still play in the regular window.';
+      }
+    }
     $('#startButton').addEventListener('click', startGame);
     $('#joinTeamButton').addEventListener('click', joinTeam);
     $('#playerName').addEventListener('keydown', event => { if (event.key === 'Enter') joinTeam(); });
     $('#resetButton').addEventListener('click', resetGame);
     $('#playAgain').addEventListener('click', resetGame);
     $('#hintButton').addEventListener('click', giveHint);
+    $('#fullscreenButton').addEventListener('click', toggleFullscreen);
+    document.addEventListener('fullscreenchange', updateFullscreenButton);
+    $$('.difficulty-option').forEach(button => button.addEventListener('click', () => selectDifficulty(button.dataset.difficulty)));
     $$('.zone').forEach(button => button.addEventListener('click', () => showPanel(button.dataset.zone)));
     $$('.clue').forEach(button => button.addEventListener('click', () => inspectClue(button.dataset.clue, button)));
     $('#analyzeButton').addEventListener('click', analyzeEvidence);
+    $$('.timeline-card').forEach(button => button.addEventListener('click', () => selectTimelineStep(button.dataset.timelineStep, button)));
     $$('.choice[data-diagnosis]').forEach(button => button.addEventListener('click', () => diagnose(button.dataset.diagnosis, button)));
     $$('.scan').forEach(button => button.addEventListener('click', () => inspectScan(button.dataset.scan, button)));
     $('#verifyCode').addEventListener('click', verifyCode);
     $('#recoveryCode').addEventListener('keydown', event => { if (event.key === 'Enter') verifyCode(); });
+    $$('.runbook-step').forEach(button => button.addEventListener('click', () => selectRunbookStep(button.dataset.runbookStep, button)));
     $$('.choice[data-recovery]').forEach(button => button.addEventListener('click', () => recover(button.dataset.recovery, button)));
-    $('#openExit').addEventListener('click', openExit);
+    $('#openValidation').addEventListener('click', openValidation);
+    $$('.validation-check').forEach(button => button.addEventListener('click', () => inspectValidation(button.dataset.validation, button)));
+    $$('.choice[data-summary]').forEach(button => button.addEventListener('click', () => selectSummary(button.dataset.summary, button)));
     $('#escapeButton').addEventListener('click', finishSuccess);
     resetGame();
   </script>
