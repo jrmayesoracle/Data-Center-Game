@@ -3,224 +3,724 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#071019">
-  <title>Data Center Case Files: The C14 Phantom Cascade</title>
+  <meta name="description" content="Critical Path, a data center campus strategy RPG prototype.">
+  <title>Critical Path — Data Center RPG</title>
   <style>
     :root {
-      --bg:#071019; --panel:#0d1d29; --panel-2:#122a39; --line:#28495e; --ink:#eef8ff; --muted:#9bb4c7;
-      --blue:#66c9f6; --green:#54e0a3; --amber:#ffc968; --red:#f06c69; --violet:#be9cff; --shadow:0 26px 68px rgba(0,0,0,.35);
-      --facilities:#60dfb0; --network:#66c9f6; --observability:#c19bff; --command:#ffc968;
+      --bg: #08111d;
+      --panel: #101d2c;
+      --panel-2: #14263a;
+      --line: #24445d;
+      --ink: #eaf5ff;
+      --muted: #95aec2;
+      --cyan: #50d9e8;
+      --green: #74d99d;
+      --amber: #ffc35c;
+      --red: #ff7c79;
+      --purple: #c396ff;
+      --shadow: 0 16px 44px rgba(0, 0, 0, .28);
     }
-    * { box-sizing:border-box; }
-    html { min-height:100%; background:var(--bg); }
-    body { min-width:320px; min-height:100vh; margin:0; color:var(--ink); font:16px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; background:radial-gradient(circle at 10% 0%,rgba(69,157,203,.16),transparent 31rem),radial-gradient(circle at 96% 18%,rgba(166,105,79,.12),transparent 28rem),linear-gradient(145deg,#071019,#091721 58%,#071019); }
-    button,select { font:inherit; } button { min-height:40px; padding:9px 12px; color:#eff9ff; background:#1b5575; border:1px solid #4386aa; border-radius:10px; font-weight:850; cursor:pointer; transition:transform .16s ease,background .16s ease,border-color .16s ease; } button:hover:not(:disabled) { background:#26749e; transform:translateY(-1px); } button:focus-visible,select:focus-visible { outline:3px solid rgba(102,201,246,.85); outline-offset:3px; } button:disabled { cursor:not-allowed; opacity:.43; } button.ghost { background:transparent; border-color:#496d84; color:#d6ebf8; } button.ghost:hover:not(:disabled) { background:rgba(87,150,189,.13); } button.success { color:#041a11; background:var(--green); border-color:#9cf8cf; } button.success:hover:not(:disabled) { background:#75f4bb; } button.warn { color:#221603; background:var(--amber); border-color:#ffe2a1; } button.danger { background:#803943; border-color:#f0807a; }
-    .app { width:min(1540px,calc(100% - 32px)); margin:0 auto; padding:22px 0 40px; }
-    .hidden { display:none!important; }
-    .topbar { display:flex; align-items:center; justify-content:space-between; gap:16px; padding-bottom:17px; border-bottom:1px solid rgba(148,190,215,.24); }
-    .brand { display:flex; align-items:center; gap:12px; min-width:0; }.brand-mark { display:grid; width:48px; height:48px; flex:0 0 auto; place-items:center; color:#071019; background:linear-gradient(145deg,#8ee5ff,#4fb5e7); border-radius:12px; box-shadow:0 0 26px rgba(102,201,246,.26); font-weight:1000; letter-spacing:.05em; }.brand strong,.brand span { display:block; }.brand strong { font-size:1.08rem; letter-spacing:.01em; }.brand span { margin-top:2px; color:var(--muted); font-size:.8rem; }
-    .top-metrics { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:8px; }.metric { min-width:108px; padding:7px 10px; background:rgba(13,31,43,.76); border:1px solid #2d5168; border-radius:10px; }.metric span,.metric b { display:block; }.metric span { color:#8ca9bd; font-size:.61rem; font-weight:900; letter-spacing:.1em; text-transform:uppercase; }.metric b { margin-top:1px; color:#eefaff; font-size:1rem; }.metric b.green { color:var(--green); }.metric b.amber { color:var(--amber); }
-    .panel { background:linear-gradient(145deg,rgba(17,42,57,.94),rgba(7,19,28,.96)); border:1px solid var(--line); border-radius:17px; box-shadow:var(--shadow); }.eyebrow { margin:0 0 8px; color:var(--blue); font-size:.71rem; font-weight:950; letter-spacing:.15em; text-transform:uppercase; }.muted { color:var(--muted); }
-    .briefing { display:grid; grid-template-columns:minmax(0,1.1fr) minmax(330px,.9fr); gap:18px; margin-top:22px; }.briefing > section { padding:25px; }.briefing h1 { max-width:14ch; margin:0 0 10px; font-size:clamp(2rem,4vw,3.45rem); line-height:1; letter-spacing:-.045em; }.briefing .lead { max-width:63ch; color:#c6dae8; font-size:1.02rem; }.case-facts { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin:20px 0; }.case-fact { padding:12px; background:rgba(255,255,255,.035); border:1px solid #2e5168; border-radius:11px; }.case-fact b,.case-fact span { display:block; }.case-fact b { margin-bottom:3px; color:#f0f8ff; font-size:.88rem; }.case-fact span { color:#a8c3d5; font-size:.77rem; }.safety { margin:18px 0 0; padding:12px 13px; color:#d6e8f5; background:rgba(102,201,246,.08); border-left:3px solid var(--blue); border-radius:8px; font-size:.85rem; }
-    .how-it-plays h2 { margin:0 0 10px; font-size:1.15rem; }.flow { display:grid; gap:9px; margin:14px 0 19px; }.flow-step { display:grid; grid-template-columns:31px 1fr; gap:10px; align-items:start; }.flow-step b { display:grid; width:29px; height:29px; place-items:center; color:#061219; background:var(--green); border-radius:50%; font-size:.78rem; }.flow-step strong,.flow-step span { display:block; }.flow-step strong { color:#e7f4fc; font-size:.87rem; }.flow-step span { margin-top:2px; color:#abc1d1; font-size:.76rem; }.start-row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }.start-row span { color:#a9bfd0; font-size:.79rem; }
-    .game { margin-top:18px; }.phase-ribbon { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 14px; margin-bottom:15px; background:rgba(7,18,27,.78); border:1px solid #284b63; border-radius:13px; }.phase-copy b,.phase-copy span { display:block; }.phase-copy b { color:#f5fbff; }.phase-copy span { margin-top:2px; color:#9fb9cb; font-size:.77rem; }.phase-steps { display:flex; gap:6px; overflow:auto; padding-bottom:2px; }.phase-step { min-width:max-content; padding:5px 8px; color:#7f9aaa; border:1px solid #2a475a; border-radius:99px; font-size:.67rem; font-weight:900; letter-spacing:.055em; text-transform:uppercase; }.phase-step.active { color:#08151c; background:var(--blue); border-color:#b1e8ff; }.phase-step.done { color:#baf2d5; border-color:rgba(84,224,163,.5); background:rgba(84,224,163,.1); }
-    .case-layout { display:grid; grid-template-columns:minmax(500px,1.35fr) minmax(380px,.92fr); gap:15px; align-items:start; }.map-panel,.board-panel { padding:16px; }.section-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:13px; }.section-head h2,.section-head p { margin:0; }.section-head h2 { font-size:1.12rem; }.section-head p { margin-top:3px; color:#9fb9ca; font-size:.76rem; }.map-status { display:inline-flex; align-items:center; gap:6px; padding:5px 8px; color:#c9e6f7; background:rgba(102,201,246,.08); border:1px solid rgba(102,201,246,.27); border-radius:99px; font-size:.68rem; font-weight:850; }.map-status i { width:7px; height:7px; background:var(--green); border-radius:50%; box-shadow:0 0 8px var(--green); }
-    .hall { position:relative; min-height:565px; overflow:hidden; background:radial-gradient(ellipse at 51% 43%,#1a3b4d 0%,#0d2635 44%,#07131d 100%); border:1px solid #375d73; border-radius:14px; isolation:isolate; }.hall::before { content:""; position:absolute; z-index:-1; inset:48px 46px 42px; opacity:.78; transform:rotateX(58deg) rotateZ(-2deg) scaleY(1.35); transform-origin:center; background-image:linear-gradient(rgba(158,213,243,.13) 1px,transparent 1px),linear-gradient(90deg,rgba(158,213,243,.13) 1px,transparent 1px); background-size:31px 31px; border:1px solid rgba(140,206,240,.25); box-shadow:inset 0 0 48px rgba(0,0,0,.28); }.hall::after { content:"FICTIONAL TRAINING HALL · CASE FILE 01"; position:absolute; right:15px; bottom:12px; color:rgba(180,220,241,.32); font-size:.64rem; font-weight:950; letter-spacing:.12em; }.hall-label { position:absolute; z-index:2; color:#c5e3f3; font-size:.65rem; font-weight:900; letter-spacing:.1em; text-transform:uppercase; pointer-events:none; }.hall-label.cold { top:35%; left:30%; color:#78d8ff; }.hall-label.hot { top:53%; left:39%; color:#e8a280; }.hall-label.noc { top:8%; left:8%; }.hall-label.entry { right:8%; bottom:9%; }.aisle { position:absolute; z-index:0; left:17%; width:65%; height:46px; border:1px solid rgba(116,201,245,.25); transform:skewX(-7deg); }.aisle.cold { top:36%; background:linear-gradient(90deg,rgba(55,153,214,.11),rgba(133,225,255,.16),rgba(55,153,214,.11)); }.aisle.hot { top:51%; background:linear-gradient(90deg,rgba(196,79,62,.09),rgba(235,150,99,.16),rgba(196,79,62,.09)); border-color:rgba(237,148,97,.22); }
-    .cable-tray { position:absolute; z-index:1; height:13px; background:repeating-linear-gradient(90deg,#3a5b6d 0 11px,#142d3d 11px 16px); border:1px solid #5b7b8b; border-radius:3px; opacity:.8; }.cable-tray.one { top:20%; left:19%; width:62%; }.cable-tray.two { top:28%; left:24%; width:50%; }.containment { position:absolute; z-index:1; top:30%; left:23%; width:57%; height:188px; border:2px solid rgba(130,215,246,.42); border-bottom-color:rgba(130,215,246,.16); background:linear-gradient(90deg,rgba(123,217,250,.025),rgba(123,217,250,.10),rgba(123,217,250,.025)); box-shadow:inset 0 0 24px rgba(72,174,219,.1); }.containment::before,.containment::after { content:""; position:absolute; top:-14px; bottom:-14px; width:9px; border:1px solid #709ab2; background:#173749; }.containment::before { left:20%; }.containment::after { right:22%; }
-    .asset { --tone:var(--blue); position:absolute; z-index:3; display:grid; width:130px; min-height:92px; place-content:center; gap:3px; padding:8px; color:#eef9ff; text-align:center; background:linear-gradient(145deg,#24485b,#0d202d); border:1px solid color-mix(in srgb,var(--tone) 68%,#304d5f); border-radius:8px; box-shadow:0 14px 20px rgba(0,0,0,.22),inset 0 0 14px rgba(255,255,255,.03); transform:translate(-50%,-50%) skewY(-4deg); }.asset::before { content:""; position:absolute; inset:7px; border:1px solid rgba(219,245,255,.15); border-radius:4px; pointer-events:none; }.asset:hover:not(:disabled) { border-color:var(--tone); box-shadow:0 0 0 2px color-mix(in srgb,var(--tone) 22%,transparent),0 16px 26px rgba(0,0,0,.28); }.asset:disabled { opacity:.55; }.asset .asset-icon { position:relative; color:var(--tone); font-size:1.35rem; filter:drop-shadow(0 0 8px color-mix(in srgb,var(--tone) 70%,transparent)); }.asset b,.asset span,.asset em { position:relative; display:block; font-style:normal; }.asset b { font-size:.72rem; letter-spacing:.045em; }.asset span { color:#aac7d8; font-size:.61rem; }.asset em { color:#9ab9ca; font-size:.56rem; }.asset.solved { border-color:var(--green); background:linear-gradient(145deg,#1b5745,#0c2e28); }.asset.solved::after { content:"✓"; position:absolute; top:5px; right:7px; color:#ccffe4; font-weight:1000; }.asset.needs-team { filter:saturate(.55); }.asset .team-dot { position:absolute; top:7px; left:7px; width:7px; height:7px; background:var(--tone); border-radius:50%; box-shadow:0 0 8px var(--tone); }.asset.pdu { left:82%; top:45%; --tone:var(--facilities); }.asset.crac { left:12%; top:44%; --tone:var(--facilities); }.asset.rack { left:58%; top:53%; --tone:var(--network); }.asset.tor { left:74%; top:30%; --tone:var(--network); }.asset.noc { left:17%; top:18%; --tone:var(--observability); }.asset.alert { left:42%; top:16%; --tone:var(--observability); }.asset.inventory { left:26%; top:75%; --tone:var(--command); }.asset.change { left:71%; top:76%; --tone:var(--command); }
-    .team-deck { margin-top:15px; padding:14px; }.team-deck-head { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }.team-deck-head h2,.team-deck-head p { margin:0; }.team-deck-head h2 { font-size:1rem; }.team-deck-head p { margin-top:2px; color:#9db9cb; font-size:.75rem; }.team-switcher { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:7px; margin-top:11px; }.team-button { min-height:63px; padding:8px; text-align:left; background:rgba(255,255,255,.035); border-color:#31556c; }.team-button b,.team-button span { display:block; }.team-button b { font-size:.74rem; }.team-button span { margin-top:2px; color:#a5c3d4; font-size:.63rem; }.team-button[data-team="facilities"].active { border-color:var(--facilities); box-shadow:inset 3px 0 0 var(--facilities); }.team-button[data-team="network"].active { border-color:var(--network); box-shadow:inset 3px 0 0 var(--network); }.team-button[data-team="observability"].active { border-color:var(--observability); box-shadow:inset 3px 0 0 var(--observability); }.team-button[data-team="command"].active { border-color:var(--command); box-shadow:inset 3px 0 0 var(--command); }
-    .role-card { display:grid; grid-template-columns:auto 1fr; gap:10px; align-items:start; margin-top:11px; padding:11px; background:rgba(5,16,24,.55); border:1px solid #294b62; border-radius:11px; }.role-symbol { display:grid; width:35px; height:35px; place-items:center; color:#06141c; background:var(--blue); border-radius:9px; font-size:1.05rem; font-weight:950; }.role-card h3,.role-card p { margin:0; }.role-card h3 { font-size:.85rem; }.role-card p { margin-top:3px; color:#acc5d5; font-size:.72rem; }.role-card .role-task { margin-top:6px; color:#d9ecf8; font-weight:700; }.pass-device { margin-top:10px; color:#9fc3d7; font-size:.72rem; }
-    .board-panel { min-height:770px; }.board-overview { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px; }.board-stat { padding:9px 10px; background:rgba(255,255,255,.035); border:1px solid #31556c; border-radius:10px; }.board-stat span,.board-stat b { display:block; }.board-stat span { color:#91aec0; font-size:.61rem; font-weight:900; letter-spacing:.09em; text-transform:uppercase; }.board-stat b { margin-top:1px; font-size:1.1rem; }.board-stat b.green { color:var(--green); }.board-stat b.amber { color:var(--amber); }
-    .board-section { margin-top:13px; padding-top:13px; border-top:1px solid rgba(142,190,218,.2); }.board-section h3,.board-section p { margin:0; }.board-section h3 { font-size:.89rem; }.board-section > p { margin-top:3px; color:#9db9ca; font-size:.72rem; }.evidence-list { display:grid; gap:7px; margin-top:10px; }.evidence-card { position:relative; padding:9px 9px 9px 12px; background:rgba(255,255,255,.035); border:1px solid #2f5269; border-radius:9px; }.evidence-card::before { content:""; position:absolute; top:10px; bottom:10px; left:0; width:3px; background:var(--card-tone,var(--blue)); border-radius:2px; }.evidence-card header { display:flex; align-items:flex-start; justify-content:space-between; gap:7px; }.evidence-card h4,.evidence-card p { margin:0; }.evidence-card h4 { font-size:.73rem; }.evidence-card p { margin-top:3px; color:#b1c8d7; font-size:.67rem; }.evidence-meta { color:#81a8bd; font-size:.58rem; font-weight:850; letter-spacing:.04em; text-transform:uppercase; }.card-actions { display:flex; gap:5px; flex-wrap:wrap; margin-top:8px; }.card-actions button { min-height:27px; padding:4px 7px; border-radius:7px; font-size:.6rem; }.classification { display:inline-flex; align-items:center; gap:5px; margin-top:7px; padding:3px 6px; color:#b8cbd7; background:#0a1923; border:1px solid #284b60; border-radius:99px; font-size:.58rem; font-weight:850; }.classification.primary { color:#b9f7d7; border-color:rgba(84,224,163,.5); }.classification.secondary { color:#b9e6fb; border-color:rgba(102,201,246,.5); }.classification.stale { color:#ffe4a7; border-color:rgba(255,201,104,.5); }.classification.wrong { color:#ffc2bd; border-color:rgba(240,108,105,.58); }
-    .classify-row { display:flex; gap:5px; flex-wrap:wrap; margin-top:8px; }.classify-row button { min-height:27px; padding:4px 7px; background:#142b3a; border-color:#345d72; border-radius:7px; font-size:.59rem; }.classify-row button.active { color:#07141a; background:var(--green); border-color:#aaf5d1; }.gate { margin-top:10px; padding:10px; background:rgba(102,201,246,.07); border:1px solid rgba(102,201,246,.27); border-radius:10px; color:#b9d8e8; font-size:.72rem; }.gate b { color:#f1fbff; }.gate.good { background:rgba(84,224,163,.08); border-color:rgba(84,224,163,.42); }.gate.warn { background:rgba(255,201,104,.08); border-color:rgba(255,201,104,.38); }
-    .hypotheses { display:grid; gap:8px; margin-top:10px; }.hypothesis { padding:10px; background:rgba(255,255,255,.035); border:1px solid #31556c; border-radius:10px; }.hypothesis header { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }.hypothesis h4,.hypothesis p { margin:0; }.hypothesis h4 { font-size:.78rem; }.hypothesis p { margin-top:3px; color:#a7c1d2; font-size:.68rem; }.hypothesis .status { padding:3px 6px; border:1px solid #3c6074; border-radius:99px; color:#b6cfdd; font-size:.57rem; font-weight:900; text-transform:uppercase; }.hypothesis .status.supported { color:#bdffe0; border-color:rgba(84,224,163,.55); }.hypothesis .status.cleared { color:#bdeaff; border-color:rgba(102,201,246,.55); }.hypothesis .status.open { color:#ffe4aa; border-color:rgba(255,201,104,.48); }.hypothesis footer { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:8px; }.hypothesis footer small { color:#91adbd; font-size:.61rem; }.hypothesis footer button { min-height:28px; padding:4px 7px; font-size:.61rem; }
-    .chain { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; margin-top:10px; }.chain-node { min-height:68px; padding:8px; color:#dff0fa; background:#122b3a; border:1px solid #355e74; border-radius:9px; text-align:left; font-size:.68rem; font-weight:800; }.chain-node.done { color:#d1ffea; background:#174d3c; border-color:var(--green); }.chain-node.wrong { border-color:var(--red); background:#4d2730; }.chain-node span { display:block; margin-top:3px; color:#9ebdce; font-size:.58rem; font-weight:700; }.chain-node.done span { color:#bdebd5; }
-    .claims { display:grid; gap:6px; margin-top:10px; max-height:200px; overflow:auto; }.claim { padding:8px; background:rgba(255,255,255,.03); border-left:3px solid var(--claim-tone,var(--blue)); border-radius:0 8px 8px 0; }.claim b,.claim span { display:block; }.claim b { font-size:.67rem; }.claim span { margin-top:2px; color:#aac3d3; font-size:.64rem; }.request-row { display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; }.request-row button { min-height:28px; padding:4px 7px; background:#132b3b; border-color:#345b71; font-size:.6rem; }
-    .modal { position:fixed; z-index:30; inset:0; display:grid; place-items:center; padding:18px; background:rgba(1,7,11,.73); backdrop-filter:blur(7px); }.modal-card { width:min(860px,100%); max-height:min(800px,calc(100svh - 36px)); overflow:auto; padding:19px; background:linear-gradient(145deg,#123145,#07151f); border:1px solid #5794b6; border-radius:18px; box-shadow:0 28px 80px rgba(0,0,0,.54); }.modal-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }.modal-head h2,.modal-head p { margin:0; }.modal-head h2 { font-size:1.35rem; }.modal-head p { margin-top:4px; color:#acc7d8; font-size:.79rem; }.modal-head button { min-height:32px; padding:5px 8px; font-size:.68rem; }.inspection-meta { display:flex; gap:7px; flex-wrap:wrap; margin:13px 0; }.pill { padding:4px 7px; color:#cbe8f6; background:rgba(102,201,246,.1); border:1px solid rgba(102,201,246,.3); border-radius:99px; font-size:.62rem; font-weight:850; }.inspection-scene { position:relative; min-height:265px; overflow:hidden; margin-top:12px; background:radial-gradient(circle at 50% 38%,#214b64,#0b1e2b 72%); border:1px solid #345e75; border-radius:13px; }.device { position:absolute; inset:38px 21%; display:grid; place-content:center; color:#d9f2ff; background:linear-gradient(145deg,#2f5466,#102832); border:2px solid #6a9bb2; border-radius:12px; box-shadow:inset 0 0 0 9px rgba(0,0,0,.14),0 18px 26px rgba(0,0,0,.25); }.device::before { content:""; position:absolute; inset:23px; background:repeating-linear-gradient(180deg,rgba(217,246,255,.16) 0 3px,transparent 3px 20px); border:1px solid rgba(191,229,246,.25); border-radius:7px; }.device .device-icon { position:relative; color:var(--device-tone,var(--blue)); font-size:3.2rem; filter:drop-shadow(0 0 12px var(--device-tone,var(--blue))); }.device .device-label { position:relative; margin-top:5px; color:#dff3ff; font-size:.76rem; font-weight:950; letter-spacing:.13em; text-transform:uppercase; }.puzzle-track { position:absolute; top:50%; right:5%; left:5%; display:flex; justify-content:space-between; gap:8px; transform:translateY(-50%); }.puzzle-track::before { content:""; position:absolute; z-index:0; top:50%; right:7%; left:7%; height:3px; background:linear-gradient(90deg,rgba(102,201,246,.23),rgba(102,201,246,.72),rgba(102,201,246,.23)); }.puzzle-node { position:relative; z-index:1; display:grid; width:126px; min-height:82px; place-content:center; gap:3px; padding:8px; color:#eaf7ff; text-align:center; background:#102a3a; border:2px solid #4c7790; border-radius:10px; font-size:.65rem; font-weight:850; }.puzzle-node:hover:not(:disabled) { border-color:var(--amber); }.puzzle-node.done { color:#c9ffe1; background:#174d3c; border-color:var(--green); }.puzzle-node .puzzle-icon { color:var(--blue); font-size:1.2rem; }.puzzle-node.done .puzzle-icon { color:var(--green); }.puzzle-node span { color:#a8c6d8; font-size:.57rem; }.puzzle-result { margin:14px 0 0; padding:11px; color:#c3dceb; background:rgba(102,201,246,.08); border:1px solid rgba(102,201,246,.28); border-radius:10px; font-size:.78rem; }.report-options { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; margin-top:13px; }.report-option { min-height:116px; padding:11px; color:#dfedf6; text-align:left; background:#112b3b; border:1px solid #345d73; }.report-option strong,.report-option span { display:block; }.report-option strong { margin-bottom:4px; color:#e7f5ff; font-size:.74rem; }.report-option span { color:#acc6d5; font-size:.66rem; }.modal-actions { display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-top:14px; }.modal-actions p { margin:0; color:#a8c1d0; font-size:.71rem; }
-    .toast { position:fixed; z-index:45; right:18px; bottom:18px; max-width:min(380px,calc(100% - 36px)); padding:11px 13px; color:#e8f6ff; background:#102a3a; border:1px solid #5992b1; border-radius:10px; box-shadow:0 13px 32px rgba(0,0,0,.3); font-size:.78rem; font-weight:750; transform:translateY(18px); opacity:0; pointer-events:none; transition:.22s ease; }.toast.show { transform:translateY(0); opacity:1; }.toast.good { border-color:var(--green); }.toast.bad { border-color:var(--red); }
-    .debrief { margin-top:14px; padding:16px; }.debrief h2,.debrief p { margin:0; }.debrief h2 { font-size:1.3rem; }.debrief p { margin-top:4px; color:#b4cbd8; }.debrief-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin:14px 0; }.debrief-grid div { padding:10px; background:rgba(255,255,255,.04); border:1px solid #31556c; border-radius:9px; }.debrief-grid span,.debrief-grid b { display:block; }.debrief-grid span { color:#98b4c5; font-size:.62rem; font-weight:900; text-transform:uppercase; }.debrief-grid b { margin-top:2px; font-size:.94rem; }.debrief-list { display:grid; gap:6px; margin:11px 0 0; padding:0; list-style:none; }.debrief-list li { padding:8px; color:#c4d9e6; background:rgba(255,255,255,.035); border-radius:8px; font-size:.72rem; }.debrief-list b { color:#a9efcc; }
-    @media (max-width:1120px) { .case-layout { grid-template-columns:1fr; }.board-panel { min-height:0; }.board-panel { order:2; }.map-panel { order:1; } }
-    @media (max-width:760px) { .app { width:min(100% - 20px,1540px); padding-top:12px; }.topbar { align-items:flex-start; }.brand span { display:none; }.top-metrics { gap:5px; }.metric { min-width:75px; padding:6px 7px; }.metric b { font-size:.83rem; }.briefing { grid-template-columns:1fr; }.briefing > section { padding:18px; }.briefing h1 { max-width:none; }.case-facts { grid-template-columns:1fr; }.phase-ribbon { align-items:flex-start; flex-direction:column; }.phase-steps { width:100%; }.hall { min-height:500px; }.asset { width:106px; min-height:78px; padding:6px; }.asset b { font-size:.61rem; }.asset span,.asset em { display:none; }.asset .asset-icon { font-size:1.08rem; }.team-switcher { grid-template-columns:repeat(2,minmax(0,1fr)); }.board-overview { grid-template-columns:1fr 1fr; }.report-options { grid-template-columns:1fr; }.puzzle-track { right:3%; left:3%; gap:3px; }.puzzle-node { width:88px; min-height:78px; padding:5px; font-size:.57rem; }.puzzle-node span { display:none; }.device { right:29%; left:29%; }.debrief-grid { grid-template-columns:1fr 1fr; } }
-    @media (max-width:440px) { .metric:first-child { display:none; }.hall { min-height:445px; }.containment { top:31%; height:152px; }.asset { width:88px; min-height:65px; }.asset b { font-size:.55rem; }.asset .team-dot { top:5px; left:5px; }.puzzle-node { width:72px; min-height:68px; font-size:.51rem; }.puzzle-node .puzzle-icon { font-size:1rem; }.inspection-scene { min-height:245px; }.device { right:28%; left:28%; }.chain { grid-template-columns:1fr; } }
-    @media (prefers-reduced-motion:reduce) { *,*::before,*::after { transition:none!important; animation:none!important; } }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-width: 320px;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 15% 0%, rgba(42, 129, 157, .20), transparent 32rem),
+        radial-gradient(circle at 88% 30%, rgba(83, 85, 175, .17), transparent 28rem),
+        var(--bg);
+      font: 15px/1.45 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    button { font: inherit; }
+    button:focus-visible { outline: 3px solid white; outline-offset: 2px; }
+    .shell { width: min(1500px, calc(100% - 32px)); margin: 0 auto; padding: 24px 0 40px; }
+    .topbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 18px; }
+    .eyebrow { color: var(--cyan); text-transform: uppercase; letter-spacing: .16em; font-size: 11px; font-weight: 800; }
+    h1 { margin: 2px 0 2px; font-size: clamp(30px, 5vw, 46px); line-height: 1; letter-spacing: -.045em; }
+    .subhead { margin: 8px 0 0; color: var(--muted); max-width: 700px; }
+    .shift { display: grid; gap: 2px; align-content: center; min-width: 145px; text-align: right; }
+    .shift strong { font-size: 23px; }
+    .shift span { color: var(--muted); font-size: 12px; }
+    .status { display: inline-flex; align-items: center; gap: 7px; justify-content: flex-end; color: var(--green); font-weight: 750; font-size: 12px; text-transform: uppercase; letter-spacing: .08em; }
+    .status::before { content: ""; width: 8px; height: 8px; border-radius: 100%; background: currentColor; box-shadow: 0 0 12px currentColor; }
+    .status.warning { color: var(--amber); }
+    .status.critical { color: var(--red); }
+
+    .metrics { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; margin-bottom: 16px; }
+    .metric, .panel { border: 1px solid var(--line); background: linear-gradient(145deg, rgba(20, 38, 58, .92), rgba(11, 25, 40, .92)); box-shadow: var(--shadow); }
+    .metric { padding: 12px 14px; border-radius: 12px; min-height: 84px; }
+    .metric-label { display: block; color: var(--muted); font-weight: 700; font-size: 10px; text-transform: uppercase; letter-spacing: .1em; }
+    .metric-value { display: block; margin-top: 4px; font-weight: 850; font-size: 24px; letter-spacing: -.04em; }
+    .metric-note { display: block; color: var(--muted); font-size: 11px; }
+    .value-good { color: var(--green); }
+    .value-warn { color: var(--amber); }
+    .value-bad { color: var(--red); }
+
+    .layout { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(340px, .95fr); gap: 16px; }
+    .column { display: grid; gap: 16px; align-content: start; }
+    .panel { border-radius: 16px; overflow: hidden; }
+    .panel-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 18px 12px; }
+    .panel-header h2 { margin: 0; font-size: 16px; letter-spacing: -.01em; }
+    .panel-header p { margin: 3px 0 0; color: var(--muted); font-size: 12px; }
+    .panel-body { padding: 0 18px 18px; }
+    .badge { display: inline-flex; align-items: center; border: 1px solid var(--line); color: var(--cyan); background: rgba(31, 71, 95, .4); padding: 4px 8px; border-radius: 99px; font-size: 11px; font-weight: 800; white-space: nowrap; }
+    .badge.amber { color: var(--amber); }
+    .badge.green { color: var(--green); }
+    .badge.purple { color: var(--purple); }
+
+    .campus { display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 14px; }
+    .campus-legend { display: grid; gap: 8px; align-content: start; }
+    .legend-card { padding: 10px; border-left: 3px solid var(--cyan); background: rgba(9, 21, 33, .65); border-radius: 0 9px 9px 0; }
+    .legend-card.power { border-color: var(--amber); }
+    .legend-card.cooling { border-color: var(--green); }
+    .legend-card span { display: block; color: var(--muted); font-size: 11px; }
+    .legend-card strong { display: block; font-size: 13px; margin-top: 2px; }
+    .hall { position: relative; min-height: 280px; padding: 20px; border: 1px solid #326280; border-radius: 12px; overflow: hidden; background: linear-gradient(125deg, rgba(22, 59, 80, .65), rgba(11, 29, 47, .9)); }
+    .hall::before { content: ""; position: absolute; inset: 0; opacity: .22; background-image: linear-gradient(rgba(119, 214, 232, .35) 1px, transparent 1px), linear-gradient(90deg, rgba(119, 214, 232, .35) 1px, transparent 1px); background-size: 24px 24px; pointer-events: none; }
+    .hall-label { position: relative; display: flex; justify-content: space-between; color: #c2eff8; font-weight: 800; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
+    .racks { position: relative; display: grid; grid-template-columns: repeat(4, minmax(46px, 1fr)); gap: 8px; margin: 28px 18px 0; }
+    .rack { height: 86px; padding: 7px; display: grid; align-content: space-between; border: 1px solid #3d7c99; background: linear-gradient(90deg, #162d42, #0d1d2e); border-radius: 5px; color: #bde9f2; font-size: 11px; }
+    .rack.used { border-color: #61b4cb; box-shadow: inset 0 0 0 1px rgba(80, 217, 232, .14); }
+    .rack.hot { border-color: var(--red); background: linear-gradient(90deg, rgba(115, 37, 49, .86), rgba(50, 25, 39, .92)); box-shadow: 0 0 20px rgba(255, 90, 99, .22); }
+    .rack.empty { opacity: .48; border-style: dashed; }
+    .rack .kw { color: var(--cyan); font-weight: 800; }
+    .rack.hot .kw { color: var(--amber); }
+    .aisle { position: relative; height: 18px; margin: 8px 4px 0; color: rgba(191, 239, 248, .78); text-align: center; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; }
+    .equipment-row { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 20px; }
+    .equipment { padding: 7px; border: 1px solid rgba(116, 217, 157, .5); background: rgba(23, 68, 63, .52); border-radius: 7px; color: #c8f8da; font-size: 10px; text-align: center; }
+    .equipment.amber { border-color: rgba(255, 195, 92, .55); background: rgba(81, 58, 24, .48); color: #ffe0a2; }
+
+    .meter-row { display: grid; gap: 12px; }
+    .meter { display: grid; grid-template-columns: 130px minmax(0, 1fr) 72px; gap: 10px; align-items: center; font-size: 12px; }
+    .meter strong { text-align: right; font-size: 12px; }
+    .track { height: 9px; overflow: hidden; border-radius: 99px; background: #07131f; box-shadow: inset 0 0 0 1px rgba(118, 172, 198, .22); }
+    .fill { height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--cyan), #69baf0); transition: width .3s ease; }
+    .fill.green { background: linear-gradient(90deg, #63ca90, #b0e285); }
+    .fill.amber { background: linear-gradient(90deg, #f7a95e, #ffd167); }
+    .fill.red { background: linear-gradient(90deg, #f16e70, #ff9d85); }
+    .mini-note { color: var(--muted); font-size: 11px; margin: 13px 0 0; }
+
+    .actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+    .action { position: relative; min-height: 128px; display: grid; align-content: space-between; gap: 12px; padding: 13px; border: 1px solid var(--line); background: rgba(8, 21, 33, .58); border-radius: 10px; color: var(--ink); text-align: left; cursor: pointer; transition: transform .16s ease, border-color .16s ease, background .16s ease; }
+    .action:hover { transform: translateY(-2px); border-color: #4d91b4; background: rgba(14, 35, 53, .92); }
+    .action:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+    .action .title { display: block; font-weight: 820; font-size: 13px; }
+    .action .desc { display: block; color: var(--muted); font-size: 11px; line-height: 1.38; }
+    .action .cost { color: var(--green); font-size: 11px; font-weight: 800; }
+    .action .cost.warning { color: var(--amber); }
+    .action .tag { color: var(--purple); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; }
+
+    .staff-list, .log { display: grid; gap: 8px; }
+    .staff { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 10px; border: 1px solid rgba(57, 95, 120, .75); background: rgba(8, 20, 32, .5); border-radius: 10px; }
+    .avatar { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, #38597a, #1b314c); color: var(--cyan); font-size: 12px; font-weight: 900; }
+    .staff .name { display: block; font-weight: 800; font-size: 12px; }
+    .staff .role { display: block; margin-top: 1px; color: var(--muted); font-size: 10px; }
+    .staff button, .button { border: 1px solid rgba(97, 217, 157, .68); border-radius: 7px; background: rgba(40, 112, 80, .34); color: #d7ffe6; padding: 7px 9px; font-size: 11px; font-weight: 800; cursor: pointer; }
+    .staff button:hover, .button:hover { background: rgba(60, 145, 105, .5); }
+    .staff button:disabled { border-color: var(--line); background: transparent; color: var(--muted); cursor: default; }
+    .staff .assigned { color: var(--green); font-size: 10px; font-weight: 800; text-transform: uppercase; }
+
+    .incident { padding: 14px; border: 1px solid rgba(255, 195, 92, .5); border-radius: 10px; background: linear-gradient(135deg, rgba(81, 55, 25, .62), rgba(35, 31, 34, .64)); }
+    .incident.critical { border-color: rgba(255, 124, 121, .75); background: linear-gradient(135deg, rgba(93, 35, 41, .68), rgba(35, 26, 37, .68)); }
+    .incident h3 { margin: 0; font-size: 14px; }
+    .incident p { margin: 5px 0 10px; color: #e8d5aa; font-size: 12px; }
+    .incident.critical p { color: #ffd2d0; }
+    .incident-actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; }
+    .incident-actions button { min-height: 52px; padding: 7px; border: 1px solid rgba(255, 209, 103, .5); border-radius: 7px; background: rgba(70, 51, 23, .68); color: #fff4d9; font-size: 10px; font-weight: 750; cursor: pointer; text-align: left; }
+    .incident-actions button:hover { background: rgba(113, 78, 28, .8); }
+    .incident.critical .incident-actions button { border-color: rgba(255, 143, 140, .65); background: rgba(91, 37, 42, .7); }
+    .incident.critical .incident-actions button:hover { background: rgba(128, 46, 56, .9); }
+    .quiet-state { padding: 16px; border: 1px dashed #35576d; border-radius: 10px; color: var(--muted); font-size: 12px; }
+    .quiet-state strong { color: var(--ink); }
+    .log-item { display: grid; grid-template-columns: 55px 1fr; gap: 10px; padding-bottom: 8px; border-bottom: 1px solid rgba(62, 93, 116, .35); color: var(--muted); font-size: 11px; }
+    .log-item:last-child { padding-bottom: 0; border-bottom: 0; }
+    .log-item time { color: var(--cyan); font-weight: 800; }
+    .log-item strong { color: var(--ink); }
+
+    .footer-actions { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 16px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 12px; background: rgba(8, 20, 32, .72); }
+    .footer-actions p { margin: 0; color: var(--muted); font-size: 12px; }
+    .button.primary { border-color: #68d99c; background: linear-gradient(135deg, #236847, #1d965f); color: white; padding: 10px 14px; white-space: nowrap; }
+    .button.primary:hover { background: linear-gradient(135deg, #2b8258, #22aa6a); }
+
+    .modal[hidden] { display: none; }
+    .modal { position: fixed; z-index: 10; inset: 0; display: grid; place-items: center; padding: 18px; background: rgba(1, 7, 13, .75); backdrop-filter: blur(7px); }
+    .dialog { width: min(760px, 100%); max-height: min(800px, calc(100vh - 36px)); overflow: auto; border: 1px solid #3b6986; border-radius: 16px; background: linear-gradient(160deg, #14263a, #0d1a29); box-shadow: 0 22px 70px rgba(0,0,0,.5); }
+    .dialog-header { display: flex; justify-content: space-between; gap: 12px; padding: 18px 20px 12px; }
+    .dialog-header h2 { margin: 0; font-size: 20px; }
+    .dialog-header p { margin: 5px 0 0; color: var(--muted); font-size: 12px; }
+    .close { width: 30px; height: 30px; border: 1px solid var(--line); border-radius: 8px; background: transparent; color: var(--ink); cursor: pointer; font-size: 18px; }
+    .dialog-body { padding: 0 20px 20px; }
+    .walkthrough { position: relative; min-height: 260px; overflow: hidden; border: 1px solid #37637f; border-radius: 10px; background: linear-gradient(180deg, #17364d 0 46%, #0c1724 46%); }
+    .walkthrough::before { content: ""; position: absolute; left: 0; right: 0; top: 45%; height: 10px; background: #ec9a58; box-shadow: 0 -24px 0 rgba(90, 188, 224, .15); opacity: .8; }
+    .walk-rack { position: absolute; bottom: 16px; width: 84px; height: 138px; border: 2px solid #487b99; border-radius: 4px; background: repeating-linear-gradient(to bottom, #102234 0 8px, #203b51 8px 12px); box-shadow: 0 6px 0 #07111b; }
+    .walk-rack.a { left: 10%; }
+    .walk-rack.b { left: 39%; }
+    .walk-rack.c { right: 13%; }
+    .clue { position: absolute; display: grid; place-items: center; width: 27px; height: 27px; border: 1px solid #ffd57f; border-radius: 50%; background: #6c4a1f; color: #fff3c9; font-weight: 900; font-size: 12px; cursor: pointer; box-shadow: 0 0 0 3px rgba(255, 194, 92, .15); }
+    .clue:hover { transform: scale(1.08); }
+    .clue.found { border-color: #73d9a0; background: #225e42; color: #dfffe9; box-shadow: none; }
+    .clue.one { left: 17%; bottom: 46px; }
+    .clue.two { left: 50%; bottom: 88px; }
+    .clue.three { right: 19%; top: 57px; }
+    .clue.four { left: 35%; top: 72px; }
+    .inspection-info { min-height: 44px; margin: 12px 0; color: var(--muted); font-size: 12px; }
+    .inspection-info strong { color: var(--ink); }
+    .puzzle-progress { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 12px 0 0; }
+    .puzzle-progress span { color: var(--amber); font-size: 12px; font-weight: 800; }
+    .trivia-options { display: grid; gap: 8px; }
+    .trivia-options button { padding: 12px; border: 1px solid var(--line); border-radius: 9px; background: rgba(9, 23, 35, .75); color: var(--ink); cursor: pointer; text-align: left; font-size: 13px; }
+    .trivia-options button:hover { border-color: var(--cyan); background: rgba(20, 48, 66, .9); }
+    .trivia-explain { min-height: 40px; margin-top: 12px; color: var(--muted); font-size: 12px; }
+    .trivia-explain.correct { color: #baf3cb; }
+    .trivia-explain.incorrect { color: #ffd2a0; }
+
+    #toast { position: fixed; z-index: 20; left: 50%; bottom: 24px; max-width: min(560px, calc(100% - 32px)); transform: translate(-50%, 20px); padding: 11px 14px; border: 1px solid #4c7592; border-radius: 10px; background: #142b40; color: var(--ink); box-shadow: var(--shadow); opacity: 0; pointer-events: none; transition: opacity .2s ease, transform .2s ease; font-size: 12px; }
+    #toast.show { opacity: 1; transform: translate(-50%, 0); }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+    @media (max-width: 1100px) { .metrics { grid-template-columns: repeat(3, 1fr); } .layout { grid-template-columns: 1fr; } }
+    @media (max-width: 700px) { .shell { width: min(100% - 20px, 1500px); padding-top: 16px; } .topbar { gap: 10px; } .shift { min-width: auto; } .metrics { grid-template-columns: repeat(2, 1fr); } .campus { grid-template-columns: 1fr; } .campus-legend { grid-template-columns: repeat(3, 1fr); } .racks { margin-left: 0; margin-right: 0; gap: 5px; } .rack { height: 72px; font-size: 9px; } .meter { grid-template-columns: 105px minmax(0, 1fr) 58px; gap: 7px; } .actions { grid-template-columns: 1fr; } .incident-actions { grid-template-columns: 1fr; } .footer-actions { align-items: flex-start; flex-direction: column; } }
   </style>
 </head>
 <body>
-  <main class="app">
+  <main class="shell">
     <header class="topbar">
-      <div class="brand"><div class="brand-mark" aria-hidden="true">CF</div><div><strong>Data Center Case Files</strong><span>Collaborative fictional incident investigations</span></div></div>
-      <div class="top-metrics" aria-live="polite">
-        <div class="metric"><span>Case file</span><b>C14-01</b></div>
-        <div class="metric"><span>Case clock</span><b id="caseClock">00:00</b></div>
-        <div class="metric"><span>Confidence</span><b id="confidenceValue" class="green">100%</b></div>
-        <button id="resetButton" class="ghost" type="button">New case</button>
+      <div>
+        <div class="eyebrow">Harbor One · Data-center strategy RPG</div>
+        <h1>Critical Path</h1>
+        <p class="subhead">Grow a resilient campus without running out of power, cooling, capacity—or trust.</p>
+      </div>
+      <div class="shift">
+        <span class="status" id="siteStatus">Nominal</span>
+        <strong id="shiftNumber">Shift 1</strong>
+        <span>Morning operations board</span>
       </div>
     </header>
 
-    <section id="briefing" class="briefing">
-      <section class="panel">
-        <p class="eyebrow">Case file 01 · 50–70 minute investigation</p>
-        <h1>The C14 Phantom Cascade</h1>
-        <p class="lead">A fictional Aster-14 service cluster is failing from Rack C14. Cooling, network, and power indicators all look suspicious—but only one simulated component started the cascade.</p>
-        <div class="case-facts">
-          <div class="case-fact"><b>Victim</b><span>Aster-14 fictional service cluster, Rack C14</span></div>
-          <div class="case-fact"><b>Known symptoms</b><span>Localized heat, retries, and conflicting alerts</span></div>
-          <div class="case-fact"><b>Core question</b><span>Which simulated event happened first—and why?</span></div>
-          <div class="case-fact"><b>Win condition</b><span>Prove a causal chain and clear two false suspects</span></div>
-        </div>
-        <div class="start-row"><button id="startButton" class="success" type="button">Open case file</button><span>Pass one device between teams for this prototype.</span></div>
-        <p class="safety"><strong>Fictional training only:</strong> all equipment, data, alerts, and decisions in this game are simulated. Do not use it for real operational actions.</p>
-      </section>
-      <section class="panel how-it-plays">
-        <p class="eyebrow">How the team wins</p>
-        <h2>Prove it—do not guess it.</h2>
-        <div class="flow">
-          <div class="flow-step"><b>1</b><div><strong>Investigate privately</strong><span>Each team owns a different area and sees only part of the truth.</span></div></div>
-          <div class="flow-step"><b>2</b><div><strong>Publish a structured claim</strong><span>Every report includes an observation, inference, and open question.</span></div></div>
-          <div class="flow-step"><b>3</b><div><strong>Classify evidence</strong><span>Separate primary evidence from secondary symptoms and stale distractions.</span></div></div>
-          <div class="flow-step"><b>4</b><div><strong>Challenge the leading theory</strong><span>Clear the innocent suspects before making a final accusation.</span></div></div>
-          <div class="flow-step"><b>5</b><div><strong>Reconstruct and validate</strong><span>The team must rebuild the fictional chain before the case can close.</span></div></div>
-        </div>
-        <p class="muted" style="font-size:.78rem">This first build is a one-browser facilitator prototype. It is designed to show the full reasoning flow before live multi-device sync is added.</p>
-      </section>
+    <section class="metrics" aria-label="Campus status">
+      <article class="metric"><span class="metric-label">Capital</span><strong class="metric-value" id="cashMetric">$280k</strong><span class="metric-note">Build & recovery budget</span></article>
+      <article class="metric"><span class="metric-label">Customer trust</span><strong class="metric-value" id="trustMetric">62</strong><span class="metric-note">Premium work unlocks at 75</span></article>
+      <article class="metric"><span class="metric-label">IT load</span><strong class="metric-value" id="itMetric">32 kW</strong><span class="metric-note" id="itNote">40% of conditioned capacity</span></article>
+      <article class="metric"><span class="metric-label">Cooling margin</span><strong class="metric-value" id="coolingMetric">26 kW</strong><span class="metric-note">Room + local airflow limits</span></article>
+      <article class="metric"><span class="metric-label">PUE</span><strong class="metric-value" id="pueMetric">1.58</strong><span class="metric-note">Facility energy ÷ IT energy</span></article>
+      <article class="metric"><span class="metric-label">Resilience</span><strong class="metric-value" id="resilienceMetric">48</strong><span class="metric-note" id="resilienceNote">N+1 only if maintained</span></article>
     </section>
 
-    <section id="game" class="game hidden">
-      <div class="phase-ribbon">
-        <div class="phase-copy"><b id="phaseTitle">Scene survey</b><span id="phaseCopy">Each team must secure and publish one reliable observation.</span></div>
-        <div id="phaseSteps" class="phase-steps" aria-label="Investigation phases"></div>
-      </div>
-      <div class="case-layout">
-        <div>
-          <section class="panel map-panel">
-            <div class="section-head"><div><p class="eyebrow">Interactive floor view</p><h2>Fictional Data Hall A</h2><p>Click only components assigned to the active team. Every finding needs a verbal report.</p></div><span class="map-status"><i></i> Investigation live</span></div>
-            <div id="hall" class="hall" aria-label="Interactive fictional data center floor plan">
-              <div class="hall-label noc">NOC / records wall</div><div class="hall-label cold">contained cold aisle</div><div class="hall-label hot">hot aisle</div><div class="hall-label entry">case command desk</div>
-              <div class="aisle cold"></div><div class="aisle hot"></div><div class="cable-tray one"></div><div class="cable-tray two"></div><div class="containment"></div>
+    <section class="layout">
+      <div class="column">
+        <article class="panel">
+          <div class="panel-header">
+            <div><h2>Harbor One · Hall A</h2><p>Physical layout, live load, and local thermal risk.</p></div>
+            <span class="badge" id="sellableBadge">Sellable: 26 kW</span>
+          </div>
+          <div class="panel-body campus">
+            <aside class="campus-legend" aria-label="Hall summary">
+              <div class="legend-card"><span>Rack positions</span><strong id="racksLegend">8 / 16 used</strong></div>
+              <div class="legend-card power"><span>Conditioned power</span><strong id="powerLegend">80 kW usable</strong></div>
+              <div class="legend-card cooling"><span>Cooling plant</span><strong id="coolingLegend">58 kW effective</strong></div>
+            </aside>
+            <div class="hall" aria-label="Data hall grid">
+              <div class="hall-label"><span>Cold aisle →</span><span id="hotspotLabel">2 thermal clues</span></div>
+              <div class="racks" id="rackGrid"></div>
+              <div class="aisle">Hot aisle / partial containment</div>
+              <div class="equipment-row"><div class="equipment">CRAC-1</div><div class="equipment" id="cracTwo">CRAC-2</div><div class="equipment amber">PDU-A</div></div>
             </div>
-          </section>
-          <section class="panel team-deck">
-            <div class="team-deck-head"><div><p class="eyebrow">Role rotation</p><h2>Pass the device to the active team</h2><p>Each team receives private evidence. The case board only sees what teams choose to publish.</p></div><button id="facilitatorButton" class="ghost" type="button">Facilitator prompt</button></div>
-            <div id="teamSwitcher" class="team-switcher" role="group" aria-label="Select active team"></div>
-            <div id="roleCard" class="role-card"></div>
-          </section>
-          <section id="debrief" class="panel debrief hidden"></section>
-        </div>
-        <aside class="panel board-panel" aria-live="polite">
-          <div class="section-head"><div><p class="eyebrow">Shared case board</p><h2>Evidence, theories, and claims</h2><p>Facts are not conclusions. Use the board to make reasoning visible.</p></div><button id="advanceButton" class="ghost" type="button">Check phase gate</button></div>
-          <div id="board" aria-label="Shared case board"></div>
-        </aside>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-header"><div><h2>Capacity lens</h2><p>Empty racks are not automatically sellable capacity.</p></div><span class="badge purple">Constraint-driven</span></div>
+          <div class="panel-body meter-row">
+            <div class="meter"><span>Rack positions</span><div class="track"><div class="fill" id="rackBar"></div></div><strong id="rackBarLabel">8 / 16</strong></div>
+            <div class="meter"><span>Power path</span><div class="track"><div class="fill amber" id="powerBar"></div></div><strong id="powerBarLabel">32 / 80 kW</strong></div>
+            <div class="meter"><span>Cooling path</span><div class="track"><div class="fill green" id="coolingBar"></div></div><strong id="coolingBarLabel">32 / 58 kW</strong></div>
+            <p class="mini-note" id="constraintNote">Your current limiting factor is cooling margin (26 kW). Containment will protect that margin and lower PUE.</p>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-header"><div><h2>Build, operate, and sell capacity</h2><p>Each action changes a real operating trade-off.</p></div><span class="badge green">Safe growth</span></div>
+          <div class="panel-body actions" id="actionGrid"></div>
+        </article>
       </div>
+
+      <aside class="column">
+        <article class="panel">
+          <div class="panel-header"><div><h2>Operations team</h2><p>Hire specialists; expertise improves your incident choices.</p></div><span class="badge" id="staffBadge">0 specialists</span></div>
+          <div class="panel-body staff-list" id="staffList"></div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-header"><div><h2>Live incident queue</h2><p>Stabilize first. Diagnose before you change a system.</p></div><span class="badge amber" id="incidentBadge">No active event</span></div>
+          <div class="panel-body" id="incidentArea"></div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-header"><div><h2>Shift log</h2><p>Small decisions become your reliability story.</p></div><span class="badge purple" id="knowledgeBadge">0 knowledge</span></div>
+          <div class="panel-body log" id="logArea"></div>
+        </article>
+      </aside>
     </section>
+
+    <footer class="footer-actions">
+      <p id="shiftPrompt"><strong>Recommended next move:</strong> inspect the hall, then decide whether to improve containment or accept a new customer load.</p>
+      <button class="button primary" id="nextShift">Close shift →</button>
+    </footer>
   </main>
 
-  <div id="inspectionModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="inspectionTitle"></div>
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <section class="modal" id="puzzleModal" hidden aria-modal="true" role="dialog" aria-labelledby="puzzleTitle">
+    <div class="dialog">
+      <div class="dialog-header"><div><h2 id="puzzleTitle">Operations Walkthrough</h2><p>Find the contextual clues before approving the heat-season load plan.</p></div><button class="close" data-close="puzzleModal" aria-label="Close walkthrough">×</button></div>
+      <div class="dialog-body">
+        <div class="walkthrough" aria-label="Illustrated hall inspection. Select the four clues.">
+          <div class="walk-rack a"></div><div class="walk-rack b"></div><div class="walk-rack c"></div>
+          <button class="clue one" data-clue="blanking" aria-label="Inspect rack gap">?</button>
+          <button class="clue two" data-clue="cable" aria-label="Inspect cable bundle">?</button>
+          <button class="clue three" data-clue="sensor" aria-label="Inspect temperature sensor">?</button>
+          <button class="clue four" data-clue="tag" aria-label="Inspect service tag">?</button>
+        </div>
+        <p class="inspection-info" id="inspectionInfo">Select a highlighted area. Look for airflow, monitoring, and maintenance issues.</p>
+        <div class="puzzle-progress"><span id="puzzleProgress">0 / 4 clues inspected</span><button class="button" id="completeWalkthrough" disabled>Log findings</button></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="modal" id="triviaModal" hidden aria-modal="true" role="dialog" aria-labelledby="triviaTitle">
+    <div class="dialog">
+      <div class="dialog-header"><div><h2 id="triviaTitle">Knowledge Vault</h2><p>A 15-second operations question. It is optional, but gives your team an edge.</p></div><button class="close" data-close="triviaModal" aria-label="Close trivia">×</button></div>
+      <div class="dialog-body">
+        <p><strong>Why can a data hall with vacant rack space still have no sellable capacity?</strong></p>
+        <div class="trivia-options" id="triviaOptions">
+          <button data-answer="a">Because unused racks must remain unused for aesthetic symmetry.</button>
+          <button data-answer="b">Because the limiting factor may be power, cooling, network capacity, or the reliability margin—not floor space.</button>
+          <button data-answer="c">Because racks become unavailable whenever a generator is installed.</button>
+        </div>
+        <p class="trivia-explain" id="triviaExplain"></p>
+      </div>
+    </div>
+  </section>
+
+  <div id="toast" role="status" aria-live="polite"></div>
 
   <script>
-    const TEAMS = {
-      facilities:{ label:'Team 1', short:'Facilities', role:'Facilities & environment', icon:'❄', color:'var(--facilities)', task:'Inspect PDU-C14 and CRAC-2. Determine whether heat is a cause or a response.' },
-      network:{ label:'Team 2', short:'Compute & network', role:'Compute & network', icon:'⌁', color:'var(--network)', task:'Trace Aster-14’s impact and decide whether ToR retries are primary or secondary.' },
-      observability:{ label:'Team 3', short:'Observability', role:'Observability & timeline', icon:'◉', color:'var(--observability)', task:'Separate canonical timing from late or stale alert presentation.' },
-      command:{ label:'Team 4', short:'Case command', role:'Case command & records', icon:'⌘', color:'var(--command)', task:'Find the hidden relationship in the inventory mirror and rule out unrelated changes.' }
+    const state = {
+      shift: 1,
+      cash: 280000,
+      trust: 62,
+      rackSlots: 16,
+      rackUsed: 8,
+      itLoad: 32,
+      utilityCapacity: 96,
+      upsCapacity: 80,
+      coolingCapacity: 58,
+      containment: 0,
+      coolingPods: 0,
+      maintenanceDebt: 2,
+      hotspots: 2,
+      staff: {},
+      knowledge: 0,
+      activeEvent: null,
+      resolvedEvents: [],
+      tempStress: 0,
+      generatorReadiness: 52,
+      completedWalkthrough: false,
+      answeredTrivia: false,
+      log: [
+        { time: '08:00', title: 'Morning board', text: 'Harbor One is operating normally, but Hall A has two thermal clues.' },
+        { time: '08:10', title: 'Capacity view', text: 'Cooling—not empty floor space—is the current growth constraint.' }
+      ]
     };
-    const PHASES = [
-      {id:'survey',title:'Scene survey',copy:'Each team must secure and publish one reliable observation.'},
-      {id:'exchange',title:'Evidence reliability lab',copy:'Classify what is primary, secondary, or stale before theory work begins.'},
-      {id:'theory',title:'Competing hypotheses',copy:'Use pinned evidence to support one suspect and clear the other two.'},
-      {id:'reconstruction',title:'Incident reconstruction',copy:'Rebuild the fictional cascade in the only order the evidence supports.'},
-      {id:'verdict',title:'Case hearing',copy:'Name the culprit and defend the full causal chain.'},
-      {id:'validation',title:'Independent validation',copy:'Confirm that independent simulated checks agree before closing the case.'}
+
+    const staff = [
+      { id: 'maya', initials: 'MO', name: 'Maya Ortiz', role: 'Facilities lead', cost: 38000, ability: 'Walk the Path: exposes a dependency and improves maintenance outcomes.' },
+      { id: 'eli', initials: 'EP', name: 'Eli Park', role: 'Electrical engineer', cost: 42000, ability: 'Clean Transfer: adds safer choices during utility and UPS events.' },
+      { id: 'nia', initials: 'NB', name: 'Nia Banerjee', role: 'Mechanical engineer', cost: 40000, ability: 'Thermal Model: reduces hot spots and improves cooling actions.' },
+      { id: 'rowan', initials: 'RO', name: 'Rowan Okafor', role: 'Capacity planner', cost: 34000, ability: 'Constraint Lens: improves contract and capacity decisions.' },
+      { id: 'imani', initials: 'IB', name: 'Imani Brooks', role: 'Security & OT analyst', cost: 39000, ability: 'Segment and Seal: adds a safe response to controls-security events.' }
     ];
-    const EVIDENCE = {
-      'pdu-alias': {id:'pdu-alias',team:'facilities',title:'PDU-C14 identity mismatch',source:'PDU-C14 face panel',time:'19:42 canonical',tone:'#60dfb0',correctClass:'primary',summary:'The display alternates between C14 and C14-M before other modeled symptoms appear.',observation:'PDU-C14 changed identity at 19:42 on the canonical local panel.',inference:'A branch-state problem may be initiating the incident.',question:'Why would C14-M be bound to the same fictional branch? ',supports:['pdu'],clears:[]},
-      'cooling-response': {id:'cooling-response',team:'facilities',title:'CRAC-2 response trend',source:'CRAC-2 thermal display',time:'19:48 canonical',tone:'#60dfb0',correctClass:'secondary',summary:'CRAC-2 responds after the local rise; nearby racks and the room trend remain stable.',observation:'The local thermal rise begins after the PDU signal and CRAC-2 response is normal.',inference:'Cooling is responding to a local condition, not creating it.',question:'What event made Rack C14 different from nearby racks?',supports:[],clears:['cooling']},
-      'rack-impact': {id:'rack-impact',team:'network',title:'Aster-14 local impact',source:'Rack C14 service panel',time:'19:44 canonical',tone:'#66c9f6',correctClass:'secondary',summary:'Aster-14 behavior changes at Rack C14 before fabric retries are visible.',observation:'The fictional service changes locally at Rack C14 at 19:44.',inference:'The issue is localized before any broad network symptom.',question:'Which dependency feeds this specific rack?',supports:['pdu'],clears:[]},
-      'network-retry': {id:'network-retry',team:'network',title:'ToR-C14 retry pattern',source:'ToR-C14 route trace',time:'19:46 canonical',tone:'#66c9f6',correctClass:'secondary',summary:'Local retries appear after Aster-14 shifts; upstream paths remain clean.',observation:'ToR retries begin after the local service impact while upstream stays healthy.',inference:'Network retries are an effect, not an initiating fabric failure.',question:'What made the local service behavior change first?',supports:[],clears:['network']},
-      'timeline-source': {id:'timeline-source',team:'observability',title:'Canonical event order',source:'Time authority / NOC',time:'Trusted clock',tone:'#c19bff',correctClass:'primary',summary:'The trusted fictional clock places the PDU event before impact, retries, and heat.',observation:'The PDU event is the earliest reliable timestamp in the case.',inference:'Any theory beginning with cooling or network contradicts the canonical sequence.',question:'What mechanism connects the PDU event to C14?',supports:['pdu'],clears:['cooling','network']},
-      'alert-stale': {id:'alert-stale',team:'observability',title:'Late cooling alarm',source:'Alert-stream confidence audit',time:'Surfaced 19:51',tone:'#c19bff',correctClass:'stale',summary:'A cooling alarm was sampled earlier but surfaced late; it is a misleading presentation, not a live first event.',observation:'The dramatic cooling alarm is stale in the fictional alert stream.',inference:'The alert cannot establish the root-cause timeline.',question:'Which source should the case board trust instead?',supports:[],clears:['cooling']},
-      'mirror-alias': {id:'mirror-alias',team:'command',title:'C14-M inventory mirror',source:'Inventory mirror record',time:'Pre-existing record',tone:'#ffc968',correctClass:'primary',summary:'The fictional inventory mirror duplicates C14 as C14-M and shares a modeled branch binding.',observation:'C14 and C14-M point to the same simulated branch identity.',inference:'The alias can explain why PDU-C14 presents an inconsistent branch state.',question:'Does this relationship match the earliest PDU evidence?',supports:['pdu'],clears:[]},
-      'change-clear': {id:'change-clear',team:'command',title:'No relevant change record',source:'Case command records',time:'18:00–20:00 review',tone:'#ffc968',correctClass:'primary',summary:'No fictional cooling or network change aligns with the start of the incident.',observation:'Records show no relevant CRAC or network change during the case window.',inference:'A change-based theory lacks supporting context.',question:'Which hidden record could still explain the PDU mismatch?',supports:['pdu'],clears:['cooling','network']}
+
+    const actionDefinitions = [
+      {
+        id: 'containment', tag: 'Thermal + efficiency', title: 'Install aisle containment', desc: 'Correct recirculation and improve local cooling delivery. Lowers PUE without pretending extra cooling is free.', cost: 22000,
+        available: () => state.containment < 2,
+        apply: () => { state.cash -= 22000; state.containment += 1; state.hotspots = Math.max(0, state.hotspots - 1); addLog('Build', 'Installed containment. Local thermal margin and PUE improve.'); }
+      },
+      {
+        id: 'cooling', tag: 'Cooling capacity', title: 'Add cooling pod', desc: 'Add 25 kW of effective room cooling capacity. Stronger with a mechanical specialist on staff.', cost: 56000,
+        available: () => state.coolingPods < 2,
+        apply: () => { state.cash -= 56000; state.coolingPods += 1; state.coolingCapacity += state.staff.nia ? 28 : 25; state.hotspots = Math.max(0, state.hotspots - 1); addLog('Build', 'Added a cooling pod and commissioned it into Hall A.'); }
+      },
+      {
+        id: 'ups', tag: 'Power path', title: 'Add UPS module', desc: 'Raise conditioned power capacity by 30 kW and restore N+1 margin. It does not add utility service capacity.', cost: 68000,
+        available: () => state.upsCapacity < 140,
+        apply: () => { state.cash -= 68000; state.upsCapacity += 30; state.maintenanceDebt = Math.max(0, state.maintenanceDebt - 1); addLog('Build', 'Commissioned a UPS module; conditioned power headroom increased.'); }
+      },
+      {
+        id: 'racks', tag: 'Physical capacity', title: 'Fit out four rack positions', desc: 'Adds physical room, but the new positions only become sellable if power and cooling headroom are available.', cost: 28000,
+        available: () => state.rackSlots < 28,
+        apply: () => { state.cash -= 28000; state.rackSlots += 4; addLog('Build', 'Four rack positions added. Check the other capacity ledgers before selling them.'); }
+      },
+      {
+        id: 'maintenance', tag: 'Reliability work', title: 'Run planned maintenance', desc: 'Use a controlled window to inspect UPS, transfer path, and cooling controls. Reduces hidden technical debt.', cost: 12000,
+        available: () => state.maintenanceDebt > 0,
+        apply: () => { state.cash -= 12000; state.maintenanceDebt = Math.max(0, state.maintenanceDebt - (state.staff.maya ? 2 : 1)); state.generatorReadiness = Math.min(100, state.generatorReadiness + 18); addLog('Window', 'Completed planned maintenance and documented rollback steps.'); }
+      },
+      {
+        id: 'walk', tag: 'Puzzle · hidden clues', title: 'Conduct an operations walkthrough', desc: 'Find concrete airflow, monitoring, and maintenance clues in the hall. Unlocks a low-risk thermal response.', cost: 0,
+        available: () => !state.completedWalkthrough,
+        apply: () => openModal('puzzleModal')
+      },
+      {
+        id: 'healthcare', tag: 'Customer opportunity', title: 'Accept healthcare workload', desc: 'A steady 8 kW, two-rack customer. Builds trust but needs headroom in every capacity ledger.', cost: -24000,
+        available: () => canFit(2, 8),
+        apply: () => { state.cash += 24000; state.trust += 5; state.rackUsed += 2; state.itLoad += 8; addLog('Contract', 'Accepted an 8 kW healthcare workload with clear service commitments.'); }
+      },
+      {
+        id: 'ai', tag: 'Customer opportunity', title: 'Accept AI inference pod', desc: 'A high-margin 18 kW, two-rack load. It places immediate pressure on local cooling and capacity planning.', cost: -60000,
+        available: () => canFit(2, 18) && state.trust >= 60,
+        apply: () => { state.cash += 60000; state.trust += 2; state.rackUsed += 2; state.itLoad += 18; state.hotspots += 2; addLog('Contract', 'Accepted a high-density AI inference pod. Thermal monitoring has been elevated.'); }
+      }
+    ];
+
+    const events = {
+      heatwave: {
+        title: 'Heatwave: Hall A inlet trend rising', severity: 'warning',
+        body: 'Outside air is hotter than forecast. CRAC-2 is still operating, but its margin is shrinking. Your data hall walkthrough can reveal whether a local defect is making this worse.',
+        choices: [
+          { label: 'Walkthrough + rebalance', effect: () => {
+            if (!state.completedWalkthrough) { toast('Run the operations walkthrough first to use this low-risk response.'); return false; }
+            state.hotspots = Math.max(0, state.hotspots - 2); state.tempStress = 0; state.trust += 3; state.cash -= 5000;
+            addLog('Incident', 'Used inspection findings to rebalance heat load before the thermal trend escalated.'); return true;
+          } },
+          { label: 'Rent temporary cooling · $18k', effect: () => { state.cash -= 18000; state.coolingCapacity += 10; state.tempStress = 0; state.trust += 1; addLog('Incident', 'Rented temporary cooling capacity for the heatwave.'); return true; } },
+          { label: 'Throttle noncritical load', effect: () => { state.itLoad = Math.max(20, state.itLoad - 4); state.trust -= 3; state.tempStress = 0; addLog('Incident', 'Throttled noncritical load to protect inlet temperatures; a customer accepted a service reduction.'); return true; } }
+        ]
+      },
+      utility: {
+        title: 'Utility voltage sag: transfer readiness check', severity: 'critical',
+        body: 'The utility has reported a localized disturbance. There is no outage yet. Your task is to stabilize operations and prove that backup systems are ready—not to panic-transfer a healthy site.',
+        choices: [
+          { label: 'Verify path & test status', effect: () => {
+            if (!state.staff.eli && state.generatorReadiness < 70) { toast('Without an electrical specialist or better maintenance state, the team cannot confidently verify the transfer path.'); return false; }
+            state.trust += 4; state.generatorReadiness = Math.min(100, state.generatorReadiness + 5); addLog('Incident', 'Verified the electrical path and generator readiness; the sag passed without customer impact.'); return true;
+          } },
+          { label: 'Run controlled contingency drill · $9k', effect: () => { state.cash -= 9000; state.generatorReadiness = Math.min(100, state.generatorReadiness + 25); state.maintenanceDebt = Math.max(0, state.maintenanceDebt - 1); state.trust += 1; addLog('Incident', 'Ran a controlled contingency drill, improving transfer confidence.'); return true; } },
+          { label: 'Defer until a real outage', effect: () => { state.trust -= 5; state.maintenanceDebt += 2; addLog('Incident', 'Deferred transfer readiness work. The risk is now visible in the reliability ledger.'); return true; } }
+        ]
+      },
+      circuit: {
+        title: 'PDU circuit creep: local capacity mismatch', severity: 'warning',
+        body: 'The building remains under its overall power limit, but a branch circuit is trending above its safe planning threshold after incremental customer changes. This is a local constraint, not a campus-wide free pass.',
+        choices: [
+          { label: 'Map circuits & move load', effect: () => {
+            if (!state.staff.rowan && !state.staff.maya) { toast('Hire a capacity/facilities specialist or complete planned maintenance to perform this safely.'); return false; }
+            state.cash -= 6000; state.hotspots = Math.max(0, state.hotspots - 1); state.trust += 3; addLog('Incident', 'Mapped branch circuits and performed a controlled workload move.'); return true;
+          } },
+          { label: 'Install local distribution · $23k', effect: () => { state.cash -= 23000; state.upsCapacity += 8; state.trust += 2; addLog('Incident', 'Added local distribution capacity and updated the as-built record.'); return true; } },
+          { label: 'Watch it for now', effect: () => { state.maintenanceDebt += 2; state.trust -= 2; addLog('Incident', 'Marked circuit creep for later; technical debt increased.'); return true; } }
+        ]
+      },
+      bms: {
+        title: 'BMS security alert: unusual remote session', severity: 'critical',
+        body: 'Monitoring has identified an unusual remote session targeting building-management systems. Keep critical equipment safe while you verify access and preserve approved manual procedures.',
+        choices: [
+          { label: 'Segment & preserve manual ops', effect: () => {
+            if (!state.staff.imani) { toast('This response needs a Security & OT analyst. Hire Imani or choose a slower containment path.'); return false; }
+            state.cash -= 4000; state.trust += 4; state.maintenanceDebt = Math.max(0, state.maintenanceDebt - 1); addLog('Incident', 'Segmented BMS access, preserved manual controls, and started clean recovery.'); return true;
+          } },
+          { label: 'Bring in approved response partner · $16k', effect: () => { state.cash -= 16000; state.trust += 1; addLog('Incident', 'An approved response partner contained the BMS security alert.'); return true; } },
+          { label: 'Power-cycle management systems', effect: () => { state.trust -= 7; state.tempStress += 2; addLog('Incident', 'A broad shutdown disrupted visibility and raised thermal operations risk.'); return true; } }
+        ]
+      }
     };
-    const ASSETS = {
-      pdu:{id:'pdu',team:'facilities',kind:'pdu',title:'PDU-C14',subtitle:'Branch identity panel',icon:'⚡',evidence:'pdu-alias',sequence:['label','branch','timestamp'],nodes:{label:['▤','Compare C14 and C14-M labels'],branch:['◇','Trace the fictional branch binding'],timestamp:['◷','Anchor the display to the trusted time']},conclusions:[['Report a room-wide power loss','The available evidence does not support that scope.'],['Report an early C14/C14-M identity mismatch','This fits the panel, branch, and timing evidence.'],['Report a cooling control failure','Cooling is outside this panel’s direct evidence.']],correct:1},
-      crac:{id:'crac',team:'facilities',kind:'crac',title:'CRAC-2',subtitle:'Thermal response display',icon:'❄',evidence:'cooling-response',sequence:['heat','response','neighbors'],nodes:{heat:['▤','Locate the local heat ribbon'],response:['◷','Compare the CRAC response timestamp'],neighbors:['◌','Check nearby simulated racks']},conclusions:[['Report CRAC-2 as the initiating fault','The modeled response occurs after the local change.'],['Report a normal response to a local condition','The event is localized and CRAC-2 is responding.'],['Report a hall-wide cooling loss','Nearby virtual racks do not support that scope.']],correct:1},
-      rack:{id:'rack',team:'network',kind:'rack',title:'Rack C14',subtitle:'Aster-14 service panel',icon:'▣',evidence:'rack-impact',sequence:['cluster','feed','time'],nodes:{cluster:['▣','Isolate the Aster-14 cluster'],feed:['⌁','Read the modeled rack dependency'],time:['◷','Compare local service timing']},conclusions:[['Report local service impact before fabric retries','The rack panel shows behavior changes before network symptoms.'],['Report a global compute event','The fictional impact is isolated to C14.'],['Report a CRAC-originated service fault','This panel does not show cooling as the first cause.']],correct:0},
-      tor:{id:'tor',team:'network',kind:'tor',title:'ToR-C14',subtitle:'Route resiliency trace',icon:'⌁',evidence:'network-retry',sequence:['local','upstream','time'],nodes:{local:['⌁','Inspect the local retry trace'],upstream:['◌','Compare the upstream route'],time:['◷','Place retries on the canonical timeline']},conclusions:[['Report a primary fabric outage','The upstream route remains healthy.'],['Report retries as a secondary local symptom','The retries begin after the local service change.'],['Report a failed alternate route','The simulated alternate path is healthy.']],correct:1},
-      noc:{id:'noc',team:'observability',kind:'noc',title:'NOC clock wall',subtitle:'Canonical event authority',icon:'◉',evidence:'timeline-source',sequence:['source','order','confidence'],nodes:{source:['◉','Choose the canonical source'],order:['◷','Sort the trusted timestamps'],confidence:['✓','Reject untrusted presentation time']},conclusions:[['Report the PDU event as the first reliable event','The fictional canonical clock supports this ordering.'],['Report the cooling alert as first','Its presentation timestamp is not trusted.'],['Report the network retry as first','The retry begins after the rack impact.']],correct:0},
-      alert:{id:'alert',team:'observability',kind:'alert',title:'Alert confidence wall',subtitle:'Stale presentation audit',icon:'⌇',evidence:'alert-stale',sequence:['sample','surface','compare'],nodes:{sample:['◷','Find the sample time'],surface:['⌇','Find the late surfaced alarm'],compare:['◉','Compare against the trusted clock']},conclusions:[['Treat the cooling alarm as live root-cause proof','It was surfaced late in the fictional alert stream.'],['Mark the cooling alarm stale and misleading','Its presentation time cannot establish causality.'],['Discard all monitoring evidence','The canonical clock remains a trusted source.']],correct:1},
-      inventory:{id:'inventory',team:'command',kind:'inventory',title:'Inventory mirror',subtitle:'C14 dependency record',icon:'⌘',evidence:'mirror-alias',sequence:['alias','binding','scope'],nodes:{alias:['⌘','Locate the C14-M alias'],binding:['◇','Follow the shared model binding'],scope:['▣','Match the binding to Rack C14']},conclusions:[['Report a C14-M alias sharing the C14 branch binding','The inventory relationship explains the identity mismatch.'],['Report a normal independent C14-M record','The fictional record is not independent.'],['Report a ToR labeling error','The relation is in the modeled power dependency record.']],correct:0},
-      change:{id:'change',team:'command',kind:'change',title:'Case records desk',subtitle:'Change-window review',icon:'↻',evidence:'change-clear',sequence:['window','cooling','network'],nodes:{window:['◷','Set the incident time window'],cooling:['❄','Check fictional cooling changes'],network:['⌁','Check fictional network changes']},conclusions:[['Report a matching cooling or network change','No relevant change aligns with the event.'],['Report no relevant change in either false-suspect domain','The change record clears a popular assumption.'],['Report missing case records','The fictional record is complete for this window.']],correct:1}
+
+    const clueText = {
+      blanking: ['Missing blanking panels', 'Empty U-space lets hot exhaust recirculate into the cold aisle. Fill it before raising rack density.'],
+      cable: ['Cable bundle blocks airflow', 'Unmanaged cabling near the rack intake can create a local hot spot even when the room average is acceptable.'],
+      sensor: ['Sensor in the wrong stream', 'A sensor must represent the inlet condition you are trying to protect; poor placement can hide localized heat.'],
+      tag: ['Overdue service tag', 'A maintenance tag is a clue about latent reliability risk. Verify work history before relying on the device during a heat event.']
     };
-    const HYPOTHESES = {
-      cooling:{id:'cooling',title:'CRAC-2 cooling fault',copy:'The temperature alert suggests a cooling control fault caused the incident.',required:[],clearRequired:['cooling-response','alert-stale','timeline-source']},
-      network:{id:'network',title:'ToR-C14 network fault',copy:'The retry pattern suggests a fabric path fault caused the service impact.',required:[],clearRequired:['network-retry','timeline-source','change-clear']},
-      pdu:{id:'pdu',title:'PDU-C14 identity collision',copy:'A C14-M inventory mirror created a fictional branch-identity collision at PDU-C14.',required:['pdu-alias','mirror-alias','rack-impact','timeline-source'],clearRequired:[]}
-    };
-    const REQUIRED_EXCHANGE = ['pdu-alias','cooling-response','rack-impact','network-retry','timeline-source','alert-stale','mirror-alias','change-clear'];
-    const REQUIRED_PROOF = ['pdu-alias','mirror-alias','rack-impact','timeline-source','cooling-response','network-retry'];
-    const RECONSTRUCTION = ['mirror-alias','pdu-alias','rack-impact','network-retry','cooling-response','alert-stale'];
-    const $ = selector => document.querySelector(selector);
-    const $$ = selector => [...document.querySelectorAll(selector)];
-    let toastTimer = null;
-    function createState() { return {started:false,activeTeam:'facilities',phase:'survey',confidence:100,elapsed:0,timer:null,solved:new Set(),shared:new Set(),classifications:{},pinned:new Set(),claims:[],tested:[],correctTheory:false,reconstruction:[],verdict:null,validation:new Set(),inspection:null,puzzleProgress:0,logs:['Case file opened. The team must distinguish facts from assumptions.'],finished:false}; }
-    let state = createState();
-    function escapeHtml(value) { return String(value).replace(/[&<>'"]/g,character => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[character])); }
-    function clock(seconds) { const minutes=Math.floor(seconds/60); const remaining=seconds%60; return String(minutes).padStart(2,'0')+':'+String(remaining).padStart(2,'0'); }
-    function phaseIndex(id) { return PHASES.findIndex(phase => phase.id===id); }
-    function evidenceForTeam(team) { return Object.values(EVIDENCE).filter(item=>item.team===team); }
-    function hasSharedFromTeam(team) { return [...state.shared].some(id=>EVIDENCE[id].team===team); }
-    function activeRole() { return TEAMS[state.activeTeam]; }
-    function showToast(message,type) { const toast=$('#toast'); toast.textContent=message; toast.className='toast show '+(type||''); clearTimeout(toastTimer); toastTimer=setTimeout(()=>toast.className='toast',3600); }
-    function record(text) { state.logs.push(text); if (state.logs.length>45) state.logs.shift(); }
-    function adjustConfidence(amount,reason) { state.confidence=Math.max(35,Math.min(100,state.confidence+amount)); if (reason) record((amount>=0?'+':'')+amount+' confidence: '+reason); }
-    function phaseData() { return PHASES.find(item=>item.id===state.phase) || PHASES[0]; }
-    function startCase() { if (state.started) return; state.started=true; $('#briefing').classList.add('hidden'); $('#game').classList.remove('hidden'); state.timer=setInterval(()=>{ if(!state.finished){state.elapsed+=1; $('#caseClock').textContent=clock(state.elapsed);} },1000); record('Scene survey began. Team members receive separate fictional evidence.'); render(); }
-    function resetCase() { if (state.timer) clearInterval(state.timer); state=createState(); $('#caseClock').textContent='00:00'; $('#briefing').classList.remove('hidden'); $('#game').classList.add('hidden'); $('#inspectionModal').classList.add('hidden'); showToast('Fresh case file ready.','good'); }
-    function render() { if(!state.started) return; renderHeader(); renderPhase(); renderHall(); renderTeamDeck(); renderBoard(); renderDebrief(); renderInspection(); }
-    function renderHeader() { $('#confidenceValue').textContent=state.confidence+'%'; $('#confidenceValue').className=state.confidence>=75?'green':state.confidence>=55?'amber':''; $('#caseClock').textContent=clock(state.elapsed); }
-    function renderPhase() { const data=phaseData(); $('#phaseTitle').textContent=data.title; $('#phaseCopy').textContent=data.copy; $('#phaseSteps').innerHTML=PHASES.map((phase,index)=>'<span class="phase-step '+(phase.id===state.phase?'active':index<phaseIndex(state.phase)?'done':'')+'">'+(index+1)+'. '+escapeHtml(phase.title)+'</span>').join(''); $('#advanceButton').textContent=state.phase==='validation'?'Check validation':'Check phase gate'; }
-    function assetStatus(asset) { if (state.solved.has(asset.id)) return 'solved'; if (asset.team!==state.activeTeam) return 'needs-team'; return 'available'; }
-    function renderHall() { const hall=$('#hall'); const visual=Object.values(ASSETS).map(asset=>{ const status=assetStatus(asset); const team=TEAMS[asset.team]; return '<button type="button" class="asset '+asset.kind+' '+(status==='solved'?'solved':'')+' '+(status==='needs-team'?'needs-team':'')+'" data-asset="'+asset.id+'" aria-label="'+escapeHtml(asset.title)+' · '+escapeHtml(team.label)+' '+escapeHtml(team.short)+'" '+(status==='needs-team'?'disabled':'')+'><i class="team-dot"></i><span class="asset-icon">'+asset.icon+'</span><b>'+escapeHtml(asset.title)+'</b><span>'+escapeHtml(asset.subtitle)+'</span><em>'+escapeHtml(team.label)+' · '+escapeHtml(team.short)+'</em></button>'; }).join(''); hall.querySelectorAll('.asset').forEach(node=>node.remove()); hall.insertAdjacentHTML('beforeend',visual); }
-    function renderTeamDeck() { $('#teamSwitcher').innerHTML=Object.entries(TEAMS).map(([id,team])=>'<button type="button" class="team-button '+(id===state.activeTeam?'active':'')+'" data-team="'+id+'"><b>'+team.label+' · '+escapeHtml(team.short)+'</b><span>'+escapeHtml(team.role)+'</span></button>').join(''); const team=activeRole(); const discovered=evidenceForTeam(state.activeTeam).filter(item=>state.solved.has(assetForEvidence(item.id).id)).length; const shared=evidenceForTeam(state.activeTeam).filter(item=>state.shared.has(item.id)).length; $('#roleCard').innerHTML='<div class="role-symbol" style="background:'+team.color+'">'+team.icon+'</div><div><h3>'+escapeHtml(team.label)+' · '+escapeHtml(team.role)+'</h3><p>'+escapeHtml(team.task)+'</p><p class="role-task">Private discoveries: <b>'+discovered+'</b> · Published claims: <b>'+shared+'</b></p><p class="pass-device">Before switching teams, have this group state: <b>what we know / what we assume / what we need.</b></p></div>'; }
-    function assetForEvidence(evidenceId) { return Object.values(ASSETS).find(asset=>asset.evidence===evidenceId); }
-    function sharedEvidence() { return [...state.shared].map(id=>EVIDENCE[id]).filter(Boolean); }
-    function classifyClassLabel(id) { const value=state.classifications[id]; if(!value) return ''; const correct=EVIDENCE[id].correctClass===value; return '<span class="classification '+value+' '+(correct?'':'wrong')+'">'+(correct?'✓ ':'? ')+(value==='primary'?'Primary / reliable':value==='secondary'?'Secondary symptom':'Stale / misleading')+'</span>'; }
-    function renderEvidenceCard(item,options) { const opts=options||{}; const active=state.pinned.has(item.id); const canClassify=state.phase==='exchange'; const classification=state.classifications[item.id]; const classify=canClassify?'<div class="classify-row"><button type="button" data-classify="'+item.id+'|primary" class="'+(classification==='primary'?'active':'')+'">Primary</button><button type="button" data-classify="'+item.id+'|secondary" class="'+(classification==='secondary'?'active':'')+'">Secondary</button><button type="button" data-classify="'+item.id+'|stale" class="'+(classification==='stale'?'active':'')+'">Stale / misleading</button></div>':''; const pin=state.phase==='theory'?'<button type="button" data-pin="'+item.id+'" class="'+(active?'success':'ghost')+'">'+(active?'Pinned':'Pin to theory')+'</button>':''; return '<article class="evidence-card" style="--card-tone:'+item.tone+'"><header><div><h4>'+escapeHtml(item.title)+'</h4><span class="evidence-meta">'+escapeHtml(TEAMS[item.team].label)+' · '+escapeHtml(item.source)+'</span></div><span class="evidence-meta">'+escapeHtml(item.time)+'</span></header><p>'+escapeHtml(item.summary)+'</p>'+classifyClassLabel(item.id)+classify+'<div class="card-actions">'+pin+'</div></article>'; }
-    function renderClaims() { if(!state.claims.length) return '<div class="gate warn"><b>Awaiting team reports.</b> Each team must publish a fact, inference, and open question.</div>'; return '<div class="claims">'+state.claims.slice().reverse().map(claim=>'<div class="claim" style="--claim-tone:'+TEAMS[claim.team].color+'"><b>'+escapeHtml(TEAMS[claim.team].label)+' · '+escapeHtml(EVIDENCE[claim.evidence].title)+'</b><span><b>Fact:</b> '+escapeHtml(EVIDENCE[claim.evidence].observation)+'</span><span><b>Question:</b> '+escapeHtml(EVIDENCE[claim.evidence].question)+'</span></div>').join('')+'</div>'; }
-    function exchangeReady() { return REQUIRED_EXCHANGE.every(id=>state.shared.has(id) && state.classifications[id]===EVIDENCE[id].correctClass) && Object.keys(TEAMS).every(hasSharedFromTeam); }
-    function proofReady() { return REQUIRED_PROOF.every(id=>state.pinned.has(id)); }
-    function hypothesisStatus(id) { if(id==='pdu') return state.correctTheory?'supported':proofReady()&&falseSuspectsCleared()?'ready':'open'; const hypothesis=HYPOTHESES[id]; const cleared=hypothesis.clearRequired.every(evidenceId=>state.pinned.has(evidenceId)); return cleared?'cleared':'open'; }
-    function falseSuspectsCleared() { return ['cooling','network'].every(id=>state.tested.includes(id)&&hypothesisStatus(id)==='cleared'); }
-    function renderBoard() { const board=$('#board'); const shared=sharedEvidence(); let body='<div class="board-overview"><div class="board-stat"><span>Published evidence</span><b>'+shared.length+' / '+Object.keys(EVIDENCE).length+'</b></div><div class="board-stat"><span>Team claims</span><b class="green">'+state.claims.length+' / 4</b></div><div class="board-stat"><span>Primary theory</span><b class="amber">'+(state.correctTheory?'Supported':'Unproven')+'</b></div><div class="board-stat"><span>Case status</span><b>'+escapeHtml(phaseData().title)+'</b></div></div>';
-      body+='<section class="board-section"><h3>Team claims</h3><p>Publish findings as a fact plus an uncertainty. This prevents a confident guess becoming “truth.”</p>'+renderClaims()+'<div class="request-row"><button type="button" data-request="Need timeline confirmation">Need timeline confirmation</button><button type="button" data-request="Can anyone clear Cooling?">Can anyone clear Cooling?</button><button type="button" data-request="What would disprove our theory?">Challenge our theory</button></div></section>';
-      if(state.phase==='survey') { const complete=Object.keys(TEAMS).filter(hasSharedFromTeam).length; body+='<section class="board-section"><h3>Scene survey gate</h3><p>Every team needs one published finding before evidence can be compared.</p><div class="gate '+(complete===4?'good':'')+'"><b>'+complete+' / 4 teams have published.</b> '+(complete===4?'The reliability lab can now open.':'Pass the device to a team that has not shared an observation.')+'</div></section>'; }
-      if(['exchange','theory','reconstruction','verdict','validation'].includes(state.phase)) { const unpublished=REQUIRED_EXCHANGE.filter(id=>!state.shared.has(id)).length; body+='<section class="board-section"><h3>Evidence reliability lab</h3><p>Classify each published clue. “Dramatic” does not mean “primary.”</p><div class="evidence-list">'+(shared.length?shared.map(item=>renderEvidenceCard(item)).join(''):'<div class="gate warn">No reports have reached the case board yet.</div>')+'</div>'+((state.phase==='exchange')?'<div class="gate '+(exchangeReady()?'good':'')+'"><b>'+REQUIRED_EXCHANGE.filter(id=>state.shared.has(id)&&state.classifications[id]===EVIDENCE[id].correctClass).length+' / '+REQUIRED_EXCHANGE.length+' required classifications are sound.</b> '+(exchangeReady()?'The theory lab is ready.':unpublished?unpublished+' evidence station'+(unpublished===1?' still needs':'s still need')+' a published report. Rotate through every team, then classify the complete board.':'All reports are published. Teams may revise a classification without penalty—talk through the evidence.')+'</div>':'')+'</section>'; }
-      if(['theory','reconstruction','verdict','validation'].includes(state.phase)) { const exclusionsComplete=falseSuspectsCleared(); const proofComplete=proofReady(); body+='<section class="board-section"><h3>Competing hypotheses</h3><p>Pin evidence before testing a theory. A sound case must support the culprit and clear innocent suspects.</p><div class="gate '+(proofComplete&&exclusionsComplete?'good':'')+'"><b>'+REQUIRED_PROOF.filter(id=>state.pinned.has(id)).length+' / '+REQUIRED_PROOF.length+' core pieces pinned · '+['cooling','network'].filter(id=>state.tested.includes(id)&&hypothesisStatus(id)==='cleared').length+' / 2 false leads tested and cleared.</b> '+(proofComplete&&exclusionsComplete?'The causal chain and both exclusions are ready. Test the PDU theory.':proofComplete?'Pin each clearance clue, then formally test both false leads before advancing.':'Pin the earliest event, hidden relationship, local impact, and both suspect clearances.')+'</div><div class="hypotheses">'+Object.values(HYPOTHESES).map(hypothesis=>{const status=hypothesisStatus(hypothesis.id);return '<article class="hypothesis"><header><h4>'+escapeHtml(hypothesis.title)+'</h4><span class="status '+status+'">'+(status==='ready'?'ready to test':status)+'</span></header><p>'+escapeHtml(hypothesis.copy)+'</p><footer><small>'+ (hypothesis.id==='pdu'?'Needs primary chain evidence and two cleared false leads.':'Needs evidence that contradicts this suspect.')+'</small><button type="button" data-test="'+hypothesis.id+'" '+(state.phase!=='theory'||state.correctTheory?'disabled':'')+'>Test theory</button></footer></article>';}).join('')+'</div></section>'; }
-      if(['reconstruction','verdict','validation'].includes(state.phase)) { body+='<section class="board-section"><h3>Incident reconstruction</h3><p>Click the evidence chain in chronological order. Each step must fit the complete fictional case.</p><div class="chain">'+RECONSTRUCTION.map(id=>{const item=EVIDENCE[id];const index=state.reconstruction.indexOf(id);const next=state.reconstruction.length;return '<button type="button" data-chain="'+id+'" class="chain-node '+(index>=0?'done':'')+'" '+(state.phase!=='reconstruction'||index>=0?'disabled':'')+'><b>'+escapeHtml(item.title)+'</b><span>'+(index>=0?'Locked as step '+(index+1):'Place in the causal chain')+'</span></button>';}).join('')+'</div><div class="gate '+(state.reconstruction.length===RECONSTRUCTION.length?'good':'')+'"><b>'+state.reconstruction.length+' / '+RECONSTRUCTION.length+' reconstruction steps locked.</b> '+(state.reconstruction.length===RECONSTRUCTION.length?'The hearing can begin.':'Use the shared timeline—not the first alert you noticed.')+'</div></section>'; }
-      if(['verdict','validation'].includes(state.phase)) { body+='<section class="board-section"><h3>Case hearing</h3><p>Name the fictional culprit only after the evidence chain has been reconstructed.</p><div class="hypotheses">'+Object.values(HYPOTHESES).map(hypothesis=>'<article class="hypothesis"><header><h4>'+escapeHtml(hypothesis.title)+'</h4><span class="status '+(state.verdict===hypothesis.id?'supported':'open')+'">'+(state.verdict===hypothesis.id?'accused':'available')+'</span></header><p>'+escapeHtml(hypothesis.copy)+'</p><footer><small>Require: culprit + cause + cleared suspects</small><button type="button" data-verdict="'+hypothesis.id+'" '+(state.phase!=='verdict'?'disabled':'')+'>Make accusation</button></footer></article>').join('')+'</div></section>'; }
-      if(state.phase==='validation') { const validations=['timeline-source','cooling-response','network-retry']; body+='<section class="board-section"><h3>Independent validation</h3><p>Do not close the case because one indicator looks better. Verify independent fictional checks.</p><div class="chain">'+validations.map(id=>'<button type="button" data-validate="'+id+'" class="chain-node '+(state.validation.has(id)?'done':'')+'" '+(state.validation.has(id)?'disabled':'')+'><b>'+escapeHtml(EVIDENCE[id].title)+'</b><span>'+(state.validation.has(id)?'Independent check confirmed':'Confirm simulated stability')+'</span></button>').join('')+'</div><div class="gate '+(state.validation.size===validations.length?'good':'')+'"><b>'+state.validation.size+' / '+validations.length+' independent checks complete.</b> '+(state.validation.size===validations.length?'The case can close.':'Do not skip validation—this is where false confidence is exposed.')+'</div></section>'; }
-      board.innerHTML=body; }
-    function renderDebrief() { const debrief=$('#debrief'); if(!state.finished){debrief.classList.add('hidden');return;} const cleared=['cooling','network'].filter(id=>hypothesisStatus(id)==='cleared').length; debrief.classList.remove('hidden'); debrief.innerHTML='<p class="eyebrow">Case closed · training debrief</p><h2>The C14 Phantom Cascade is resolved.</h2><p>The fictional PDU-C14 identity collision was proven as the initiating condition. Cooling and network symptoms were secondary or stale—not the root cause.</p><div class="debrief-grid"><div><span>Case confidence</span><b>'+state.confidence+'%</b></div><div><span>Time spent</span><b>'+clock(state.elapsed)+'</b></div><div><span>Cleared suspects</span><b>'+cleared+' / 2</b></div><div><span>Team claims</span><b>'+state.claims.length+' / 4</b></div></div><h3 style="margin:0;font-size:.92rem">Debrief prompts</h3><ul class="debrief-list"><li><b>Strongest collaboration moment:</b> Which team’s evidence changed the group’s leading theory?</li><li><b>False assumption:</b> Which alert looked convincing but did not establish causality?</li><li><b>Quality check:</b> What finding would have disproved the final PDU theory?</li><li><b>Next case:</b> Rotate spokesperson, skeptic, recorder, and evidence runner before opening another file.</li></ul>'; }
-    function renderInspection() { const modal=$('#inspectionModal'); if(!state.inspection){modal.classList.add('hidden');modal.innerHTML='';return;} const asset=ASSETS[state.inspection]; const evidence=EVIDENCE[asset.evidence]; const team=TEAMS[asset.team]; const solved=state.solved.has(asset.id); const progress=state.puzzleProgress; const complete=progress>=asset.sequence.length; let content='<div class="modal-card"><div class="modal-head"><div><p class="eyebrow">'+escapeHtml(team.label)+' · private evidence station</p><h2 id="inspectionTitle">'+escapeHtml(asset.title)+'</h2><p>'+escapeHtml(asset.subtitle)+' · solve the visual trace before reporting to the room.</p></div><button type="button" class="ghost" data-close-inspection>Close</button></div><div class="inspection-meta"><span class="pill">'+escapeHtml(team.role)+'</span><span class="pill">Fictional simulation</span><span class="pill">'+(solved?'Evidence secured':'Visual inspection')+'</span></div>';
-      if(!solved){ content+='<div class="inspection-scene"><div class="device" style="--device-tone:'+evidence.tone+'"><span class="device-icon">'+asset.icon+'</span><span class="device-label">'+escapeHtml(asset.title)+' virtual panel</span></div><div class="puzzle-track">'+asset.sequence.map((id,index)=>{const node=asset.nodes[id];const done=index<progress;return '<button type="button" class="puzzle-node '+(done?'done':'')+'" data-puzzle-step="'+id+'" '+(done?'disabled':'')+'><span class="puzzle-icon">'+(done?'✓':node[0])+'</span><b>'+escapeHtml(node[1])+'</b><span>'+ (done?'Trace confirmed':'Select when ready')+'</span></button>';}).join('')+'</div></div>'; if(!complete){content+='<p class="puzzle-result"><b>Investigation cue:</b> Select the next visual trace in a cause-and-evidence order. A wrong trace reduces case confidence, but your team can reassess.</p>';} else {content+='<p class="puzzle-result"><b>Trace complete.</b> Before publishing, your team must agree on the conclusion that the evidence actually supports.</p><div class="report-options">'+asset.conclusions.map((choice,index)=>'<button type="button" class="report-option" data-report="'+index+'"><strong>Conclusion '+String.fromCharCode(65+index)+'</strong><span>'+escapeHtml(choice[0])+'</span></button>').join('')+'</div>';}}
-      else {content+='<div class="puzzle-result"><b>Evidence secured:</b> '+escapeHtml(evidence.summary)+'</div><div class="report-options"><div class="report-option"><strong>Observation</strong><span>'+escapeHtml(evidence.observation)+'</span></div><div class="report-option"><strong>Inference</strong><span>'+escapeHtml(evidence.inference)+'</span></div><div class="report-option"><strong>Open question</strong><span>'+escapeHtml(evidence.question)+'</span></div></div>';}
-      content+='<div class="modal-actions"><p>'+ (solved?(state.shared.has(evidence.id)?'This finding is on the shared case board.':'Have the team say the observation and question out loud, then publish it to the shared board.'):'Keep this information private until your team agrees on a conclusion.')+'</p>'+ (solved&&!state.shared.has(evidence.id)?'<button type="button" class="success" data-publish="'+evidence.id+'">Publish structured claim</button>':'')+'</div></div>'; modal.innerHTML=content; modal.classList.remove('hidden'); }
-    function openAsset(assetId) { const asset=ASSETS[assetId]; if(!asset)return; if(asset.team!==state.activeTeam){showToast(TEAMS[asset.team].label+' owns this evidence. Pass the device to '+TEAMS[asset.team].short+'.','bad');return;} state.inspection=assetId; state.puzzleProgress=state.solved.has(assetId)?ASSETS[assetId].sequence.length:0; renderInspection(); }
-    function closeInspection() { state.inspection=null; renderInspection(); }
-    function selectPuzzleStep(id) { const asset=ASSETS[state.inspection]; if(!asset)return; const expected=asset.sequence[state.puzzleProgress]; if(id!==expected){adjustConfidence(-4,'private team selected a trace out of order'); showToast('That trace does not establish the next finding. Reassess the visual evidence.','bad'); render();return;} state.puzzleProgress+=1; if(state.puzzleProgress===asset.sequence.length){showToast('Visual trace complete. Agree on the conclusion before publishing.','good'); record(TEAMS[asset.team].label+' completed the '+asset.title+' inspection trace.');} renderInspection(); renderHeader(); }
-    function selectReport(index) { const asset=ASSETS[state.inspection]; if(!asset)return; if(index!==asset.correct){adjustConfidence(-5,TEAMS[asset.team].label+' selected an unsupported private conclusion'); showToast('That conclusion reaches past the evidence. Discuss the competing explanation and try again.','bad'); render();return;} state.solved.add(asset.id); record(TEAMS[asset.team].label+' secured private evidence: '+EVIDENCE[asset.evidence].title+'.'); showToast('Evidence secured. Prepare a fact, inference, and open question for the room.','good'); render(); }
-    function publishEvidence(evidenceId) { const evidence=EVIDENCE[evidenceId]; if(!evidence || state.shared.has(evidenceId))return; state.shared.add(evidenceId); state.claims.push({team:evidence.team,evidence:evidenceId}); record(TEAMS[evidence.team].label+' published: '+evidence.title+'.'); showToast('Structured claim published to the shared board.','good'); closeInspection(); if(state.phase==='survey'&&Object.keys(TEAMS).every(hasSharedFromTeam)){state.phase='exchange';record('All teams published. Evidence reliability lab unlocked.');showToast('Every team has spoken. Begin the evidence reliability lab.','good');} render(); }
-    function classifyEvidence(id,classification) { if(state.phase!=='exchange'||!state.shared.has(id))return; state.classifications[id]=classification; const correct=EVIDENCE[id].correctClass===classification; if(!correct){adjustConfidence(-2,'evidence classification requires discussion');showToast('That category is not supported by the case. It can be revised—ask another team to challenge it.','bad');}else{showToast('Classification recorded. Explain why this evidence belongs there.','good');} render(); }
-    function togglePin(id) { if(state.phase!=='theory'||!state.shared.has(id))return; if(state.pinned.has(id))state.pinned.delete(id);else state.pinned.add(id); render(); }
-    function testTheory(id) { if(state.phase!=='theory'||state.correctTheory)return; const hypothesis=HYPOTHESES[id]; if(id==='pdu'){ if(!proofReady()){showToast('The PDU theory needs its full evidence chain pinned before it can be tested.','bad');return;} if(!falseSuspectsCleared()){showToast('Clear and formally test both false leads before supporting the PDU theory.','bad');return;} state.correctTheory=true; state.tested.push(id); state.phase='reconstruction'; adjustConfidence(4,'the team supported the PDU theory with a causal chain'); record('The group supported the PDU-C14 identity collision theory and unlocked reconstruction.'); showToast('Theory supported. Reconstruct the fictional cascade before the hearing.','good'); render();return; } const cleared=hypothesis.clearRequired.every(evidenceId=>state.pinned.has(evidenceId)); if(cleared){if(!state.tested.includes(id))state.tested.push(id);adjustConfidence(2,'the team cleared the '+hypothesis.title+' theory with contradictory evidence');showToast(hypothesis.title+' is cleared by the pinned evidence.','good');}else{adjustConfidence(-7,'the team tested '+hypothesis.title+' without enough contradictory evidence');showToast('This theory is not yet cleared. Pin evidence that contradicts its assumed starting point.','bad');} render(); }
-    function selectChain(id) { if(state.phase!=='reconstruction')return; const expected=RECONSTRUCTION[state.reconstruction.length]; if(id!==expected){adjustConfidence(-5,'the group placed a later symptom before its cause');showToast('That event comes later in the fictional cascade. Use the trusted clock and dependency evidence.','bad');render();return;} state.reconstruction.push(id); record('Reconstruction step '+state.reconstruction.length+': '+EVIDENCE[id].title+'.'); if(state.reconstruction.length===RECONSTRUCTION.length){state.phase='verdict';showToast('Causal chain complete. Begin the case hearing.','good');}render(); }
-    function chooseVerdict(id) { if(state.phase!=='verdict')return; if(id!=='pdu'){adjustConfidence(-9,'the group accused a cleared suspect');showToast('That suspect does not explain the complete causal chain. The case remains open.','bad');render();return;} state.verdict=id;state.phase='validation';record('Case hearing: PDU-C14 identity collision named as the fictional culprit.');showToast('Verdict accepted. Complete independent validation before closing the file.','good');render(); }
-    function validate(id) { if(state.phase!=='validation'||state.validation.has(id))return; state.validation.add(id);record('Independent validation confirmed: '+EVIDENCE[id].title+'.'); if(state.validation.size===3){state.finished=true;clearInterval(state.timer);record('Case file closed after independent validation.');showToast('Case closed. Review the debrief with every team.','good');}render(); }
-    function checkGate() { if(state.phase==='survey'){if(Object.keys(TEAMS).every(hasSharedFromTeam)){state.phase='exchange';showToast('Evidence reliability lab opened.','good');}else showToast('The group is still waiting for a structured report from every team.','bad');}else if(state.phase==='exchange'){if(exchangeReady()){state.phase='theory';record('The evidence reliability lab passed. Theory work began.');showToast('Evidence lab passed. Pin evidence and test competing theories.','good');}else showToast('The reliability board is incomplete. Every shared clue needs the right classification.','bad');}else if(state.phase==='theory'){showToast(proofReady()?'Use the theory cards to test the causal chain.':'Pin the complete core chain before testing a theory.','');}else if(state.phase==='reconstruction'){showToast('Place the next earliest event in the fictional cascade.','');}else if(state.phase==='verdict'){showToast('The group must accuse the culprit supported by every link in the chain.','');}else if(state.phase==='validation'){if(state.validation.size===3){state.finished=true;clearInterval(state.timer);render();}else showToast('Independent validation is still incomplete.','bad');}render(); }
-    function facilitatorPrompt() { const prompts=[ 'Ask each team: What do we know, what do we assume, and what would change our mind?', 'Invite the skeptic: Which current claim has the weakest evidence trail?', 'Ask case command: Which evidence establishes sequence rather than just correlation?', 'Ask facilities and network: Are your alerts causes, responses, or stale presentations?' ]; const prompt=prompts[(state.claims.length+phaseIndex(state.phase))%prompts.length]; showToast('Facilitator prompt: '+prompt,'good'); }
-    document.addEventListener('click',event=>{ const button=event.target.closest('button'); if(!button)return; if(button.id==='startButton')startCase(); else if(button.id==='resetButton')resetCase(); else if(button.id==='advanceButton')checkGate(); else if(button.id==='facilitatorButton')facilitatorPrompt(); else if(button.dataset.team){state.activeTeam=button.dataset.team;showToast('Active role: '+TEAMS[state.activeTeam].label+' · '+TEAMS[state.activeTeam].short+'.','good');render();} else if(button.dataset.asset)openAsset(button.dataset.asset); else if(button.dataset.closeInspection!==undefined)closeInspection(); else if(button.dataset.puzzleStep)selectPuzzleStep(button.dataset.puzzleStep); else if(button.dataset.report!==undefined)selectReport(Number(button.dataset.report)); else if(button.dataset.publish)publishEvidence(button.dataset.publish); else if(button.dataset.classify){const [id,classification]=button.dataset.classify.split('|');classifyEvidence(id,classification);} else if(button.dataset.pin)togglePin(button.dataset.pin); else if(button.dataset.test)testTheory(button.dataset.test); else if(button.dataset.chain)selectChain(button.dataset.chain); else if(button.dataset.verdict)chooseVerdict(button.dataset.verdict); else if(button.dataset.validate)validate(button.dataset.validate); else if(button.dataset.request){showToast('Team request posted aloud: “'+button.dataset.request+'”','good');record('Team request: '+button.dataset.request);} });
+
+    const $ = (selector) => document.querySelector(selector);
+    const money = (number) => `$${Math.round(number / 1000)}k`;
+    const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+
+    function hasStaff(id) { return Boolean(state.staff[id]); }
+    function reliablePower() { return Math.max(0, Math.min(state.utilityCapacity, state.upsCapacity) - state.maintenanceDebt * 2); }
+    function effectiveCooling() { return Math.max(0, state.coolingCapacity - Math.max(0, state.hotspots - state.containment) * 1.5 - state.tempStress * 2); }
+    function freeRackSlots() { return state.rackSlots - state.rackUsed; }
+    function powerHeadroom() { return reliablePower() - state.itLoad; }
+    function coolingHeadroom() { return effectiveCooling() - state.itLoad; }
+    function sellableCapacity() { return Math.max(0, Math.min(powerHeadroom(), coolingHeadroom(), freeRackSlots() * 9)); }
+    function pue() { return clamp(1.58 - state.containment * .065 - state.coolingPods * .04 - (hasStaff('nia') ? .018 : 0) + state.hotspots * .012 + state.tempStress * .018, 1.22, 1.85); }
+    function resilience() { return clamp(Math.round(44 + (state.upsCapacity - 80) * .32 + (state.generatorReadiness - 50) * .18 - state.maintenanceDebt * 5 - state.hotspots * 1.5 + Object.keys(state.staff).length * 1.5), 5, 98); }
+    function canFit(racks, kw) { return freeRackSlots() >= racks && powerHeadroom() >= kw && coolingHeadroom() >= kw; }
+    function setText(selector, value) { $(selector).textContent = value; }
+    function valueClass(value, warning, bad, invert = false) {
+      if (invert) return value >= warning ? 'value-good' : value >= bad ? 'value-warn' : 'value-bad';
+      return value <= bad ? 'value-bad' : value <= warning ? 'value-warn' : 'value-good';
+    }
+
+    function addLog(title, text) {
+      state.log.unshift({ time: String(8 + state.shift).padStart(2, '0') + ':20', title, text });
+      state.log = state.log.slice(0, 6);
+    }
+
+    let toastTimer;
+    function toast(message) {
+      const target = $('#toast');
+      target.textContent = message;
+      target.classList.add('show');
+      window.clearTimeout(toastTimer);
+      toastTimer = window.setTimeout(() => target.classList.remove('show'), 3600);
+    }
+
+    function renderRacks() {
+      const grid = $('#rackGrid');
+      grid.innerHTML = '';
+      for (let i = 0; i < state.rackSlots; i += 1) {
+        const used = i < state.rackUsed;
+        const hot = used && i >= Math.max(0, state.rackUsed - state.hotspots);
+        const rack = document.createElement('div');
+        rack.className = `rack ${used ? 'used' : 'empty'} ${hot ? 'hot' : ''}`;
+        rack.innerHTML = used
+          ? `<span>R-${String(i + 1).padStart(2, '0')}</span><span class="kw">${i % 3 === 0 ? '6' : i % 2 === 0 ? '4' : '3'}–${hot ? '7' : '5'} kW</span>`
+          : `<span>R-${String(i + 1).padStart(2, '0')}</span><span>Available</span>`;
+        grid.appendChild(rack);
+      }
+    }
+
+    function renderMetrics() {
+      const power = reliablePower();
+      const cooling = effectiveCooling();
+      const sellable = sellableCapacity();
+      const res = resilience();
+      const siteStatus = state.activeEvent ? (events[state.activeEvent].severity === 'critical' ? 'Critical attention' : 'Operational alert') : (res < 35 ? 'Fragile' : 'Nominal');
+      const statusEl = $('#siteStatus');
+      statusEl.textContent = siteStatus;
+      statusEl.className = `status ${state.activeEvent ? events[state.activeEvent].severity : (res < 35 ? 'critical' : '')}`;
+      setText('#shiftNumber', `Shift ${state.shift}`);
+      setText('#cashMetric', money(state.cash));
+      setText('#trustMetric', state.trust);
+      setText('#itMetric', `${state.itLoad} kW`);
+      setText('#itNote', `${Math.round((state.itLoad / power) * 100)}% of conditioned capacity`);
+      setText('#coolingMetric', `${Math.max(0, Math.round(coolingHeadroom()))} kW`);
+      setText('#pueMetric', pue().toFixed(2));
+      setText('#resilienceMetric', res);
+      setText('#resilienceNote', state.maintenanceDebt ? `${state.maintenanceDebt} maintenance debt` : 'Maintenance current');
+      $('#coolingMetric').className = `metric-value ${valueClass(coolingHeadroom(), 15, 6)}`;
+      $('#resilienceMetric').className = `metric-value ${valueClass(res, 60, 35, true)}`;
+      $('#pueMetric').className = `metric-value ${valueClass(1.62 - pue(), .1, -.1, true)}`;
+      setText('#racksLegend', `${state.rackUsed} / ${state.rackSlots} used`);
+      setText('#powerLegend', `${power} kW usable`);
+      setText('#coolingLegend', `${Math.round(cooling)} kW effective`);
+      setText('#hotspotLabel', `${state.hotspots} thermal ${state.hotspots === 1 ? 'clue' : 'clues'}`);
+      setText('#sellableBadge', `Sellable: ${Math.floor(sellable)} kW`);
+      setText('#rackBarLabel', `${state.rackUsed} / ${state.rackSlots}`);
+      setText('#powerBarLabel', `${state.itLoad} / ${power} kW`);
+      setText('#coolingBarLabel', `${state.itLoad} / ${Math.round(cooling)} kW`);
+      $('#rackBar').style.width = `${clamp((state.rackUsed / state.rackSlots) * 100, 0, 100)}%`;
+      $('#powerBar').style.width = `${clamp((state.itLoad / power) * 100, 0, 100)}%`;
+      $('#coolingBar').style.width = `${clamp((state.itLoad / cooling) * 100, 0, 100)}%`;
+      $('#powerBar').className = `fill ${powerHeadroom() < 8 ? 'red' : powerHeadroom() < 18 ? 'amber' : 'amber'}`;
+      $('#coolingBar').className = `fill ${coolingHeadroom() < 8 ? 'red' : coolingHeadroom() < 18 ? 'amber' : 'green'}`;
+      const constraints = [
+        { name: 'rack positions', value: freeRackSlots() * 9, explainer: 'Add rack positions only after confirming that electrical and thermal ledgers can support them.' },
+        { name: 'conditioned power', value: powerHeadroom(), explainer: 'Power is constrained by the usable path, including maintenance state—not just the utility feed.' },
+        { name: 'cooling margin', value: coolingHeadroom(), explainer: 'Cooling margin is local as well as room-wide; airflow defects lower the usable value.' }
+      ].sort((a, b) => a.value - b.value);
+      setText('#constraintNote', `Your current limiting factor is ${constraints[0].name} (${Math.max(0, Math.floor(constraints[0].value))} kW). ${constraints[0].explainer}`);
+      $('#cracTwo').textContent = state.coolingPods ? `Cooling Pod +${state.coolingPods}` : 'CRAC-2';
+      renderRacks();
+    }
+
+    function renderActions() {
+      const grid = $('#actionGrid');
+      grid.innerHTML = '';
+      actionDefinitions.forEach((action) => {
+        const button = document.createElement('button');
+        const enoughCash = state.cash >= action.cost;
+        const available = action.available() && enoughCash;
+        button.className = 'action';
+        button.disabled = !available;
+        button.innerHTML = `<span><span class="tag">${action.tag}</span><span class="title">${action.title}</span><span class="desc">${action.desc}</span></span><span class="cost ${action.cost > state.cash ? 'warning' : ''}">${action.cost < 0 ? `+${money(-action.cost)}` : action.cost === 0 ? 'No capital cost' : money(action.cost)}</span>`;
+        button.addEventListener('click', () => {
+          action.apply();
+          render();
+        });
+        grid.appendChild(button);
+      });
+    }
+
+    function renderStaff() {
+      const list = $('#staffList');
+      list.innerHTML = '';
+      staff.forEach((person) => {
+        const hired = hasStaff(person.id);
+        const row = document.createElement('div');
+        row.className = 'staff';
+        row.innerHTML = `<span class="avatar">${person.initials}</span><span><span class="name">${person.name}</span><span class="role">${person.role} · ${person.ability}</span></span>`;
+        const button = document.createElement('button');
+        button.textContent = hired ? 'On team' : `Hire ${money(person.cost)}`;
+        button.disabled = hired || state.cash < person.cost;
+        button.addEventListener('click', () => {
+          state.cash -= person.cost;
+          state.staff[person.id] = true;
+          if (person.id === 'nia') state.hotspots = Math.max(0, state.hotspots - 1);
+          if (person.id === 'maya') state.maintenanceDebt = Math.max(0, state.maintenanceDebt - 1);
+          addLog('Team', `Hired ${person.name}, ${person.role}.`);
+          render();
+        });
+        row.appendChild(button);
+        list.appendChild(row);
+      });
+      setText('#staffBadge', `${Object.keys(state.staff).length} specialist${Object.keys(state.staff).length === 1 ? '' : 's'}`);
+    }
+
+    function resolveEvent(choiceIndex) {
+      const current = events[state.activeEvent];
+      if (!current) return;
+      const success = current.choices[choiceIndex].effect();
+      if (!success) return;
+      const resolved = state.activeEvent;
+      state.activeEvent = null;
+      state.resolvedEvents.push(resolved);
+      state.trust = clamp(state.trust, 0, 100);
+      state.cash = Math.max(0, state.cash);
+      toast('Incident stabilized. A postmortem note has been added to the shift log.');
+      render();
+    }
+
+    function renderIncident() {
+      const area = $('#incidentArea');
+      const badge = $('#incidentBadge');
+      area.innerHTML = '';
+      if (!state.activeEvent) {
+        badge.textContent = 'No active event';
+        badge.className = 'badge green';
+        area.innerHTML = `<div class="quiet-state"><strong>Quiet operations window.</strong><br>Use this time to build capacity, schedule maintenance, inspect clues, or assemble a stronger on-call team.</div>`;
+        return;
+      }
+      const event = events[state.activeEvent];
+      badge.textContent = event.severity === 'critical' ? 'Critical response' : 'Action needed';
+      badge.className = `badge ${event.severity === 'critical' ? 'amber' : 'amber'}`;
+      const card = document.createElement('div');
+      card.className = `incident ${event.severity === 'critical' ? 'critical' : ''}`;
+      card.innerHTML = `<h3>${event.title}</h3><p>${event.body}</p>`;
+      const choices = document.createElement('div');
+      choices.className = 'incident-actions';
+      event.choices.forEach((choice, index) => {
+        const button = document.createElement('button');
+        button.textContent = choice.label;
+        button.addEventListener('click', () => resolveEvent(index));
+        choices.appendChild(button);
+      });
+      card.appendChild(choices);
+      area.appendChild(card);
+    }
+
+    function renderLog() {
+      const list = $('#logArea');
+      list.innerHTML = '';
+      state.log.forEach((entry) => {
+        const item = document.createElement('div');
+        item.className = 'log-item';
+        item.innerHTML = `<time>${entry.time}</time><span><strong>${entry.title}</strong><br>${entry.text}</span>`;
+        list.appendChild(item);
+      });
+      setText('#knowledgeBadge', `${state.knowledge} knowledge`);
+    }
+
+    function renderPrompt() {
+      let prompt = '<strong>Recommended next move:</strong> inspect the hall, then decide whether to improve containment or accept a new customer load.';
+      if (state.activeEvent) prompt = '<strong>Operations priority:</strong> stabilize the active event before closing the shift.';
+      else if (!state.completedWalkthrough) prompt = '<strong>Recommended next move:</strong> conduct the Operations Walkthrough. It unlocks the least disruptive heat-event response.';
+      else if (coolingHeadroom() < 12) prompt = '<strong>Capacity alert:</strong> local cooling margin is thin. Improve airflow or cooling before selling dense load.';
+      else if (state.maintenanceDebt > 2) prompt = '<strong>Reliability alert:</strong> planned maintenance will reduce technical debt before the next failure tests the site.';
+      $('#shiftPrompt').innerHTML = prompt;
+    }
+
+    function render() {
+      renderMetrics();
+      renderActions();
+      renderStaff();
+      renderIncident();
+      renderLog();
+      renderPrompt();
+    }
+
+    function openModal(id) { document.getElementById(id).hidden = false; }
+    function closeModal(id) { document.getElementById(id).hidden = true; }
+
+    const inspected = new Set();
+    document.querySelectorAll('.clue').forEach((button) => {
+      button.addEventListener('click', () => {
+        const [title, detail] = clueText[button.dataset.clue];
+        inspected.add(button.dataset.clue);
+        button.classList.add('found');
+        button.textContent = '✓';
+        $('#inspectionInfo').innerHTML = `<strong>${title}.</strong> ${detail}`;
+        setText('#puzzleProgress', `${inspected.size} / 4 clues inspected`);
+        $('#completeWalkthrough').disabled = inspected.size < 4;
+      });
+    });
+    $('#completeWalkthrough').addEventListener('click', () => {
+      state.completedWalkthrough = true;
+      state.hotspots = Math.max(0, state.hotspots - 1);
+      state.maintenanceDebt = Math.max(0, state.maintenanceDebt - 1);
+      state.knowledge += 1;
+      addLog('Walkthrough', 'Logged four operational clues: airflow, cabling, sensor placement, and service history.');
+      closeModal('puzzleModal');
+      openModal('triviaModal');
+      render();
+    });
+
+    document.querySelectorAll('[data-close]').forEach((button) => button.addEventListener('click', () => closeModal(button.dataset.close)));
+    document.querySelectorAll('.modal').forEach((modal) => modal.addEventListener('click', (event) => { if (event.target === modal) modal.hidden = true; }));
+    $('#triviaOptions').addEventListener('click', (event) => {
+      const answer = event.target.closest('button')?.dataset.answer;
+      if (!answer || state.answeredTrivia) return;
+      state.answeredTrivia = true;
+      if (answer === 'b') {
+        state.knowledge += 1;
+        state.trust += 1;
+        $('#triviaExplain').className = 'trivia-explain correct';
+        $('#triviaExplain').textContent = 'Correct. Sellable capacity is the tightest of physical rack space, usable power, cooling, network, and planned reliability margins. +1 knowledge.';
+        addLog('Knowledge', 'Capacity-planning concept reinforced: vacant floor space is not sellable capacity by itself.');
+      } else {
+        $('#triviaExplain').className = 'trivia-explain incorrect';
+        $('#triviaExplain').textContent = 'Not quite. A rack can be empty while the electrical, cooling, network, or resilience ledger is already constrained. The explanation is now saved in the Knowledge Vault.';
+      }
+      document.querySelectorAll('#triviaOptions button').forEach((button) => button.disabled = true);
+      render();
+    });
+
+    function triggerNextEvent() {
+      const sequence = ['heatwave', 'utility', 'circuit', 'bms'];
+      const candidate = sequence.find((name) => !state.resolvedEvents.includes(name));
+      if (candidate) {
+        state.activeEvent = candidate;
+        addLog('Alert', `${events[candidate].title} requires an operations decision.`);
+        toast('A live operational event has appeared in the incident queue.');
+      }
+    }
+
+    $('#nextShift').addEventListener('click', () => {
+      if (state.activeEvent) { toast('Resolve the active incident before closing the shift.'); return; }
+      state.shift += 1;
+      const operatingMargin = Math.max(0, state.itLoad * 850 - state.coolingPods * 1200 - state.containment * 600);
+      state.cash += operatingMargin;
+      state.generatorReadiness = Math.max(25, state.generatorReadiness - 3);
+      if (state.shift % 3 === 0) state.maintenanceDebt += 1;
+      if (state.itLoad > effectiveCooling() - 8) state.tempStress += 1;
+      state.trust = clamp(state.trust + (resilience() > 60 ? 1 : 0), 0, 100);
+      addLog('Shift close', `Collected operating margin ${money(operatingMargin)}. Readiness and maintenance state have been updated.`);
+      triggerNextEvent();
+      render();
+    });
+
+    render();
   </script>
 </body>
 </html>
-
