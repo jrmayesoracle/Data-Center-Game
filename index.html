@@ -168,6 +168,25 @@
     .floor-plan.three-ready .iso-visual,.floor-plan.three-ready .iso-zone { visibility:hidden; pointer-events:none; }
     .floor-plan.three-ready + .three-navigation { display:grid; }
     .floor-plan.three-ready::after { content:"INTERACTIVE 3D TRAINING MODEL · FICTIONAL"; }
+    /* First-person game room. Puzzle content is drawn on in-world 3D terminal screens. */
+    .game-grid.fps-mode { display:block; }
+    .game-grid.fps-mode > .room-map,.game-grid.fps-mode > .stage { display:none; }
+    body.fps-playing .hero,body.fps-playing .footer { display:none; }
+    body.fps-playing .app { width:min(1440px,calc(100% - 20px)); padding-top:10px; }
+    .fps-game { position:relative; min-height:clamp(560px,72vh,860px); overflow:hidden; background:#050b12; border:1px solid #355069; border-radius:18px; box-shadow:var(--shadow),inset 0 0 0 1px rgba(255,255,255,.025); }
+    .fps-viewport { position:absolute; inset:0; background:radial-gradient(circle at 50% 45%,#1d3448 0,#07111b 68%); }
+    .fps-viewport canvas { display:block; width:100%; height:100%; touch-action:none; outline:none; }
+    .fps-vignette { position:absolute; inset:0; pointer-events:none; background:radial-gradient(ellipse at center,transparent 38%,rgba(0,0,0,.22) 73%,rgba(0,0,0,.62) 100%); }
+    .fps-hud { position:absolute; z-index:4; top:15px; left:15px; display:flex; gap:8px; max-width:calc(100% - 30px); pointer-events:none; }
+    .fps-hud-card { min-width:92px; padding:8px 10px; color:#d7e8f7; background:rgba(4,13,22,.79); border:1px solid rgba(114,178,224,.42); border-radius:9px; box-shadow:0 8px 22px rgba(0,0,0,.22); }
+    .fps-hud-card span,.fps-hud-card b { display:block; }.fps-hud-card span { color:#8ba8be; font-size:.61rem; font-weight:900; letter-spacing:.1em; text-transform:uppercase; }.fps-hud-card b { margin-top:2px; color:#f2f9ff; font-size:1rem; }.fps-hud-card.timer-card b { color:var(--green); font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
+    .fps-objective { position:absolute; z-index:4; top:16px; right:15px; width:min(390px,calc(100% - 330px)); margin:0; padding:9px 11px; color:#d8e9f8; background:rgba(4,13,22,.79); border:1px solid rgba(114,178,224,.34); border-radius:9px; font-size:.76rem; font-weight:750; pointer-events:none; }.fps-objective span { display:block; margin-top:4px; color:#a8c8dd; font-size:.7rem; }
+    .fps-objective b { color:var(--blue); }.fps-crosshair { position:absolute; z-index:5; top:50%; left:50%; width:22px; height:22px; pointer-events:none; transform:translate(-50%,-50%); }.fps-crosshair::before,.fps-crosshair::after { content:""; position:absolute; background:rgba(235,247,255,.95); box-shadow:0 0 8px rgba(110,185,255,.8); }.fps-crosshair::before { top:10px; left:0; width:22px; height:2px; }.fps-crosshair::after { top:0; left:10px; width:2px; height:22px; }
+    .fps-prompt { position:absolute; z-index:6; right:50%; bottom:25px; width:min(550px,calc(100% - 30px)); margin:0; padding:10px 13px; color:#e5f3ff; text-align:center; background:rgba(4,13,22,.84); border:1px solid rgba(110,185,255,.4); border-radius:10px; transform:translateX(50%); font-size:.83rem; font-weight:750; pointer-events:none; }.fps-prompt b { color:var(--green); }
+    .fps-enter-overlay { position:absolute; z-index:8; inset:0; display:grid; place-items:center; padding:20px; text-align:center; background:radial-gradient(circle at center,rgba(10,35,54,.32),rgba(2,8,14,.88)); }
+    .fps-enter-overlay.hidden { display:none!important; }.fps-enter-panel { width:min(540px,100%); padding:28px; background:rgba(7,18,29,.9); border:1px solid rgba(110,185,255,.55); border-radius:16px; box-shadow:0 22px 65px rgba(0,0,0,.38); }.fps-enter-panel h2 { margin-bottom:7px; font-size:clamp(1.35rem,3.4vw,2rem); }.fps-enter-panel p { margin:8px auto; color:#b8cce0; }.fps-enter-panel button { margin-top:12px; }.fps-control-help { color:#87a8c1!important; font-size:.78rem; }
+    .fps-touch-controls { position:absolute; z-index:9; inset:auto 0 0; display:none; justify-content:space-between; align-items:flex-end; padding:17px; pointer-events:none; }.fps-touch-pad { display:grid; grid-template-columns:repeat(3,48px); grid-template-rows:repeat(2,45px); gap:4px; pointer-events:auto; }.fps-touch-pad button,.fps-use-button { display:grid; min-width:0; min-height:0; place-items:center; padding:0; color:#e9f7ff; background:rgba(10,28,43,.86); border:1px solid rgba(110,185,255,.55); border-radius:12px; box-shadow:none; font-size:1.1rem; }.fps-touch-pad button:nth-child(1) { grid-column:2; }.fps-touch-pad button:nth-child(2) { grid-column:1; grid-row:2; }.fps-touch-pad button:nth-child(3) { grid-column:2; grid-row:2; }.fps-touch-pad button:nth-child(4) { grid-column:3; grid-row:2; }.fps-use-button { width:74px; height:74px; flex:0 0 auto; color:#05131d; background:var(--green); border-color:#8bf1c3; font-size:.8rem; font-weight:950; letter-spacing:.08em; pointer-events:auto; }
+    .fps-game.terminal-open .fps-crosshair { opacity:.18; }.fps-game.terminal-open .fps-prompt { opacity:0; }.fps-game.terminal-open .fps-touch-controls { display:none!important; }
     .map-caption { margin:12px 0 0; color:#aabbd0; font-size:.81rem; }
     .event-log { margin-top:15px; padding-top:14px; border-top:1px solid #2b3a4c; }
     .event-log h3 { margin-bottom:8px; }.event-log ul { display:grid; gap:7px; max-height:180px; margin:0; padding:0; overflow:auto; list-style:none; }
@@ -228,7 +247,9 @@
       .app { width:min(100% - 22px,1240px); padding-top:13px; }.topbar { align-items:flex-start; }.brand span { display:none; }.top-actions button { padding-inline:10px; }
       .card { padding:16px; }.alert-grid,.choice-grid,.scan-grid,.rack-wall,.difficulty-grid,.sequence-grid { grid-template-columns:1fr; }.challenge-head { align-items:flex-start; }.badge { display:none; }.code-box { flex-direction:column; }.code-box button { width:100%; }.result-grid,.team-roster,.join-fields { grid-template-columns:1fr; }.map-heading { display:block; }.map-legend { margin-top:11px; }
       .floor-plan.isometric { min-width:0; }.iso-zone.zone { min-height:40px; padding:6px 7px; }.iso-zone .zone-copy b { font-size:.67rem; }.iso-zone .zone-copy span { display:none; }.isometric .noc-zone,.isometric .diagnose-zone { width:96px; }.isometric .recovery-zone { width:113px; }.isometric .exit-zone { width:94px; }.isometric .rack-target { min-width:84px; }.three-navigation { grid-template-columns:repeat(2,minmax(0,1fr)); }.three-status { max-width:calc(100% - 128px); font-size:.58rem; }.map-view-reset { right:9px; padding-inline:7px; }
+      .fps-game { min-height:calc(100svh - 164px); border-radius:13px; }.fps-hud { top:10px; left:10px; gap:5px; }.fps-hud-card { min-width:72px; padding:6px 7px; }.fps-hud-card b { font-size:.83rem; }.fps-objective { top:91px; left:10px; right:auto; width:calc(100% - 20px); font-size:.7rem; }.fps-touch-controls { display:flex; }.fps-enter-panel { padding:22px 17px; }.fps-prompt { bottom:111px; font-size:.73rem; }
     }
+    @media (pointer:coarse) { .fps-touch-controls { display:flex; } }
     @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation:none!important; transition:none!important; } }
   </style>
 </head>
@@ -569,6 +590,37 @@
             </div>
           </div>
         </section>
+      </section>
+
+      <section id="fpsGame" class="fps-game hidden" aria-label="First-person fictional data center training room">
+        <div id="fpsViewport" class="fps-viewport" role="application" aria-label="First-person fictional data center. Desktop: click Enter room, use WASD to move, mouse to look, and E to use terminals. Mobile: drag to look and use the on-screen movement and Use controls."></div>
+        <div class="fps-vignette" aria-hidden="true"></div>
+        <div class="fps-hud" aria-live="polite">
+          <div class="fps-hud-card timer-card"><span>Time</span><b id="fpsHudTimer">--:--</b></div>
+          <div class="fps-hud-card"><span>Score</span><b id="fpsHudScore">100</b></div>
+          <div class="fps-hud-card"><span>Progress</span><b id="fpsHudProgress">0 / 6</b></div>
+        </div>
+        <p id="fpsObjective" class="fps-objective"><b>Objective:</b> Preparing 3D training room…</p>
+        <div class="fps-crosshair" aria-hidden="true"></div>
+        <p id="fpsPrompt" class="fps-prompt">Loading fictional 3D training room…</p>
+        <div id="fpsEnterOverlay" class="fps-enter-overlay">
+          <div class="fps-enter-panel">
+            <p class="eyebrow">First-person training mode</p>
+            <h2>Enter the fictional data hall</h2>
+            <p>Every investigation, choice, recovery step, and exit action happens on 3D terminals in the room.</p>
+            <button id="fpsEnterButton" type="button">Enter 3D room</button>
+            <p class="fps-control-help">Desktop: WASD / arrow keys to move · mouse to look · E to use · Esc pauses. Mobile: drag to look, use the movement pad, then tap USE.</p>
+          </div>
+        </div>
+        <div id="fpsTouchControls" class="fps-touch-controls" aria-label="Touch movement controls">
+          <div class="fps-touch-pad">
+            <button type="button" data-fps-move="forward" aria-label="Move forward">▲</button>
+            <button type="button" data-fps-move="left" aria-label="Move left">◀</button>
+            <button type="button" data-fps-move="back" aria-label="Move backward">▼</button>
+            <button type="button" data-fps-move="right" aria-label="Move right">▶</button>
+          </div>
+          <button id="fpsUseButton" class="fps-use-button" type="button">USE</button>
+        </div>
       </section>
     </section>
     <p class="footer">Data Center Escape is a fictional training game. It contains no connection to real systems, equipment, or operational controls.</p>
@@ -923,7 +975,8 @@
       db:window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY) : null,
       joined:false, player:null, sessionCode:'', lobbyTimer:null, isHost:false, hostName:'', sharedRunNumber:0, sharedStartedAt:null, lobbyRequestInFlight:false,
       pendingStartTimer:null, pendingCountdownTimer:null, pendingStartAt:null, pendingStartLocalMs:null,
-      scenarioKey:null, scenario:null
+      scenarioKey:null, scenario:null,
+      fpsGame:null, fpsActive:false
     };
     const $ = selector => document.querySelector(selector);
     const $$ = selector => [...document.querySelectorAll(selector)];
@@ -1350,6 +1403,808 @@
         recovered:Boolean(scenario && state.stage >= state.config.exitStage)
       });
     }
+    function fpsButtonCopy(selector) {
+      const button = document.querySelector(selector);
+      if (!button) return { title:'Unavailable', summary:'This fictional terminal is not available.', disabled:true };
+      return {
+        title:(button.querySelector('b') || button).textContent.trim(),
+        summary:(button.querySelector('b + span') || button.querySelector('span:last-child') || {}).textContent || '',
+        disabled:button.disabled || button.classList.contains('hidden')
+      };
+    }
+    function fpsObjectiveCopy() {
+      if (state.finished) return state.seconds === 0 ? 'Simulation paused. Wait for the host to restart the fictional room.' : 'Simulation complete. Reach the exit screen to review your result.';
+      if (state.stage === 0) return 'Reach the NOC console and inspect every required fictional alert.';
+      if (state.stage === 1) return 'Reach the timeline desk and rebuild the fictional incident in the correct order.';
+      if (state.stage === 2) return 'Reach the incident board and identify the modeled root cause.';
+      if (state.stage === 3) return 'Explore the hall, scan every required virtual asset, then enter the recovery key.';
+      if (state.stage === 4) return 'Reach the recovery console and complete the approved virtual sequence.';
+      if (state.stage === 5) return 'Inspect the required virtual validation points before exiting.';
+      if (state.difficulty === 'hard' && state.stage === 6) return 'Return to the incident board and confirm the hard-mode fictional root cause.';
+      if (state.stage >= state.config.exitStage) return 'Reach the exit interlock and finish the simulation.';
+      return 'Follow the highlighted virtual objective.';
+    }
+    function fpsTargetStatus(target) {
+      const allClues = completed(state.clues, state.config.clues);
+      const allScans = completed(state.scans, state.config.scans);
+      const allValidations = completed(state.validations, state.config.validations);
+      if (state.finished) return { level:'complete', message:state.seconds === 0 ? 'Simulation timed out.' : 'Simulation complete.' };
+      switch (target.kind) {
+        case 'noc': return state.stage === 0 ? { level:'available', message:'Inspect virtual NOC evidence.' } : { level:'complete', message:allClues ? 'Evidence collection complete.' : 'NOC console is not the current objective.' };
+        case 'timeline': return state.stage === 1 ? { level:'available', message:'Rebuild the fictional incident timeline.' } : { level:state.stage > 1 ? 'complete' : 'locked', message:state.stage > 1 ? 'Timeline complete.' : 'Collect NOC evidence first.' };
+        case 'incident':
+          if (state.stage === 2) return { level:'available', message:'Choose the modeled root cause.' };
+          if (state.difficulty === 'hard' && state.stage === 6) return { level:'available', message:'Confirm the hard-mode incident summary.' };
+          return { level:state.stage > 2 ? 'complete' : 'locked', message:state.stage > 2 ? 'Incident board complete.' : 'Complete the timeline first.' };
+        case 'scan':
+          if (state.stage !== 3) return { level:state.stage > 3 ? 'complete' : 'locked', message:state.stage > 3 ? 'Virtual asset trace complete.' : 'Identify the root cause first.' };
+          if (!state.config.scans.includes(target.type)) return { level:'locked', message:'This virtual asset is optional at the selected difficulty.' };
+          return state.scans.has(target.type) ? { level:'complete', message:'Virtual label collected.' } : { level:'available', message:'Scan this virtual asset.' };
+        case 'keypad': return state.stage === 3 && allScans ? { level:'available', message:'Enter the virtual recovery key.' } : { level:state.stage > 3 ? 'complete' : 'locked', message:state.stage > 3 ? 'Recovery key accepted.' : 'Collect every required virtual label first.' };
+        case 'recovery': return state.stage === 4 ? { level:'available', message:'Complete the virtual recovery sequence.' } : { level:state.stage > 4 ? 'complete' : 'locked', message:state.stage > 4 ? 'Virtual recovery complete.' : 'Recovery console stays locked until the key is accepted.' };
+        case 'validation':
+          if (state.stage !== 5) return { level:state.stage > 5 ? 'complete' : 'locked', message:state.stage > 5 ? 'Validation complete.' : 'Complete virtual recovery first.' };
+          if (!state.config.validations.includes(target.type)) return { level:'locked', message:'This validation point is optional at the selected difficulty.' };
+          return state.validations.has(target.type) ? { level:'complete', message:'Virtual validation recorded.' } : { level:'available', message:'Validate this simulated signal.' };
+        case 'exit': return state.stage >= state.config.exitStage ? { level:'available', message:'Exit interlock ready.' } : { level:'locked', message:'Complete every required virtual objective first.' };
+        default: return { level:'locked', message:'Terminal unavailable.' };
+      }
+    }
+    function fpsDefaultTarget(game) {
+      const available = game.targets.filter(target => fpsTargetStatus(target).level === 'available');
+      if (state.stage === 3) {
+        const scan = available.find(target => target.kind === 'scan');
+        return scan || available.find(target => target.kind === 'keypad') || available[0];
+      }
+      if (state.stage === 5) return available.find(target => target.kind === 'validation') || available[0];
+      return available[0];
+    }
+    function updateFpsExperience(force) {
+      const game = state.fpsGame;
+      if (!game) return;
+      const objectiveCount = Math.min(state.config.objectiveTotal, state.stage);
+      $('#fpsHudTimer').textContent = clock(state.seconds);
+      $('#fpsHudScore').textContent = String(state.score);
+      $('#fpsHudProgress').textContent = objectiveCount + ' / ' + state.config.objectiveTotal;
+      const hudNote = $('#hudMessage').textContent.trim();
+      $('#fpsObjective').innerHTML = '<b>Objective:</b> ' + escapeHtml(fpsObjectiveCopy()) + (hudNote ? '<span>' + escapeHtml(hudNote) + '</span>' : '');
+      const signature = [state.started,state.finished,state.stage,state.seconds,state.score,state.difficulty,state.scenarioKey,[...state.clues].sort().join(','),[...state.scans].sort().join(','),[...state.validations].sort().join(','),state.timelineIndex,state.runbookIndex,game.codeBuffer].join('|');
+      if (!force && game.lastSignature === signature) return;
+      game.lastSignature = signature;
+      game.updateWorld();
+      if (game.terminalOpen) game.drawTerminal();
+    }
+    function destroyFpsExperience() {
+      const game = state.fpsGame;
+      if (!game) return;
+      if (document.pointerLockElement === game.canvas && document.exitPointerLock) document.exitPointerLock();
+      if (game.frame) cancelAnimationFrame(game.frame);
+      if (game.resizeObserver) game.resizeObserver.disconnect();
+      if (game.listeners) game.listeners.forEach(item => item.target.removeEventListener(item.type, item.handler, item.options));
+      const disposedGeometries = new Set();
+      const disposedMaterials = new Set();
+      game.scene.traverse(node => {
+        if (node.geometry && !disposedGeometries.has(node.geometry)) { disposedGeometries.add(node.geometry); node.geometry.dispose(); }
+        const materials = node.material ? (Array.isArray(node.material) ? node.material : [node.material]) : [];
+        materials.forEach(material => {
+          if (!material || disposedMaterials.has(material)) return;
+          disposedMaterials.add(material);
+          if (material.map) material.map.dispose();
+          material.dispose();
+        });
+      });
+      if (game.renderer) game.renderer.dispose();
+      if (game.holder) game.holder.replaceChildren();
+      $('#fpsGame').classList.add('hidden');
+      $('#game').classList.remove('fps-mode');
+      document.body.classList.remove('fps-playing');
+      state.fpsGame = null;
+      state.fpsActive = false;
+    }
+    function resizeFpsExperience() {
+      const game = state.fpsGame;
+      if (!game) return;
+      const rect = game.holder.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      game.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+      game.renderer.setSize(Math.max(1, Math.floor(rect.width)), Math.max(1, Math.floor(rect.height)), false);
+      game.camera.aspect = rect.width / rect.height;
+      game.camera.updateProjectionMatrix();
+    }
+    function createFpsExperience() {
+      const holder = $('#fpsViewport');
+      if (!holder || !window.THREE) return null;
+      const THREE = window.THREE;
+      const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:false, powerPreference:'high-performance' });
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(74, 1, .1, 100);
+      const player = new THREE.Vector3(0, 1.7, 10.1);
+      const raycaster = new THREE.Raycaster();
+      const pointer = new THREE.Vector2();
+      const terminalCanvas = document.createElement('canvas');
+      terminalCanvas.width = 1024;
+      terminalCanvas.height = 640;
+      const terminalContext = terminalCanvas.getContext('2d');
+      const terminalTexture = new THREE.CanvasTexture(terminalCanvas);
+      if ('colorSpace' in terminalTexture && THREE.SRGBColorSpace) terminalTexture.colorSpace = THREE.SRGBColorSpace;
+      const terminalRoot = new THREE.Group();
+      const terminalMaterial = new THREE.MeshBasicMaterial({ map:terminalTexture, side:THREE.DoubleSide, transparent:true, depthWrite:false });
+      const terminalScreen = new THREE.Mesh(new THREE.PlaneGeometry(10.8, 6.75), terminalMaterial);
+      const terminalFrame = new THREE.Mesh(new THREE.BoxGeometry(11.08, 7.03, .12), new THREE.MeshBasicMaterial({ color:0x122b3f, transparent:true, opacity:.95 }));
+      const terminalGlow = new THREE.PointLight(0x6eb9ff, 1.6, 10, 2);
+      const game = {
+        THREE:THREE, holder:holder, renderer:renderer, scene:scene, camera:camera, player:player, raycaster:raycaster, pointer:pointer,
+        terminalCanvas:terminalCanvas, terminalContext:terminalContext, terminalTexture:terminalTexture, terminalRoot:terminalRoot, terminalScreen:terminalScreen,
+        terminalOpen:false, terminalTarget:null, terminalInput:false, codeBuffer:'', terminalHitboxes:[], targets:[], keys:new Set(), listeners:[],
+        yaw:0, pitch:0, pointerLocked:false, entered:false, touchLook:null, nearest:null, lastSignature:'', lastUiAt:0, frame:null, resizeObserver:null,
+        colliders:[
+          { minX:-6.8, maxX:6.8, minZ:-1.5, maxZ:.5 },
+          { minX:-6.8, maxX:6.8, minZ:2.05, maxZ:4.05 }
+        ]
+      };
+      const addListener = (target, type, handler, options) => {
+        target.addEventListener(type, handler, options);
+        game.listeners.push({ target:target, type:type, handler:handler, options:options });
+      };
+      const makeMaterial = (color, options) => new THREE.MeshStandardMaterial(Object.assign({ color:color, roughness:.67, metalness:.38, emissive:0x000000, emissiveIntensity:0 }, options || {}));
+      const addBox = (parent, size, position, color, options) => {
+        const mesh = new THREE.Mesh(new THREE.BoxGeometry(size[0], size[1], size[2]), makeMaterial(color, options));
+        mesh.position.set(position[0], position[1], position[2]);
+        if (options && options.rotation) mesh.rotation.set(options.rotation[0] || 0, options.rotation[1] || 0, options.rotation[2] || 0);
+        parent.add(mesh);
+        return mesh;
+      };
+      const addCylinder = (parent, radius, height, position, color, options) => {
+        const mesh = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, height, 18), makeMaterial(color, options));
+        mesh.position.set(position[0], position[1], position[2]);
+        if (options && options.rotation) mesh.rotation.set(options.rotation[0] || 0, options.rotation[1] || 0, options.rotation[2] || 0);
+        parent.add(mesh);
+        return mesh;
+      };
+      renderer.setClearColor(0x050b12, 1);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+      if ('outputColorSpace' in renderer && THREE.SRGBColorSpace) renderer.outputColorSpace = THREE.SRGBColorSpace;
+      if (THREE.ACESFilmicToneMapping) renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.04;
+      renderer.domElement.tabIndex = 0;
+      renderer.domElement.setAttribute('aria-label', 'First-person fictional data center training room.');
+      holder.replaceChildren(renderer.domElement);
+      scene.background = new THREE.Color(0x07131f);
+      scene.fog = new THREE.Fog(0x07131f, 20, 48);
+      scene.add(new THREE.HemisphereLight(0x9dd9ff, 0x071018, 2.1));
+      const keyLight = new THREE.DirectionalLight(0xc9e8ff, 2.15);
+      keyLight.position.set(2, 14, 7);
+      scene.add(keyLight);
+      const redLight = new THREE.PointLight(0x9b3234, 8, 18, 2);
+      redLight.position.set(6, 4.5, 0);
+      scene.add(redLight);
+      const blueLight = new THREE.PointLight(0x2a82c2, 7, 18, 2);
+      blueLight.position.set(-7, 4.5, -4);
+      scene.add(blueLight);
+      const world = new THREE.Group();
+      const floor = new THREE.Mesh(new THREE.PlaneGeometry(32, 24), makeMaterial(0x112436, { roughness:.86, metalness:.22 }));
+      floor.rotation.x = -Math.PI / 2;
+      world.add(floor);
+      const grid = new THREE.GridHelper(32, 32, 0x315975, 0x173247);
+      grid.position.y = .012;
+      world.add(grid);
+      const coldAisle = new THREE.Mesh(new THREE.PlaneGeometry(16.5, 2.4), new THREE.MeshBasicMaterial({ color:0x1f78b8, transparent:true, opacity:.18, depthWrite:false }));
+      coldAisle.rotation.x = -Math.PI / 2;
+      coldAisle.position.set(0, .022, 1.25);
+      world.add(coldAisle);
+      const hotAisle = new THREE.Mesh(new THREE.PlaneGeometry(16.5, 2.3), new THREE.MeshBasicMaterial({ color:0x963534, transparent:true, opacity:.13, depthWrite:false }));
+      hotAisle.rotation.x = -Math.PI / 2;
+      hotAisle.position.set(0, .027, -2.55);
+      world.add(hotAisle);
+      const wallMaterial = makeMaterial(0x183044, { roughness:.74, metalness:.34 });
+      [[0, 3.55, -12, 32, 7.1, .32], [0, 3.55, 12, 32, 7.1, .32], [-16, 3.55, 0, .32, 7.1, 24], [16, 3.55, 0, .32, 7.1, 24]].forEach(item => {
+        const wall = new THREE.Mesh(new THREE.BoxGeometry(item[3], item[4], item[5]), wallMaterial);
+        wall.position.set(item[0], item[1], item[2]);
+        world.add(wall);
+      });
+      const ceiling = new THREE.Mesh(new THREE.BoxGeometry(32, .18, 24), makeMaterial(0x102232, { roughness:.78, metalness:.29 }));
+      ceiling.position.set(0, 7.12, 0);
+      world.add(ceiling);
+      for (let x = -12; x <= 12; x += 6) addBox(world, [.16, 6.8, 23], [x, 3.5, 0], 0x25445d, { metalness:.57 });
+      const roomLabel = makeThreeLabel(THREE, 'DATA HALL A · FICTIONAL TRAINING SIMULATION', '#6eb9ff');
+      roomLabel.position.set(0, 5.7, -11.72);
+      roomLabel.scale.set(8.2, 1.3, 1);
+      world.add(roomLabel);
+      const rackGeometry = new THREE.BoxGeometry(1.15, 3.35, 1.25);
+      const rackMaterial = makeMaterial(0x203744, { metalness:.55, roughness:.58 });
+      const rackPositions = [];
+      [-.75, 2.95].forEach(z => [-6,-4.5,-3,-1.5,0,1.5,3,4.5,6].forEach(x => rackPositions.push([x,z])));
+      const racks = new THREE.InstancedMesh(rackGeometry, rackMaterial, rackPositions.length);
+      const matrix = new THREE.Matrix4();
+      rackPositions.forEach((position, index) => {
+        matrix.makeTranslation(position[0], 1.68, position[1]);
+        racks.setMatrixAt(index, matrix);
+      });
+      world.add(racks);
+      const rackStripes = new THREE.Mesh(new THREE.BoxGeometry(13.5, .075, .075), makeMaterial(0x4b7189, { emissive:0x0b2840, emissiveIntensity:.35, metalness:.2 }));
+      [-.75,2.95].forEach(z => {
+        for (let y = .7; y < 3; y += .45) {
+          const stripe = rackStripes.clone();
+          stripe.position.set(0, y, z - .67);
+          world.add(stripe);
+        }
+      });
+      const makeTerminal = (definition, color) => {
+        const group = new THREE.Group();
+        group.position.set(definition.position[0], 0, definition.position[1]);
+        addBox(group, [3.45, .6, 1.85], [0, .62, 0], 0x28495f, { metalness:.54 });
+        addBox(group, [2.75, 1.72, .12], [0, 1.78, -.73], color, { emissive:color, emissiveIntensity:.56, metalness:.19, rotation:[-.11,0,0] });
+        [-1.22,1.22].forEach(x => addBox(group, [.18,1.1,.18], [x,.16,0], 0x415d70, { metalness:.62 }));
+        const ringMaterial = new THREE.MeshBasicMaterial({ color:0x546d80, transparent:true, opacity:.7, depthWrite:false });
+        const ring = new THREE.Mesh(new THREE.TorusGeometry(2.18,.08,8,42), ringMaterial);
+        ring.rotation.x = Math.PI / 2;
+        ring.position.y = .06;
+        group.add(ring);
+        const label = makeThreeLabel(THREE, definition.title, '#6eb9ff');
+        label.position.set(0,3.58,0);
+        group.add(label);
+        world.add(group);
+        game.targets.push(Object.assign({}, definition, { group:group, ring:ring, ringMaterial:ringMaterial, accent:group.children[1].material, position:new THREE.Vector3(definition.position[0], 0, definition.position[1]) }));
+      };
+      const makeEquipment = (definition, color, model) => {
+        const group = new THREE.Group();
+        group.position.set(definition.position[0], 0, definition.position[1]);
+        const body = model(group, color);
+        const ringMaterial = new THREE.MeshBasicMaterial({ color:0x546d80, transparent:true, opacity:.7, depthWrite:false });
+        const ring = new THREE.Mesh(new THREE.TorusGeometry(definition.ring || 1.75,.07,8,40), ringMaterial);
+        ring.rotation.x = Math.PI / 2;
+        ring.position.y = .06;
+        group.add(ring);
+        const label = makeThreeLabel(THREE, definition.title, '#6eb9ff');
+        label.position.set(0,definition.labelHeight || 3.7,0);
+        group.add(label);
+        world.add(group);
+        game.targets.push(Object.assign({}, definition, { group:group, ring:ring, ringMaterial:ringMaterial, accent:body.material || null, position:new THREE.Vector3(definition.position[0], 0, definition.position[1]) }));
+      };
+      const cabinetModel = (group, color) => {
+        const body = addBox(group, [1.75,3.2,1.25], [0,1.6,0], 0x344e5f, { metalness:.62 });
+        addBox(group, [1.18,.5,.08], [0,2.32,-.67], color, { emissive:color, emissiveIntensity:.62, metalness:.17 });
+        addCylinder(group,.075,.08,[.48,.74,-.69],color,{ emissive:color, emissiveIntensity:.9, rotation:[Math.PI/2,0,0] });
+        return body;
+      };
+      const rackModel = (group, color) => {
+        const body = addBox(group, [1.5,3.5,1.45], [0,1.75,0], 0x352c35, { metalness:.57 });
+        for (let y=.7;y<3.1;y+=.42) addBox(group,[1.12,.055,.05],[0,y,-.76],0x5e7990,{ emissive:0x153149, emissiveIntensity:.26, metalness:.2 });
+        addCylinder(group,.09,.07,[.52,.6,-.78],color,{emissive:color,emissiveIntensity:.95,rotation:[Math.PI/2,0,0]});
+        return body;
+      };
+      const cracModel = (group, color) => {
+        const body = addBox(group,[2.35,4.05,1.6],[0,2.02,0],0x22536b,{metalness:.46});
+        [-.6,-.2,.2,.6].forEach(x => addBox(group,[.11,2.3,.06],[x,2.18,-.84],0x7dd8fb,{emissive:0x176c91,emissiveIntensity:.56,metalness:.18}));
+        addCylinder(group,.4,.1,[0,3.22,-.9],color,{emissive:color,emissiveIntensity:.62,rotation:[Math.PI/2,0,0]});
+        return body;
+      };
+      makeTerminal({ id:'noc', kind:'noc', title:'NOC CONSOLE', position:[-11.2,-7.25], assetKeys:['noc'] }, 0x2c7caa);
+      makeTerminal({ id:'timeline', kind:'timeline', title:'TIMELINE DESK', position:[-5.4,-7.25], assetKeys:['noc'] }, 0x7f5caa);
+      makeTerminal({ id:'incident', kind:'incident', title:'INCIDENT BOARD', position:[11.1,-7.25], assetKeys:['incident'] }, 0x9a5a3e);
+      makeEquipment({ id:'scan-pdu', kind:'scan', type:'pdu', title:'PDU-B · VIRTUAL', position:[10.4,-.25], assetKeys:['power-b'], ring:1.75 }, 0xe23c36, cabinetModel);
+      makeEquipment({ id:'scan-rack', kind:'scan', type:'rack', title:'RACK C14 · VIRTUAL', position:[7.8,1.25], assetKeys:['rack'], ring:1.75 }, 0xe23c36, rackModel);
+      makeEquipment({ id:'scan-crac', kind:'scan', type:'crac', title:'CRAC-1 · VIRTUAL', position:[-12.3,2.45], assetKeys:['cooling'], ring:2.15, labelHeight:4.58 }, 0x55cdf4, cracModel);
+      makeEquipment({ id:'scan-ups', kind:'scan', type:'ups', title:'UPS-A · VIRTUAL', position:[-12.0,7.45], assetKeys:['power-a'], ring:1.75 }, 0x42cf91, cabinetModel);
+      makeEquipment({ id:'scan-tor', kind:'scan', type:'tor', title:'TOR-07 · VIRTUAL', position:[6.2,6.25], assetKeys:['rack'], ring:1.75 }, 0x6eb9ff, rackModel);
+      makeTerminal({ id:'keypad', kind:'keypad', title:'RECOVERY KEY PAD', position:[.2,6.9], assetKeys:['rack'] }, 0xf6bd4d);
+      makeTerminal({ id:'recovery', kind:'recovery', title:'RECOVERY CONSOLE', position:[-8.7,8.3], assetKeys:['recovery'] }, 0x42cf91);
+      makeEquipment({ id:'validation-power', kind:'validation', type:'power', title:'POWER VALIDATION', position:[10.9,6.9], assetKeys:['power-b'], ring:1.55 }, 0x42cf91, cabinetModel);
+      makeEquipment({ id:'validation-thermal', kind:'validation', type:'thermal', title:'THERMAL VALIDATION', position:[-8.8,2.9], assetKeys:['cooling-secondary'], ring:2.0, labelHeight:4.58 }, 0x58d6f8, cracModel);
+      makeEquipment({ id:'validation-workload', kind:'validation', type:'workload', title:'WORKLOAD VALIDATION', position:[1.7,8.1], assetKeys:['rack'], ring:1.55 }, 0x42cf91, rackModel);
+      const exitGroup = new THREE.Group();
+      exitGroup.position.set(12.0,0,9.25);
+      [-1.55,1.55].forEach(x => addBox(exitGroup,[.3,4.2,.5],[x,2.1,0],0x435c6e,{metalness:.6}));
+      addBox(exitGroup,[3.4,.32,.5],[0,4.02,0],0x435c6e,{metalness:.6});
+      const exitDoor = addBox(exitGroup,[2.55,3.45,.14],[0,1.86,-.24],0x286050,{emissive:0x1e664d,emissiveIntensity:.5,metalness:.32});
+      const exitRingMaterial = new THREE.MeshBasicMaterial({color:0x546d80,transparent:true,opacity:.7,depthWrite:false});
+      const exitRing = new THREE.Mesh(new THREE.TorusGeometry(2.45,.08,8,42),exitRingMaterial);
+      exitRing.rotation.x = Math.PI/2; exitRing.position.y=.06; exitGroup.add(exitRing);
+      const exitLabel = makeThreeLabel(THREE,'EXIT INTERLOCK','#6eb9ff'); exitLabel.position.set(0,4.85,0); exitGroup.add(exitLabel);
+      world.add(exitGroup);
+      game.targets.push({ id:'exit', kind:'exit', title:'EXIT INTERLOCK', assetKeys:['exit'], group:exitGroup, ring:exitRing, ringMaterial:exitRingMaterial, accent:exitDoor.material, position:new THREE.Vector3(12,0,9.25) });
+      const cracTwo = new THREE.Group(); cracTwo.position.set(12.4,0,2.45); cracModel(cracTwo,0x55cdf4); const cracTwoLabel=makeThreeLabel(THREE,'CRAC-2','#6eb9ff');cracTwoLabel.position.set(0,4.58,0);cracTwo.add(cracTwoLabel);world.add(cracTwo);
+      const powerA = new THREE.Group(); powerA.position.set(-12.1,0,-.25);cabinetModel(powerA,0x42cf91);const powerALabel=makeThreeLabel(THREE,'PDU-A','#6eb9ff');powerALabel.position.set(0,3.72,0);powerA.add(powerALabel);world.add(powerA);
+      const beacon = new THREE.Mesh(new THREE.ConeGeometry(.32,1.05,12),new THREE.MeshBasicMaterial({color:0x6eb9ff,transparent:true,opacity:.88,depthWrite:false}));
+      beacon.rotation.x = Math.PI; beacon.visible=false; world.add(beacon); game.beacon=beacon;
+      scene.add(world);
+      terminalScreen.position.z = -4.25;
+      terminalFrame.position.z = -4.40;
+      terminalGlow.position.set(0,0,-2.7);
+      terminalRoot.add(terminalFrame,terminalScreen,terminalGlow);
+      terminalRoot.visible = false;
+      camera.add(terminalRoot);
+      scene.add(camera);
+      game.updateCamera = () => {
+        camera.position.copy(game.player);
+        camera.rotation.order = 'YXZ';
+        camera.rotation.y = game.yaw;
+        camera.rotation.x = game.pitch;
+        camera.rotation.z = 0;
+      };
+      game.isBlocked = position => {
+        if (position.x < -15.1 || position.x > 15.1 || position.z < -11.1 || position.z > 11.1) return true;
+        return game.colliders.some(collider => position.x > collider.minX - .42 && position.x < collider.maxX + .42 && position.z > collider.minZ - .42 && position.z < collider.maxZ + .42);
+      };
+      game.move = dt => {
+        if (!game.entered || game.terminalOpen || state.finished) return;
+        const forwardValue = (game.keys.has('forward') ? 1 : 0) - (game.keys.has('back') ? 1 : 0);
+        const sideValue = (game.keys.has('right') ? 1 : 0) - (game.keys.has('left') ? 1 : 0);
+        if (!forwardValue && !sideValue) return;
+        const forward = new THREE.Vector3(-Math.sin(game.yaw),0,-Math.cos(game.yaw));
+        const right = new THREE.Vector3(Math.cos(game.yaw),0,-Math.sin(game.yaw));
+        const delta = forward.multiplyScalar(forwardValue).add(right.multiplyScalar(sideValue));
+        if (delta.lengthSq() > 1) delta.normalize();
+        delta.multiplyScalar(dt * 5.2);
+        const xOnly = game.player.clone(); xOnly.x += delta.x;
+        if (!game.isBlocked(xOnly)) game.player.x = xOnly.x;
+        const zOnly = game.player.clone(); zOnly.z += delta.z;
+        if (!game.isBlocked(zOnly)) game.player.z = zOnly.z;
+      };
+      game.updateNearest = () => {
+        if (game.terminalOpen || !game.entered) { game.nearest = null; return; }
+        const closeTargets = game.targets.map(target => ({ target:target, distance:Math.hypot(target.position.x - game.player.x,target.position.z - game.player.z) })).filter(item => item.distance < 3.35).sort((a,b) => a.distance - b.distance);
+        game.nearest = closeTargets.length ? closeTargets[0].target : null;
+        const prompt = $('#fpsPrompt');
+        const lookPrefix = !game.isTouch && !game.pointerLocked ? 'Click the room to look around · ' : '';
+        if (!game.nearest) { prompt.textContent = lookPrefix + 'Move through the fictional data hall to the highlighted objective.'; return; }
+        const targetState = fpsTargetStatus(game.nearest);
+        prompt.innerHTML = lookPrefix + '<b>' + (game.isTouch ? 'USE' : 'E') + '</b> · ' + escapeHtml(game.nearest.title) + ' — ' + escapeHtml(targetState.message);
+      };
+      game.updateWorld = () => {
+        const alerts = new Set(state.scenario && state.scenario.map ? state.scenario.map.alertAssets || [] : []);
+        const focus = state.scenario && state.scenario.map ? state.scenario.map.focus : '';
+        const preferred = fpsDefaultTarget(game);
+        game.targets.forEach(target => {
+          const status = fpsTargetStatus(target);
+          const alert = target.assetKeys && target.assetKeys.some(key => alerts.has(key));
+          const focused = target.assetKeys && target.assetKeys.includes(focus);
+          const preferredTarget = preferred && preferred.id === target.id;
+          const color = status.level === 'complete' ? 0x42cf91 : preferredTarget ? 0x6eb9ff : alert || focused ? 0xe23c36 : 0x526a7d;
+          target.ring.visible = status.level !== 'locked' || alert || focused;
+          target.ringMaterial.color.setHex(color);
+          target.ringMaterial.opacity = status.level === 'locked' ? .22 : .78;
+          if (target.accent && target.accent.emissive) {
+            target.accent.emissive.setHex(color);
+            target.accent.emissiveIntensity = status.level === 'locked' ? .15 : .5;
+          }
+        });
+        if (preferred) {
+          game.beacon.visible = true;
+          game.beacon.position.set(preferred.position.x,4.55 + Math.sin(performance.now()/350)*.12,preferred.position.z);
+        } else game.beacon.visible = false;
+        game.updateNearest();
+      };
+      game.drawTerminal = () => drawFpsTerminal(game);
+      game.openTerminal = target => {
+        if (!target) return;
+        game.terminalTarget = target;
+        game.terminalOpen = true;
+        game.terminalInput = target.kind === 'keypad' && fpsTargetStatus(target).level === 'available';
+        game.terminalRoot.visible = true;
+        $('#fpsGame').classList.add('terminal-open');
+        if (document.pointerLockElement === renderer.domElement && document.exitPointerLock) document.exitPointerLock();
+        game.drawTerminal();
+      };
+      game.closeTerminal = () => {
+        game.terminalOpen = false;
+        game.terminalInput = false;
+        game.terminalTarget = null;
+        game.terminalRoot.visible = false;
+        $('#fpsGame').classList.remove('terminal-open');
+        game.updateNearest();
+      };
+      game.useNearest = () => {
+        if (!game.entered) { game.enterRoom(); return; }
+        if (game.terminalOpen) return;
+        if (game.nearest) game.openTerminal(game.nearest);
+      };
+      game.enterRoom = () => {
+        game.entered = true;
+        $('#fpsEnterOverlay').classList.add('hidden');
+        renderer.domElement.focus();
+        game.requestPointerLock();
+        game.updateNearest();
+      };
+      game.activateTerminalAction = action => activateFpsTerminalAction(game, action);
+      game.getTerminalHit = event => {
+        const rect = renderer.domElement.getBoundingClientRect();
+        pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+        camera.updateMatrixWorld(true);
+        raycaster.setFromCamera(pointer,camera);
+        const hit = raycaster.intersectObject(terminalScreen,false)[0];
+        if (!hit || !hit.uv) return null;
+        const x = hit.uv.x * terminalCanvas.width;
+        const y = (1 - hit.uv.y) * terminalCanvas.height;
+        return game.terminalHitboxes.find(box => x >= box.x && x <= box.x + box.width && y >= box.y && y <= box.y + box.height) || null;
+      };
+      game.isTouch = Boolean(window.matchMedia && window.matchMedia('(pointer:coarse)').matches) || navigator.maxTouchPoints > 0;
+      game.requestPointerLock = () => {
+        if (game.isTouch || !renderer.domElement.requestPointerLock) return;
+        try {
+          const request = renderer.domElement.requestPointerLock();
+          if (request && typeof request.catch === 'function') request.catch(() => { $('#fpsPrompt').textContent = 'Mouse-look is unavailable. You can still move with the keyboard and use nearby terminals with E.'; });
+        } catch (error) {
+          $('#fpsPrompt').textContent = 'Mouse-look is unavailable. You can still move with the keyboard and use nearby terminals with E.';
+        }
+      };
+      addListener(document,'pointerlockchange',() => { game.pointerLocked = document.pointerLockElement === renderer.domElement; });
+      addListener(document,'mousemove',event => {
+        if (!state.fpsActive || !game.pointerLocked || game.terminalOpen) return;
+        game.yaw -= event.movementX * .00235;
+        game.pitch = Math.max(-1.22,Math.min(1.22,game.pitch - event.movementY * .0022));
+      });
+      addListener(window,'keydown',event => {
+        if (!state.fpsActive || state.fpsGame !== game) return;
+        if (game.terminalOpen) {
+          handleFpsTerminalKey(game,event);
+          return;
+        }
+        const moveKeys = { w:'forward',ArrowUp:'forward',s:'back',ArrowDown:'back',a:'left',ArrowLeft:'left',d:'right',ArrowRight:'right' };
+        if (moveKeys[event.key]) { game.keys.add(moveKeys[event.key]); event.preventDefault(); return; }
+        if (event.key.toLowerCase() === 'e' || event.key === 'Enter') { game.useNearest(); event.preventDefault(); }
+      });
+      addListener(window,'keyup',event => {
+        if (!state.fpsActive || state.fpsGame !== game) return;
+        const moveKeys = { w:'forward',ArrowUp:'forward',s:'back',ArrowDown:'back',a:'left',ArrowLeft:'left',d:'right',ArrowRight:'right' };
+        if (moveKeys[event.key]) game.keys.delete(moveKeys[event.key]);
+      });
+      addListener(renderer.domElement,'pointerdown',event => {
+        if (!state.fpsActive) return;
+        if (game.terminalOpen) {
+          const hit = game.getTerminalHit(event);
+          if (hit) game.activateTerminalAction(hit.action);
+          event.preventDefault();
+          return;
+        }
+        if (event.pointerType === 'touch') {
+          game.touchLook = { id:event.pointerId, x:event.clientX, y:event.clientY };
+          renderer.domElement.setPointerCapture(event.pointerId);
+          return;
+        }
+        if (!game.pointerLocked && game.entered) game.requestPointerLock();
+        else if (game.pointerLocked) game.useNearest();
+      });
+      addListener(renderer.domElement,'pointermove',event => {
+        if (!game.touchLook || game.touchLook.id !== event.pointerId || game.terminalOpen) return;
+        const dx = event.clientX - game.touchLook.x;
+        const dy = event.clientY - game.touchLook.y;
+        game.touchLook.x = event.clientX;
+        game.touchLook.y = event.clientY;
+        game.yaw -= dx * .009;
+        game.pitch = Math.max(-1.15,Math.min(1.15,game.pitch - dy * .008));
+      });
+      const clearTouchLook = event => {
+        if (game.touchLook && game.touchLook.id === event.pointerId) game.touchLook = null;
+      };
+      addListener(renderer.domElement,'pointerup',clearTouchLook);
+      addListener(renderer.domElement,'pointercancel',clearTouchLook);
+      $$('.fps-touch-pad [data-fps-move]').forEach(button => {
+        const press = event => { if (state.fpsGame === game) { game.keys.add(button.dataset.fpsMove); event.preventDefault(); } };
+        const release = event => { game.keys.delete(button.dataset.fpsMove); event.preventDefault(); };
+        addListener(button,'pointerdown',press);
+        addListener(button,'pointerup',release);
+        addListener(button,'pointercancel',release);
+        addListener(button,'pointerleave',release);
+      });
+      addListener($('#fpsUseButton'),'click',() => game.useNearest());
+      addListener($('#fpsEnterButton'),'click',() => game.enterRoom());
+      const resizeObserver = window.ResizeObserver ? new ResizeObserver(resizeFpsExperience) : null;
+      if (resizeObserver) resizeObserver.observe(holder);
+      else addListener(window,'resize',resizeFpsExperience);
+      game.resizeObserver = resizeObserver;
+      game.updateCamera();
+      game.updateWorld();
+      let lastTime = performance.now();
+      const loop = now => {
+        if (state.fpsGame !== game) return;
+        game.frame = requestAnimationFrame(loop);
+        const dt = Math.min(.05,(now-lastTime)/1000 || 0);
+        lastTime = now;
+        if (document.hidden || !state.fpsActive) return;
+        game.move(dt);
+        game.updateCamera();
+        game.updateNearest();
+        game.targets.forEach(target => { if (target.ring.visible) target.ring.rotation.z = now / 1000; });
+        if (now - game.lastUiAt > 180) { game.lastUiAt = now; updateFpsExperience(); }
+        renderer.render(scene,camera);
+      };
+      game.frame = requestAnimationFrame(loop);
+      return game;
+    }
+    function enterFpsExperience() {
+      if (!window.THREE) return false;
+      if (state.fpsGame) destroyFpsExperience();
+      $('#game').classList.add('fps-mode');
+      $('#fpsGame').classList.remove('hidden');
+      document.body.classList.add('fps-playing');
+      let game;
+      try { game = createFpsExperience(); }
+      catch (error) { game = null; }
+      if (!game) {
+        $('#fpsGame').classList.add('hidden');
+        $('#game').classList.remove('fps-mode');
+        document.body.classList.remove('fps-playing');
+        $('#hudMessage').textContent = '3D first-person mode is unavailable in this browser. The classic training view is shown instead.';
+        return false;
+      }
+      if (state.threeScene && state.threeScene.dispose) state.threeScene.dispose();
+      state.threeScene = null;
+      $('#floorPlan').classList.remove('three-ready');
+      $('#threeViewport').replaceChildren();
+      $('#resetMapViewButton').hidden = true;
+      state.fpsGame = game;
+      state.fpsActive = true;
+      updateFpsExperience(true);
+      requestAnimationFrame(resizeFpsExperience);
+      requestAnimationFrame(() => $('#fpsGame').scrollIntoView({ block:'start' }));
+      return true;
+    }
+    function fpsCanvasLines(context, value, x, y, width, lineHeight, maximumLines) {
+      const words = String(value || '').split(/\s+/).filter(Boolean);
+      let line = '';
+      let lines = 0;
+      words.forEach(word => {
+        const next = line ? line + ' ' + word : word;
+        if (context.measureText(next).width > width && line) {
+          if (lines < maximumLines) context.fillText(line, x, y + lines * lineHeight);
+          lines += 1;
+          line = word;
+        } else line = next;
+      });
+      if (line && lines < maximumLines) context.fillText(line, x, y + lines * lineHeight);
+      return Math.min(lines + 1, maximumLines) * lineHeight;
+    }
+    function fpsFeedbackText() {
+      const ids = ['summaryFeedback','validationFeedback','recoveryFeedback','runbookFeedback','aisleFeedback','diagnoseFeedback','timelineFeedback','nocFeedback'];
+      for (const id of ids) {
+        const element = $('#'+id);
+        if (element && element.textContent.trim()) return element.textContent.trim();
+      }
+      return '';
+    }
+    function drawFpsTerminal(game) {
+      const context = game.terminalContext;
+      const width = game.terminalCanvas.width;
+      const height = game.terminalCanvas.height;
+      const target = game.terminalTarget;
+      game.terminalHitboxes = [];
+      context.clearRect(0,0,width,height);
+      const background = context.createLinearGradient(0,0,width,height);
+      background.addColorStop(0,'#0c2032');
+      background.addColorStop(.55,'#07131f');
+      background.addColorStop(1,'#030a11');
+      context.fillStyle = background;
+      context.fillRect(0,0,width,height);
+      context.strokeStyle = 'rgba(110,185,255,.7)';
+      context.lineWidth = 5;
+      context.strokeRect(10,10,width-20,height-20);
+      context.fillStyle = 'rgba(110,185,255,.12)';
+      for (let y=36;y<height;y+=38) context.fillRect(26,y,width-52,1);
+      const addHitbox = (x,y,boxWidth,boxHeight,action,shortcut) => game.terminalHitboxes.push({x:x,y:y,width:boxWidth,height:boxHeight,action:action,shortcut:shortcut});
+      const drawClose = () => {
+        context.fillStyle = 'rgba(226,60,54,.18)';
+        context.fillRect(width-116,27,76,38);
+        context.strokeStyle = '#e23c36';
+        context.lineWidth = 2;
+        context.strokeRect(width-116,27,76,38);
+        context.fillStyle = '#ffe8e6';
+        context.font = '800 18px Arial, sans-serif';
+        context.textAlign = 'center';
+        context.fillText('CLOSE',width-78,52);
+        addHitbox(width-116,27,76,38,{type:'close'});
+      };
+      const drawHeader = (title, subtitle, color) => {
+        context.textAlign = 'left';
+        context.fillStyle = color || '#6eb9ff';
+        context.font = '900 17px Arial, sans-serif';
+        context.fillText('VIRTUAL TERMINAL · FICTIONAL TRAINING ONLY',46,54);
+        context.fillStyle = '#f2f9ff';
+        context.font = '900 36px Arial, sans-serif';
+        context.fillText(title,46,101);
+        context.fillStyle = '#b8d0e3';
+        context.font = '600 17px Arial, sans-serif';
+        fpsCanvasLines(context,subtitle || '',46,130,width-190,24,2);
+        drawClose();
+      };
+      const drawTerminalButton = (y,title,summary,action,options) => {
+        const settings = options || {};
+        const x = 46, buttonWidth = width - 92, buttonHeight = settings.compact ? 44 : 65;
+        const disabled = Boolean(settings.disabled);
+        const color = disabled ? '#566a7a' : settings.good ? '#42cf91' : settings.bad ? '#e23c36' : '#6eb9ff';
+        context.fillStyle = disabled ? 'rgba(68,87,101,.31)' : settings.good ? 'rgba(32,114,79,.29)' : settings.bad ? 'rgba(130,42,44,.26)' : 'rgba(20,76,115,.37)';
+        context.fillRect(x,y,buttonWidth,buttonHeight);
+        context.strokeStyle = color;
+        context.lineWidth = 2;
+        context.strokeRect(x,y,buttonWidth,buttonHeight);
+        const keyboardIndex = settings.noShortcut ? null : game.terminalHitboxes.filter(box => box.shortcut).length + 1;
+        if (keyboardIndex && keyboardIndex <= 9) {
+          context.fillStyle = color;
+          context.fillRect(x+10,y+12,29,29);
+          context.fillStyle = '#06131d';
+          context.font = '900 16px Arial, sans-serif';
+          context.textAlign = 'center';
+          context.fillText(String(keyboardIndex),x+24,y+32);
+        }
+        context.textAlign = 'left';
+        context.fillStyle = disabled ? '#93a4b2' : '#f0f8ff';
+        context.font = '800 ' + (settings.compact ? '16' : '19') + 'px Arial, sans-serif';
+        context.fillText(title,x+(keyboardIndex?52:16),y+(settings.compact?27:25));
+        if (!settings.compact && summary) {
+          context.fillStyle = disabled ? '#728a9c' : '#b9cfe0';
+          context.font = '600 14px Arial, sans-serif';
+          fpsCanvasLines(context,summary,x+(keyboardIndex?52:16),y+46,buttonWidth-75,17,1);
+        }
+        if (!disabled) addHitbox(x,y,buttonWidth,buttonHeight,action,keyboardIndex);
+        return y + buttonHeight + (settings.compact ? 8 : 11);
+      };
+      const drawFooter = message => {
+        context.fillStyle = '#92afc5';
+        context.font = '700 14px Arial, sans-serif';
+        context.textAlign = 'center';
+        context.fillText(message || 'Use the on-screen virtual controls or number keys. Esc closes this terminal.',width/2,height-28);
+      };
+      if (!target) {
+        drawHeader('TERMINAL LINK LOST','Move close to another highlighted fictional terminal.','#e23c36');
+        drawFooter('Esc closes this screen.');
+        game.terminalTexture.needsUpdate = true;
+        return;
+      }
+      if (state.finished) {
+        const timedOut = state.seconds === 0;
+        drawHeader(timedOut ? 'SIMULATION PAUSED' : 'SIMULATION COMPLETE',timedOut ? 'The fictional scenario timer expired. No real equipment was affected.' : 'You resolved the fictional incident using the approved training path.',timedOut ? '#e23c36' : '#42cf91');
+        context.fillStyle = '#e7f4ff';
+        context.font = '800 23px Arial, sans-serif';
+        context.textAlign = 'left';
+        context.fillText(timedOut ? 'Time expired.' : 'You escaped the fictional data hall.',46,212);
+        context.fillStyle = '#b9d1e3';
+        context.font = '700 18px Arial, sans-serif';
+        context.fillText('Time remaining: ' + clock(state.seconds) + '     Score: ' + state.score,46,248);
+        let endY = 302;
+        if (!state.joined || state.isHost) endY = drawTerminalButton(endY,'Restart shared simulation','Reset the fictional room for every joined team.',{type:'restart'},{good:true});
+        else {
+          context.fillStyle = '#f6d285'; context.font = '800 18px Arial, sans-serif';
+          context.fillText('Waiting for the host to restart the shared room.',46,endY+24);
+        }
+        drawFooter('This result is a training-game result only.');
+        game.terminalTexture.needsUpdate = true;
+        return;
+      }
+      const status = fpsTargetStatus(target);
+      if (status.level !== 'available') {
+        drawHeader(target.title,status.message,status.level === 'complete' ? '#42cf91' : '#f6bd4d');
+        context.fillStyle = status.level === 'complete' ? '#9de5be' : '#f6d285';
+        context.font = '800 22px Arial, sans-serif';
+        context.textAlign = 'left';
+        context.fillText(status.level === 'complete' ? 'This fictional station is complete.' : 'This terminal is locked by scenario progress.',46,225);
+        context.fillStyle = '#c2d7e7'; context.font = '600 17px Arial, sans-serif';
+        fpsCanvasLines(context,fpsObjectiveCopy(),46,260,width-92,25,3);
+        drawFooter();
+        game.terminalTexture.needsUpdate = true;
+        return;
+      }
+      let y = 184;
+      if (target.kind === 'noc') {
+        drawHeader('NOC EVIDENCE','Inspect each required fictional alert. Once every required item is collected, analyze the incident evidence.','#6eb9ff');
+        state.config.clues.forEach(key => {
+          const selector = '[data-clue="' + key + '"]';
+          const copy = fpsButtonCopy(selector);
+          y = drawTerminalButton(y,copy.title,copy.summary,{type:'dom',selector:selector},{good:state.clues.has(key),disabled:state.clues.has(key),compact:true});
+        });
+        if (completed(state.clues,state.config.clues)) y = drawTerminalButton(y,'Analyze the evidence','Unlock the incident timeline desk.',{type:'dom',selector:'#analyzeButton'},{good:true,compact:true});
+      } else if (target.kind === 'timeline') {
+        drawHeader('INCIDENT TIMELINE','Choose the next simulated event in chronological order. Incorrect choices cost virtual time.','#b982ff');
+        state.config.timeline.forEach(key => {
+          const selector = '[data-timeline-step="' + key + '"]';
+          const copy = fpsButtonCopy(selector);
+          y = drawTerminalButton(y,copy.title,copy.summary,{type:'dom',selector:selector},{good:copy.disabled,disabled:copy.disabled});
+        });
+      } else if (target.kind === 'incident' && state.stage === 2) {
+        drawHeader('INCIDENT BOARD','Choose the fictional dependency that explains the complete evidence trail.','#f6bd4d');
+        $$('[data-diagnosis]').forEach(button => {
+          const copy = fpsButtonCopy('[data-diagnosis="' + button.dataset.diagnosis + '"]');
+          y = drawTerminalButton(y,copy.title,copy.summary,{type:'dom',selector:'[data-diagnosis="' + button.dataset.diagnosis + '"]'},{disabled:copy.disabled});
+        });
+      } else if (target.kind === 'incident' && state.difficulty === 'hard' && state.stage === 6) {
+        drawHeader('HARD-MODE SUMMARY','Confirm the fictional root cause before the exit interlock will unlock.','#f6bd4d');
+        $$('[data-summary]').forEach(button => {
+          const copy = fpsButtonCopy('[data-summary="' + button.dataset.summary + '"]');
+          y = drawTerminalButton(y,copy.title,copy.summary,{type:'dom',selector:'[data-summary="' + button.dataset.summary + '"]'},{disabled:copy.disabled});
+        });
+      } else if (target.kind === 'scan') {
+        const selector = '[data-scan="' + target.type + '"]';
+        const copy = fpsButtonCopy(selector);
+        drawHeader(target.title,'Read this virtual asset label to collect its recovery-key fragment. No physical equipment is controlled.','#e23c36');
+        y = drawTerminalButton(y,'Inspect virtual label',copy.title + ' — ' + copy.summary,{type:'dom',selector:selector});
+        context.fillStyle = '#c5d9e8'; context.font = '600 17px Arial, sans-serif'; context.textAlign = 'left';
+        fpsCanvasLines(context,'Required labels collected: ' + state.config.scans.filter(item => state.scans.has(item)).length + ' of ' + state.config.scans.length + '.',46,y+22,width-92,22,2);
+      } else if (target.kind === 'keypad') {
+        drawHeader('RECOVERY KEY PAD','Enter the recovery key assembled from the virtual labels. Use the on-screen keyboard or your physical keyboard.','#f6bd4d');
+        game.terminalInput = true;
+        context.fillStyle = 'rgba(2,9,15,.75)'; context.fillRect(46,184,width-92,58); context.strokeStyle = '#f6bd4d'; context.lineWidth=2; context.strokeRect(46,184,width-92,58);
+        context.fillStyle = '#fff3c9'; context.font = '800 22px ui-monospace,SFMono-Regular,monospace'; context.textAlign='left';
+        context.fillText(game.codeBuffer || 'TYPE RECOVERY KEY',62,221);
+        const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-';
+        const columns = 8, keyWidth = 106, keyHeight = 43, startX = 68, startY = 267;
+        [...alphabet].forEach((character,index) => {
+          const col = index % columns, row = Math.floor(index / columns), x = startX + col * (keyWidth + 8), keyY = startY + row * (keyHeight + 7);
+          context.fillStyle='rgba(23,74,108,.48)'; context.fillRect(x,keyY,keyWidth,keyHeight); context.strokeStyle='#6eb9ff'; context.lineWidth=1.5; context.strokeRect(x,keyY,keyWidth,keyHeight);
+          context.fillStyle='#f1f9ff'; context.font='900 19px Arial, sans-serif'; context.textAlign='center'; context.fillText(character,x+keyWidth/2,keyY+28);
+          addHitbox(x,keyY,keyWidth,keyHeight,{type:'append-code',value:character});
+        });
+        y = 522;
+        y = drawTerminalButton(y,'Clear input','Remove the virtual key you have entered.',{type:'clear-code'},{compact:true,noShortcut:true});
+        drawTerminalButton(y,'Verify virtual key','Submit the assembled recovery key.',{type:'verify-code'},{compact:true,good:true,noShortcut:true});
+      } else if (target.kind === 'recovery') {
+        drawHeader('RECOVERY CONSOLE','Complete the approved virtual runbook in order, then select the safe simulated recovery path.','#42cf91');
+        if (state.runbookIndex < state.config.runbook.length) {
+          state.config.runbook.forEach(key => {
+            const selector = '[data-runbook-step="' + key + '"]';
+            const copy = fpsButtonCopy(selector);
+            y = drawTerminalButton(y,copy.title,copy.summary,{type:'dom',selector:selector},{good:copy.disabled,disabled:copy.disabled});
+          });
+        } else {
+          context.fillStyle = '#9de5be'; context.font = '800 19px Arial, sans-serif'; context.textAlign = 'left';
+          context.fillText('Virtual runbook complete. Select the safe recovery path.',46,y+18);
+          y += 42;
+          y += 6;
+          $$('[data-recovery]').forEach(button => {
+            const selector = '[data-recovery="' + button.dataset.recovery + '"]';
+            const copy = fpsButtonCopy(selector);
+            y = drawTerminalButton(y,copy.title,copy.summary,{type:'dom',selector:selector},{disabled:copy.disabled});
+          });
+        }
+      } else if (target.kind === 'validation') {
+        const selector = '[data-validation="' + target.type + '"]';
+        const copy = fpsButtonCopy(selector);
+        drawHeader(target.title,'Confirm this fictional post-recovery validation point before using the exit interlock.','#42cf91');
+        y = drawTerminalButton(y,'Record virtual validation',copy.title + ' — ' + copy.summary,{type:'dom',selector:selector});
+      } else if (target.kind === 'exit') {
+        drawHeader('EXIT INTERLOCK','Every required fictional check is complete. Finish the simulation to record the training result.','#42cf91');
+        y = drawTerminalButton(y,'Escape the data center','Complete this fictional training scenario.',{type:'dom',selector:'#escapeButton'},{good:true});
+      }
+      const feedback = fpsFeedbackText();
+      if (feedback) {
+        context.fillStyle = '#c4d8e8'; context.font = '600 15px Arial, sans-serif'; context.textAlign='left';
+        fpsCanvasLines(context,feedback,46,Math.min(y+7,572),width-92,20,2);
+      }
+      if (target.kind !== 'keypad') drawFooter();
+      game.terminalTexture.needsUpdate = true;
+    }
+    function activateFpsTerminalAction(game, action) {
+      if (!action) return;
+      if (action.type === 'close') { game.closeTerminal(); return; }
+      if (action.type === 'append-code') {
+        game.codeBuffer = (game.codeBuffer + action.value).slice(0,72);
+        game.drawTerminal();
+        return;
+      }
+      if (action.type === 'clear-code') { game.codeBuffer = ''; game.drawTerminal(); return; }
+      if (action.type === 'verify-code') {
+        const input = $('#recoveryCode');
+        input.value = game.codeBuffer;
+        $('#verifyCode').click();
+      } else if (action.type === 'restart') requestSessionReset();
+      else if (action.type === 'dom') {
+        const button = document.querySelector(action.selector);
+        if (button && !button.disabled) button.click();
+      }
+      setTimeout(() => updateFpsExperience(true),0);
+    }
+    function handleFpsTerminalKey(game, event) {
+      if (event.key === 'Escape') { game.closeTerminal(); event.preventDefault(); return; }
+      if (game.terminalInput) {
+        if (event.key === 'Backspace') { game.codeBuffer = game.codeBuffer.slice(0,-1); game.drawTerminal(); event.preventDefault(); return; }
+        if (event.key === 'Enter') { game.activateTerminalAction({type:'verify-code'}); event.preventDefault(); return; }
+        if (/^[a-z0-9-]$/i.test(event.key)) { game.codeBuffer = (game.codeBuffer + event.key.toUpperCase()).slice(0,72); game.drawTerminal(); event.preventDefault(); }
+        return;
+      }
+      if (/^[1-9]$/.test(event.key)) {
+        const hitbox = game.terminalHitboxes.find(box => box.shortcut === Number(event.key));
+        if (hitbox) { game.activateTerminalAction(hitbox.action); event.preventDefault(); }
+      }
+    }
     function setGameConfiguration(level, scenarioKey) {
       const nextLevel = DIFFICULTIES[level] ? level : 'medium';
       const nextScenario = SCENARIOS[scenarioKey] || null;
@@ -1767,6 +2622,7 @@
       $('#hintButton').disabled = !state.started || state.finished || state.hintsUsed >= state.config.maxHints;
       $('#hintCost').textContent = state.hintsUsed >= state.config.maxHints ? 'used' : '−' + state.config.hintCost;
       $('#teamMetric').classList.toggle('hidden', !state.joined);
+      updateFpsExperience();
     }
     function updateMap(current) {
       $$('.zone').forEach(button => {
@@ -1784,6 +2640,7 @@
         plan.classList.toggle('recovered', state.stage >= state.config.exitStage);
       }
       syncThreeScene(state.scenario, current || '');
+      updateFpsExperience();
     }
     function showPanel(panel) {
       if (!state.started || state.finished) return;
@@ -1792,6 +2649,7 @@
       updateMap(zoneRequirements[panel] !== undefined ? panel : '');
       const labels = { noc:'Reviewing NOC evidence.', timeline:'Rebuilding the incident timeline.', diagnose:'Analyzing the incident.', aisle:'Tracing virtual asset dependencies.', recovery:'Completing the virtual recovery runbook.', validation:'Verifying the simulated recovery.', summary:'Confirming the hard-mode incident summary.', exit:'Exit interlock ready.' };
       $('#hudMessage').textContent = labels[panel] || '';
+      updateFpsExperience();
     }
     async function startGame() {
       if (state.started) return;
@@ -1832,7 +2690,7 @@
       state.started = true;
       state.finished = false;
       $('#game').classList.remove('hidden');
-      requestAnimationFrame(resizeThreeScene);
+      if (!enterFpsExperience()) requestAnimationFrame(resizeThreeScene);
       updateSessionControls();
       logEvent((state.scenario ? state.scenario.title : state.config.label) + ' shared timer started. NOC console unlocked.');
       updateHud();
@@ -2078,6 +2936,7 @@
       $('#playAgain').textContent = state.joined && !state.isHost ? 'Waiting for host' : 'Restart for everyone';
       $('#playAgain').disabled = state.joined && !state.isHost;
       updateHud();
+      if (state.fpsGame) state.fpsGame.openTerminal(state.fpsGame.terminalTarget || state.fpsGame.targets.find(target => target.id === 'exit'));
       logEvent('Escape completed with ' + state.score + ' points.');
     }
     function finishFailure() {
@@ -2096,6 +2955,7 @@
         current.insertAdjacentHTML('afterbegin','<p class="notice timeout-notice" style="border-color:rgba(226,60,54,.6);color:#ffd1ce"><strong>Simulation paused:</strong> time expired. ' + resetCopy + '</p>');
       }
       updateHud();
+      if (state.fpsGame) state.fpsGame.openTerminal(state.fpsGame.terminalTarget || state.fpsGame.targets.find(target => target.id === 'exit'));
       logEvent('Simulation timed out.');
     }
     function giveHint() {
@@ -2143,6 +3003,7 @@
     }
     function resetGame(options) {
       const refresh = !options || options.refresh !== false;
+      destroyFpsExperience();
       clearPendingStart();
       clearInterval(state.timer);
       state.started = false;
@@ -2213,6 +3074,7 @@
     document.addEventListener('fullscreenchange', () => {
       updateFullscreenButton();
       requestAnimationFrame(resizeThreeScene);
+      requestAnimationFrame(resizeFpsExperience);
     });
     document.addEventListener('visibilitychange', () => { if (!document.hidden) refreshLobby(true); });
     $$('.difficulty-option').forEach(button => button.addEventListener('click', () => selectDifficulty(button.dataset.difficulty)));
