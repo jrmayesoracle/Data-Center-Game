@@ -155,6 +155,19 @@
     .isometric .noc-zone { top:10%; left:6%; width:146px; }.isometric .diagnose-zone { top:10%; right:6%; width:148px; }.isometric .recovery-zone { bottom:10%; left:8%; width:157px; }.isometric .exit-zone { right:6%; bottom:16%; width:145px; }
     .isometric .rack-target { top:48%; left:50%; min-width:105px; transform:translate(-50%,-50%); border-color:var(--red); }.isometric .rack-target:not(:disabled) { background:#421c23; }.isometric .rack-target.done { background:#153d31; border-color:var(--green); }
     .isometric[data-active-zone="noc"] #scene-noc,.isometric[data-active-zone="diagnose"] #scene-diagnose,.isometric[data-active-zone="aisle"] .map-focus,.isometric[data-active-zone="recovery"] #scene-recovery,.isometric[data-active-zone="exit"] #scene-exit { filter:drop-shadow(0 0 12px rgba(110,185,255,.9)); }
+    .three-viewport { position:absolute; inset:0; z-index:3; overflow:hidden; opacity:0; pointer-events:none; transition:opacity .25s ease; }
+    .three-viewport canvas { display:block; width:100%; height:100%; touch-action:none; cursor:grab; }
+    .three-viewport canvas:active { cursor:grabbing; }
+    .three-status { position:absolute; z-index:7; top:14px; left:50%; max-width:calc(100% - 170px); padding:6px 9px; color:#c4d7e8; background:rgba(5,13,22,.78); border:1px solid rgba(110,185,255,.3); border-radius:99px; transform:translateX(-50%); font-size:.67rem; font-weight:850; letter-spacing:.05em; text-align:center; text-transform:uppercase; pointer-events:none; }
+    .map-view-reset { position:absolute; z-index:8; top:13px; right:13px; min-height:34px; padding:6px 9px; font-size:.71rem; }
+    .three-navigation { display:none; grid-template-columns:repeat(5,minmax(0,1fr)); gap:8px; margin-top:10px; }
+    .three-navigation button { min-height:40px; padding:8px 9px; color:#dceaf7; text-align:left; background:#101c2a; border:1px solid #344e67; border-radius:9px; font-size:.74rem; }
+    .three-navigation button span { display:block; margin-top:2px; color:#8ea8be; font-size:.65rem; font-weight:650; }
+    .three-navigation button.active { border-color:var(--blue); box-shadow:0 0 0 2px rgba(110,185,255,.16); }.three-navigation button.done { border-color:var(--green); background:#11362b; }
+    .floor-plan.three-ready .three-viewport { opacity:1; pointer-events:auto; }
+    .floor-plan.three-ready .iso-visual,.floor-plan.three-ready .iso-zone { visibility:hidden; pointer-events:none; }
+    .floor-plan.three-ready + .three-navigation { display:grid; }
+    .floor-plan.three-ready::after { content:"INTERACTIVE 3D TRAINING MODEL · FICTIONAL"; }
     .map-caption { margin:12px 0 0; color:#aabbd0; font-size:.81rem; }
     .event-log { margin-top:15px; padding-top:14px; border-top:1px solid #2b3a4c; }
     .event-log h3 { margin-bottom:8px; }.event-log ul { display:grid; gap:7px; max-height:180px; margin:0; padding:0; overflow:auto; list-style:none; }
@@ -214,7 +227,7 @@
     @media (max-width:680px) {
       .app { width:min(100% - 22px,1240px); padding-top:13px; }.topbar { align-items:flex-start; }.brand span { display:none; }.top-actions button { padding-inline:10px; }
       .card { padding:16px; }.alert-grid,.choice-grid,.scan-grid,.rack-wall,.difficulty-grid,.sequence-grid { grid-template-columns:1fr; }.challenge-head { align-items:flex-start; }.badge { display:none; }.code-box { flex-direction:column; }.code-box button { width:100%; }.result-grid,.team-roster,.join-fields { grid-template-columns:1fr; }.map-heading { display:block; }.map-legend { margin-top:11px; }
-      .floor-plan.isometric { min-width:0; }.iso-zone.zone { min-height:40px; padding:6px 7px; }.iso-zone .zone-copy b { font-size:.67rem; }.iso-zone .zone-copy span { display:none; }.isometric .noc-zone,.isometric .diagnose-zone { width:96px; }.isometric .recovery-zone { width:113px; }.isometric .exit-zone { width:94px; }.isometric .rack-target { min-width:84px; }
+      .floor-plan.isometric { min-width:0; }.iso-zone.zone { min-height:40px; padding:6px 7px; }.iso-zone .zone-copy b { font-size:.67rem; }.iso-zone .zone-copy span { display:none; }.isometric .noc-zone,.isometric .diagnose-zone { width:96px; }.isometric .recovery-zone { width:113px; }.isometric .exit-zone { width:94px; }.isometric .rack-target { min-width:84px; }.three-navigation { grid-template-columns:repeat(2,minmax(0,1fr)); }.three-status { max-width:calc(100% - 128px); font-size:.58rem; }.map-view-reset { right:9px; padding-inline:7px; }
     }
     @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation:none!important; transition:none!important; } }
   </style>
@@ -296,6 +309,9 @@
         </div>
         <div class="floor-scroll">
           <div id="floorPlan" class="floor-plan isometric">
+            <div id="threeViewport" class="three-viewport" role="application" aria-label="Interactive fictional 3D data hall. Drag to rotate, scroll or pinch to zoom, and click a highlighted location to open its game panel."></div>
+            <p id="threeStatus" class="three-status" aria-live="polite">Loading interactive 3D view…</p>
+            <button id="resetMapViewButton" class="ghost map-view-reset" type="button">Reset 3D</button>
             <svg class="iso-visual" viewBox="0 0 1100 650" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
               <defs>
                 <linearGradient id="isoFloor" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#263e52"/><stop offset="1" stop-color="#132333"/></linearGradient>
@@ -377,12 +393,19 @@
             </svg>
             <button class="iso-zone zone noc-zone" data-zone="noc" type="button" disabled aria-label="Go to NOC console"><span class="dot"></span><span class="zone-copy"><b>NOC console</b><span>Alarm wall</span></span></button>
             <button class="iso-zone zone diagnose-zone" data-zone="diagnose" type="button" disabled aria-label="Go to incident board"><span class="dot"></span><span class="zone-copy"><b>Incident board</b><span>Diagnosis</span></span></button>
-            <button id="aisleZoneTarget" class="iso-zone zone rack-target" data-zone="aisle" type="button" disabled aria-label="Go to the virtual alert"><span class="dot"></span><span class="zone-copy"><b>Virtual alert</b><span>Inspect evidence</span></span></button>
+            <button id="aisleZoneTarget" class="iso-zone zone rack-target" data-zone="aisle" data-aisle-target type="button" disabled aria-label="Go to the virtual alert"><span class="dot"></span><span class="zone-copy"><b>Virtual alert</b><span>Inspect evidence</span></span></button>
             <button class="iso-zone zone recovery-zone" data-zone="recovery" type="button" disabled aria-label="Go to recovery console"><span class="dot"></span><span class="zone-copy"><b>Recovery console</b><span>Virtual runbook</span></span></button>
             <button class="iso-zone zone exit-zone" data-zone="exit" type="button" disabled aria-label="Go to exit interlock"><span class="dot"></span><span class="zone-copy"><b>Exit interlock</b><span>Mantrap</span></span></button>
           </div>
+          <div class="three-navigation" aria-label="3D map navigation fallback">
+            <button class="zone" data-zone="noc" type="button" disabled><b>NOC console</b><span>Alarm wall</span></button>
+            <button class="zone" data-zone="diagnose" type="button" disabled><b>Incident board</b><span>Diagnosis</span></button>
+            <button id="threeAisleTarget" class="zone" data-zone="aisle" data-aisle-target type="button" disabled><b>Virtual alert</b><span>Inspect evidence</span></button>
+            <button class="zone" data-zone="recovery" type="button" disabled><b>Recovery console</b><span>Virtual runbook</span></button>
+            <button class="zone" data-zone="exit" type="button" disabled><b>Exit interlock</b><span>Finish simulation</span></button>
+          </div>
         </div>
-        <p id="mapCaption" class="map-caption">This is a 3D-style, fictional data-hall model. The lit locations are game controls only; no real equipment is connected.</p>
+        <p id="mapCaption" class="map-caption">Drag the 3D hall to rotate, scroll or pinch to zoom, and click a highlighted fictional location to navigate. No real equipment is connected.</p>
         <section class="event-log">
           <h3>Event log</h3>
           <ul id="eventLog"><li>Simulation initialized.</li></ul>
@@ -551,6 +574,7 @@
     <p class="footer">Data Center Escape is a fictional training game. It contains no connection to real systems, equipment, or operational controls.</p>
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const SUPABASE_URL = 'https://ajmlylmvtialzkrgijcs.supabase.co';
@@ -918,6 +942,414 @@
       const config = DIFFICULTIES[level] || DIFFICULTIES.medium;
       return (config.scans || []).map(slot => scenario.scans[slot].fragment).join('-');
     };
+    function setThreeStatus(message) {
+      const status = $('#threeStatus');
+      if (status) status.textContent = message;
+    }
+    function showThreeFallback(message) {
+      const plan = $('#floorPlan');
+      const viewport = $('#threeViewport');
+      const reset = $('#resetMapViewButton');
+      if (state.threeScene && state.threeScene.dispose) state.threeScene.dispose();
+      state.threeScene = null;
+      if (plan) plan.classList.remove('three-ready');
+      if (viewport) viewport.replaceChildren();
+      if (reset) reset.hidden = true;
+      setThreeStatus(message || '3D view is unavailable in this browser. The training floor-plan fallback is shown.');
+    }
+    function makeThreeLabel(THREE, text, color) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 512;
+      canvas.height = 108;
+      const context = canvas.getContext('2d');
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      context.fillStyle = 'rgba(5, 16, 27, .80)';
+      context.fillRect(0, 14, canvas.width, 80);
+      context.strokeStyle = color;
+      context.lineWidth = 3;
+      context.strokeRect(2, 16, canvas.width - 4, 76);
+      context.fillStyle = '#e9f6ff';
+      context.font = '800 38px Arial, sans-serif';
+      context.textAlign = 'center';
+      context.textBaseline = 'middle';
+      context.fillText(text, canvas.width / 2, canvas.height / 2 + 2);
+      const texture = new THREE.CanvasTexture(canvas);
+      if ('colorSpace' in texture && THREE.SRGBColorSpace) texture.colorSpace = THREE.SRGBColorSpace;
+      const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map:texture, transparent:true, depthWrite:false }));
+      sprite.scale.set(4.6, .97, 1);
+      sprite.userData.noPick = true;
+      return sprite;
+    }
+    function initThreeScene() {
+      const holder = $('#threeViewport');
+      const plan = $('#floorPlan');
+      const reset = $('#resetMapViewButton');
+      if (!holder || !plan) return;
+      if (!window.THREE) {
+        showThreeFallback('3D view could not load. The training floor-plan fallback is shown.');
+        return;
+      }
+      const THREE = window.THREE;
+      let renderer;
+      try {
+        renderer = new THREE.WebGLRenderer({ antialias:true, alpha:false, powerPreference:'high-performance' });
+      } catch (error) {
+        showThreeFallback('3D view is unavailable in this browser. The training floor-plan fallback is shown.');
+        return;
+      }
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x07111b);
+      scene.fog = new THREE.Fog(0x07111b, 28, 54);
+      const camera = new THREE.PerspectiveCamera(42, 1, .1, 100);
+      const target = new THREE.Vector3(0, 1.55, 0);
+      const defaultOrbit = { azimuth:-.72, elevation:.48, distance:29 };
+      const orbit = Object.assign({}, defaultOrbit);
+      const world = new THREE.Group();
+      const assets = new Map();
+      const pickables = [];
+      const raycaster = new THREE.Raycaster();
+      const pointer = new THREE.Vector2();
+      const clamp = (value, minimum, maximum) => Math.max(minimum, Math.min(maximum, value));
+      const placeCamera = () => {
+        const horizontal = Math.cos(orbit.elevation) * orbit.distance;
+        camera.position.set(
+          Math.sin(orbit.azimuth) * horizontal,
+          Math.sin(orbit.elevation) * orbit.distance + 1.15,
+          Math.cos(orbit.azimuth) * horizontal
+        );
+        camera.lookAt(target);
+      };
+      const createMaterial = (color, options) => {
+        const material = new THREE.MeshStandardMaterial(Object.assign({
+          color:color,
+          roughness:.68,
+          metalness:.38,
+          emissive:0x000000,
+          emissiveIntensity:0
+        }, options || {}));
+        material.userData.baseColor = material.color.clone();
+        material.userData.baseEmissive = material.emissive.clone();
+        material.userData.baseEmissiveIntensity = material.emissiveIntensity;
+        return material;
+      };
+      const boxGeometry = (size) => new THREE.BoxGeometry(size[0], size[1], size[2]);
+      const addBox = (group, materials, size, position, color, options) => {
+        const material = createMaterial(color, options);
+        const mesh = new THREE.Mesh(boxGeometry(size), material);
+        mesh.position.set(position[0], position[1], position[2]);
+        if (options && options.rotation) mesh.rotation.set(options.rotation[0] || 0, options.rotation[1] || 0, options.rotation[2] || 0);
+        if (options && options.castShadow === false) mesh.castShadow = false;
+        group.add(mesh);
+        materials.push(material);
+        return mesh;
+      };
+      const addCylinder = (group, materials, radiusTop, radiusBottom, height, position, color, options) => {
+        const material = createMaterial(color, options);
+        const mesh = new THREE.Mesh(new THREE.CylinderGeometry(radiusTop, radiusBottom, height, 18), material);
+        mesh.position.set(position[0], position[1], position[2]);
+        if (options && options.rotation) mesh.rotation.set(options.rotation[0] || 0, options.rotation[1] || 0, options.rotation[2] || 0);
+        group.add(mesh);
+        materials.push(material);
+        return mesh;
+      };
+      const addAsset = (key, zone, label, position, labelHeight, ringRadius, build) => {
+        const group = new THREE.Group();
+        group.position.set(position[0], position[1], position[2]);
+        group.userData.assetKey = key;
+        group.userData.zone = zone;
+        const materials = [];
+        build(group, materials);
+        const ringMaterial = new THREE.MeshBasicMaterial({ color:0x6eb9ff, transparent:true, opacity:.72, depthWrite:false });
+        const ring = new THREE.Mesh(new THREE.TorusGeometry(ringRadius, .075, 8, 48), ringMaterial);
+        ring.rotation.x = Math.PI / 2;
+        ring.position.y = .055;
+        ring.userData.noPick = true;
+        ring.visible = false;
+        group.add(ring);
+        const labelSprite = makeThreeLabel(THREE, label, '#6eb9ff');
+        labelSprite.position.set(0, labelHeight, 0);
+        group.add(labelSprite);
+        group.traverse(node => {
+          if (node.isMesh && !node.userData.noPick) {
+            node.userData.assetKey = key;
+            pickables.push(node);
+          }
+        });
+        assets.set(key, { key:key, zone:zone, group:group, materials:[...new Set(materials)], ring:ring, ringMaterial:ringMaterial, alerted:false, selected:false });
+        world.add(group);
+      };
+      const addRack = (group, materials, x, z, highlight) => {
+        addBox(group, materials, [1.25, 3.35, 1.35], [x, 1.72, z], highlight ? 0x57262b : 0x203443, { metalness:.55 });
+        addBox(group, materials, [1.03, .12, .055], [x, 2.95, z - .704], highlight ? 0xff766d : 0x3d5a70, { emissive:highlight ? 0x7a151c : 0x133046, emissiveIntensity:highlight ? .42 : .24, metalness:.35 });
+        for (let row = 0; row < 5; row += 1) {
+          addBox(group, materials, [.94, .03, .03], [x, .75 + row * .45, z - .704], 0x5e778b, { emissive:0x0a1620, emissiveIntensity:.1, metalness:.25 });
+        }
+        addCylinder(group, materials, .07, .07, .05, [x + .42, .35, z - .72], highlight ? 0xe23c36 : 0x42cf91, { emissive:highlight ? 0xe23c36 : 0x42cf91, emissiveIntensity:.9, rotation:[Math.PI / 2, 0, 0] });
+      };
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+      renderer.setClearColor(0x07111b, 1);
+      if ('outputColorSpace' in renderer && THREE.SRGBColorSpace) renderer.outputColorSpace = THREE.SRGBColorSpace;
+      if (THREE.ACESFilmicToneMapping) renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.08;
+      renderer.domElement.tabIndex = 0;
+      renderer.domElement.setAttribute('aria-label', 'Interactive 3D fictional data hall. Drag to rotate, scroll or pinch to zoom, then click an available location.');
+      holder.replaceChildren(renderer.domElement);
+      scene.add(new THREE.HemisphereLight(0x9fdcff, 0x071016, 2.15));
+      const keyLight = new THREE.DirectionalLight(0xbce7ff, 2.1);
+      keyLight.position.set(7, 17, 10);
+      scene.add(keyLight);
+      const alertLight = new THREE.PointLight(0x356b99, 24, 24, 2);
+      alertLight.position.set(0, 6, -2);
+      scene.add(alertLight);
+      const floor = new THREE.Mesh(new THREE.PlaneGeometry(34, 24), createMaterial(0x122333, { roughness:.82, metalness:.2 }));
+      floor.rotation.x = -Math.PI / 2;
+      floor.receiveShadow = false;
+      world.add(floor);
+      const grid = new THREE.GridHelper(34, 34, 0x31516a, 0x183040);
+      grid.position.y = .012;
+      world.add(grid);
+      const coldAisle = new THREE.Mesh(new THREE.PlaneGeometry(18, 3.2), new THREE.MeshBasicMaterial({ color:0x246fa6, transparent:true, opacity:.17, depthWrite:false }));
+      coldAisle.rotation.x = -Math.PI / 2;
+      coldAisle.position.set(0, .026, -1.9);
+      world.add(coldAisle);
+      const hotAisle = new THREE.Mesh(new THREE.PlaneGeometry(18, 3.2), new THREE.MeshBasicMaterial({ color:0x9b3836, transparent:true, opacity:.13, depthWrite:false }));
+      hotAisle.rotation.x = -Math.PI / 2;
+      hotAisle.position.set(0, .03, 3.15);
+      world.add(hotAisle);
+      const perimeterMaterial = createMaterial(0x1c3548, { roughness:.72, metalness:.42 });
+      [[0, 2.2, -12, 34, 4.4, .35], [0, 2.2, 12, 34, 4.4, .35], [-17, 2.2, 0, .35, 4.4, 24], [17, 2.2, 0, .35, 4.4, 24]].forEach(item => {
+        const wall = new THREE.Mesh(new THREE.BoxGeometry(item[3], item[4], item[5]), perimeterMaterial);
+        wall.position.set(item[0], item[1], item[2]);
+        world.add(wall);
+      });
+      const floorLabel = makeThreeLabel(THREE, 'DATA HALL A · FICTIONAL TRAINING MODEL', '#5fa8d8');
+      floorLabel.position.set(0, 5.2, -10.7);
+      floorLabel.scale.set(7.5, 1.2, 1);
+      world.add(floorLabel);
+      addAsset('noc', 'noc', 'NOC CONSOLE', [-11.5, 0, -7.7], 3.35, 3.0, (group, materials) => {
+        addBox(group, materials, [4.7, .65, 2.1], [0, .55, 0], 0x28465d, { metalness:.46 });
+        [-1.25, 0, 1.25].forEach(x => addBox(group, materials, [1.0, 1.2, .12], [x, 1.55, -.78], 0x2a668f, { emissive:0x155276, emissiveIntensity:.78, metalness:.16, rotation:[-.14, 0, 0] }));
+        [-1.82, 1.82].forEach(x => addBox(group, materials, [.17, 1.05, .17], [x, .2, 0], 0x435a6d, { metalness:.62 }));
+      });
+      addAsset('incident', 'diagnose', 'INCIDENT BOARD', [11.5, 0, -7.7], 3.5, 3.0, (group, materials) => {
+        addBox(group, materials, [4.3, 2.45, .28], [0, 1.7, 0], 0x314c60, { metalness:.4 });
+        addBox(group, materials, [3.75, 1.88, .06], [0, 1.72, -.18], 0x83503c, { emissive:0x3d1c16, emissiveIntensity:.62, metalness:.16 });
+        addBox(group, materials, [3.2, .55, .75], [0, .55, .58], 0x254258, { metalness:.4 });
+      });
+      addAsset('rack', 'aisle', 'RACK ROWS', [0, 0, .3], 4.65, 8.9, (group, materials) => {
+        [-3.35, .0, 3.35].forEach((z, row) => {
+          [-6.4, -4.8, -3.2, -1.6, 0, 1.6, 3.2, 4.8, 6.4].forEach((x, column) => addRack(group, materials, x, z, row === 1 && column === 4));
+        });
+      });
+      addAsset('cooling', 'aisle', 'CRAC 1', [-12.7, 0, 3.35], 4.5, 2.4, (group, materials) => {
+        addBox(group, materials, [2.5, 4.05, 1.65], [0, 2.03, 0], 0x22516a, { metalness:.46 });
+        [-.6, -.2, .2, .6].forEach(x => addBox(group, materials, [.11, 2.2, .07], [x, 2.2, -.86], 0x7dc8ee, { emissive:0x156689, emissiveIntensity:.52, metalness:.22 }));
+        addCylinder(group, materials, .42, .42, .12, [0, 3.18, -.9], 0x5bc7ed, { emissive:0x1d7ca1, emissiveIntensity:.63, rotation:[Math.PI / 2, 0, 0] });
+      });
+      addAsset('cooling-secondary', 'aisle', 'CRAC 2', [12.7, 0, 3.35], 4.5, 2.4, (group, materials) => {
+        addBox(group, materials, [2.5, 4.05, 1.65], [0, 2.03, 0], 0x22516a, { metalness:.46 });
+        [-.6, -.2, .2, .6].forEach(x => addBox(group, materials, [.11, 2.2, .07], [x, 2.2, -.86], 0x7dc8ee, { emissive:0x156689, emissiveIntensity:.52, metalness:.22 }));
+        addCylinder(group, materials, .42, .42, .12, [0, 3.18, -.9], 0x5bc7ed, { emissive:0x1d7ca1, emissiveIntensity:.63, rotation:[Math.PI / 2, 0, 0] });
+      });
+      addAsset('power-a', 'aisle', 'PDU A', [-12.4, 0, -1.65], 3.72, 2.0, (group, materials) => {
+        addBox(group, materials, [1.8, 3.12, 1.35], [0, 1.56, 0], 0x3a5364, { metalness:.6 });
+        addBox(group, materials, [1.22, .52, .08], [0, 2.35, -.72], 0x2e7e67, { emissive:0x167052, emissiveIntensity:.64 });
+        addCylinder(group, materials, .075, .075, .08, [.49, .72, -.72], 0x42cf91, { emissive:0x42cf91, emissiveIntensity:.92, rotation:[Math.PI / 2, 0, 0] });
+      });
+      addAsset('power-b', 'aisle', 'PDU B', [12.4, 0, -1.65], 3.72, 2.0, (group, materials) => {
+        addBox(group, materials, [1.8, 3.12, 1.35], [0, 1.56, 0], 0x53353b, { metalness:.6 });
+        addBox(group, materials, [1.22, .52, .08], [0, 2.35, -.72], 0x8b3f3d, { emissive:0x521b1d, emissiveIntensity:.65 });
+        addCylinder(group, materials, .075, .075, .08, [.49, .72, -.72], 0xe23c36, { emissive:0xe23c36, emissiveIntensity:.92, rotation:[Math.PI / 2, 0, 0] });
+      });
+      addAsset('recovery', 'recovery', 'RECOVERY CONSOLE', [-10.5, 0, 8.25], 3.3, 3.0, (group, materials) => {
+        addBox(group, materials, [4.2, .75, 2.0], [0, .62, 0], 0x1f574a, { metalness:.43 });
+        addBox(group, materials, [2.8, 1.15, .11], [0, 1.55, -.75], 0x247c63, { emissive:0x176c50, emissiveIntensity:.74, rotation:[-.12, 0, 0] });
+        [-1.55, 1.55].forEach(x => addBox(group, materials, [.2, 1.1, .2], [x, .2, 0], 0x416c68, { metalness:.61 }));
+      });
+      addAsset('exit', 'exit', 'EXIT INTERLOCK', [10.6, 0, 8.25], 4.6, 3.2, (group, materials) => {
+        [-1.45, 1.45].forEach(x => addBox(group, materials, [.28, 4.15, .5], [x, 2.08, 0], 0x455b69, { metalness:.58 }));
+        addBox(group, materials, [3.2, .3, .5], [0, 4.0, 0], 0x455b69, { metalness:.58 });
+        addBox(group, materials, [2.45, 3.35, .16], [0, 1.82, -.22], 0x276252, { emissive:0x1f7156, emissiveIntensity:.54, metalness:.31 });
+        addBox(group, materials, [.9, .25, .06], [0, 2.1, -.34], 0x83dfb4, { emissive:0x2e9e70, emissiveIntensity:.8 });
+      });
+      scene.add(world);
+      placeCamera();
+      const updateAssets = options => {
+        const alerts = new Set((options && options.alertAssets) || []);
+        const focus = options && options.focus ? options.focus : '';
+        const activeZone = options && options.activeZone ? options.activeZone : '';
+        const recovered = Boolean(options && options.recovered);
+        assets.forEach(asset => {
+          const active = activeZone === 'aisle' ? asset.key === focus : asset.zone === activeZone && activeZone !== '';
+          const focused = asset.key === focus;
+          const alerted = alerts.has(asset.key);
+          const tint = recovered && alerted ? 0x42cf91 : alerted ? 0xe23c36 : active ? 0x6eb9ff : focused ? 0xf6bd4d : null;
+          asset.alerted = alerted;
+          asset.selected = active || focused;
+          asset.ring.visible = Boolean(tint);
+          if (tint) asset.ringMaterial.color.setHex(tint);
+          asset.materials.forEach(material => {
+            material.color.copy(material.userData.baseColor);
+            material.emissive.copy(material.userData.baseEmissive);
+            material.emissiveIntensity = material.userData.baseEmissiveIntensity;
+            if (tint) {
+              material.emissive.setHex(tint);
+              material.emissiveIntensity = Math.max(material.userData.baseEmissiveIntensity, alerted ? .42 : .24);
+            }
+          });
+        });
+      };
+      const resize = () => {
+        const rect = holder.getBoundingClientRect();
+        if (!rect.width || !rect.height) return;
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+        renderer.setSize(Math.max(1, Math.floor(rect.width)), Math.max(1, Math.floor(rect.height)), false);
+        camera.aspect = rect.width / rect.height;
+        camera.updateProjectionMatrix();
+      };
+      const render = now => {
+        const pulse = .74 + Math.sin((now || performance.now()) / 310) * .22;
+        assets.forEach(asset => {
+          if (asset.ring.visible) {
+            asset.ringMaterial.opacity = asset.alerted ? pulse : .55;
+            const scale = asset.alerted ? 1 + (pulse - .5) * .07 : 1;
+            asset.ring.scale.set(scale, scale, scale);
+          }
+        });
+        renderer.render(scene, camera);
+      };
+      let frame = null;
+      const loop = now => {
+        if (!state.threeScene || state.threeScene.renderer !== renderer) return;
+        frame = requestAnimationFrame(loop);
+        state.threeScene.frame = frame;
+        if (!document.hidden) render(now);
+      };
+      const activePointers = new Map();
+      let dragStart = null;
+      let pinchDistance = 0;
+      let moved = false;
+      const pointerDistance = () => {
+        const points = [...activePointers.values()];
+        return points.length < 2 ? 0 : Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y);
+      };
+      const pickLocation = event => {
+        const rect = renderer.domElement.getBoundingClientRect();
+        pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+        raycaster.setFromCamera(pointer, camera);
+        const hit = raycaster.intersectObjects(pickables, false)[0];
+        if (!hit) return;
+        const asset = assets.get(hit.object.userData.assetKey);
+        if (!asset) return;
+        showPanel(asset.zone);
+      };
+      renderer.domElement.addEventListener('pointerdown', event => {
+        activePointers.set(event.pointerId, { x:event.clientX, y:event.clientY });
+        if (activePointers.size === 1) {
+          dragStart = { x:event.clientX, y:event.clientY, azimuth:orbit.azimuth, elevation:orbit.elevation };
+          moved = false;
+        } else {
+          pinchDistance = pointerDistance();
+          moved = true;
+        }
+        renderer.domElement.setPointerCapture(event.pointerId);
+      });
+      renderer.domElement.addEventListener('pointermove', event => {
+        if (!activePointers.has(event.pointerId)) return;
+        activePointers.set(event.pointerId, { x:event.clientX, y:event.clientY });
+        if (activePointers.size >= 2) {
+          const nextDistance = pointerDistance();
+          if (pinchDistance) orbit.distance = clamp(orbit.distance - (nextDistance - pinchDistance) * .035, 18, 39);
+          pinchDistance = nextDistance;
+          moved = true;
+          placeCamera();
+          return;
+        }
+        if (!dragStart) return;
+        const dx = event.clientX - dragStart.x;
+        const dy = event.clientY - dragStart.y;
+        if (Math.abs(dx) > 3 || Math.abs(dy) > 3) moved = true;
+        orbit.azimuth = dragStart.azimuth - dx * .009;
+        orbit.elevation = clamp(dragStart.elevation + dy * .008, .17, 1.13);
+        placeCamera();
+      });
+      const releasePointer = event => {
+        const shouldPick = !moved && activePointers.size === 1;
+        activePointers.delete(event.pointerId);
+        if (renderer.domElement.hasPointerCapture(event.pointerId)) renderer.domElement.releasePointerCapture(event.pointerId);
+        if (activePointers.size === 1) {
+          const remaining = [...activePointers.values()][0];
+          dragStart = { x:remaining.x, y:remaining.y, azimuth:orbit.azimuth, elevation:orbit.elevation };
+          moved = true;
+        } else {
+          dragStart = null;
+          pinchDistance = 0;
+        }
+        if (shouldPick) pickLocation(event);
+      };
+      renderer.domElement.addEventListener('pointerup', releasePointer);
+      renderer.domElement.addEventListener('pointercancel', releasePointer);
+      renderer.domElement.addEventListener('wheel', event => {
+        event.preventDefault();
+        orbit.distance = clamp(orbit.distance + event.deltaY * .012, 18, 39);
+        placeCamera();
+      }, { passive:false });
+      renderer.domElement.addEventListener('contextmenu', event => event.preventDefault());
+      renderer.domElement.addEventListener('webglcontextlost', event => {
+        event.preventDefault();
+        showThreeFallback('3D view stopped unexpectedly. The training floor-plan fallback is shown.');
+      }, { once:true });
+      const resizeObserver = window.ResizeObserver ? new ResizeObserver(resize) : null;
+      if (resizeObserver) resizeObserver.observe(holder);
+      else window.addEventListener('resize', resize);
+      state.threeScene = {
+        renderer:renderer,
+        frame:frame,
+        resizeObserver:resizeObserver,
+        resize:resize,
+        render:render,
+        update:updateAssets,
+        resetView:() => {
+          Object.assign(orbit, defaultOrbit);
+          placeCamera();
+          render();
+        },
+        dispose:() => {
+          if (frame) cancelAnimationFrame(frame);
+          if (resizeObserver) resizeObserver.disconnect();
+          else window.removeEventListener('resize', resize);
+          renderer.dispose();
+        }
+      };
+      plan.classList.add('three-ready');
+      if (reset) reset.hidden = false;
+      setThreeStatus('Drag to rotate · scroll or pinch to zoom · click a highlighted location');
+      updateAssets({});
+      resize();
+      frame = requestAnimationFrame(loop);
+      state.threeScene.frame = frame;
+    }
+    function resizeThreeScene() {
+      if (!state.threeScene) return;
+      state.threeScene.resize();
+      state.threeScene.render();
+    }
+    function resetThreeSceneView() {
+      if (!state.threeScene) return;
+      state.threeScene.resetView();
+      setThreeStatus('3D view reset · drag to rotate · scroll or pinch to zoom');
+    }
+    function syncThreeScene(scenario, activeZone) {
+      if (!state.threeScene) return;
+      const map = scenario && scenario.map ? scenario.map : null;
+      state.threeScene.update({
+        alertAssets:map ? map.alertAssets || [] : [],
+        focus:map ? map.focus || '' : '',
+        activeZone:activeZone || '',
+        recovered:Boolean(scenario && state.stage >= state.config.exitStage)
+      });
+    }
     function setGameConfiguration(level, scenarioKey) {
       const nextLevel = DIFFICULTIES[level] ? level : 'medium';
       const nextScenario = SCENARIOS[scenarioKey] || null;
@@ -952,7 +1384,15 @@
       const plan = $('#floorPlan');
       $$('[data-map-asset]').forEach(asset => asset.classList.remove('scene-alert','map-focus'));
       if (!scenario) {
-        $('#aisleZoneTarget').setAttribute('aria-label','Go to the virtual alert');
+        $$('[data-aisle-target]').forEach(target => {
+          const title = target.querySelector('b');
+          const detail = target.querySelector('.zone-copy > span') || target.querySelector('b + span');
+          if (title) title.textContent = 'Virtual alert';
+          if (detail) detail.textContent = 'Inspect evidence';
+          target.setAttribute('aria-label','Go to the virtual alert');
+        });
+        if (plan) plan.classList.remove('recovered');
+        syncThreeScene(null, plan ? plan.dataset.activeZone || '' : '');
         return;
       }
       (scenario.map.alertAssets || []).forEach(key => {
@@ -961,11 +1401,15 @@
       });
       const focus = document.querySelector('[data-map-asset="' + scenario.map.focus + '"]');
       if (focus) focus.classList.add('map-focus');
-      const target = $('#aisleZoneTarget');
-      target.querySelector('b').textContent = scenario.location;
-      target.querySelector('span').textContent = 'Virtual alert';
-      target.setAttribute('aria-label','Go to ' + scenario.location);
+      $$('[data-aisle-target]').forEach(target => {
+        const title = target.querySelector('b');
+        const detail = target.querySelector('.zone-copy > span') || target.querySelector('b + span');
+        if (title) title.textContent = scenario.location;
+        if (detail) detail.textContent = 'Virtual alert';
+        target.setAttribute('aria-label','Go to ' + scenario.location);
+      });
       if (plan) plan.classList.remove('recovered');
+      syncThreeScene(scenario, plan ? plan.dataset.activeZone || '' : '');
     }
     function renderScenario() {
       const scenario = state.scenario;
@@ -977,7 +1421,7 @@
         $('#scenarioHud').textContent = 'Rotating';
         $('#mapTitle').textContent = 'Fictional Data Hall A';
         $('#mapSubtitle').textContent = 'The shared scenario highlights the relevant virtual area after the host starts.';
-        $('#mapCaption').textContent = 'This is a 3D-style fictional data-hall model. The lit locations are game controls only; no real equipment is connected.';
+        $('#mapCaption').textContent = 'Rotate and zoom the 3D fictional data hall. Highlighted locations are game controls only; no real equipment is connected.';
         renderMapScenario(null);
         return;
       }
@@ -989,7 +1433,7 @@
       $('#scenarioHud').textContent = scenario.category;
       $('#mapTitle').textContent = 'Fictional Data Hall A · ' + scenario.category;
       $('#mapSubtitle').textContent = 'Highlighted: ' + scenario.location + '. Inspect only virtual game evidence.';
-      $('#mapCaption').textContent = 'Scenario focus: ' + scenario.location + '. This is a fictional training model with no connection to real systems or equipment.';
+      $('#mapCaption').textContent = 'Scenario focus: ' + scenario.location + '. Rotate the 3D fictional hall and inspect only game evidence; no real system or equipment is connected.';
       $('#nocPanel .notice').innerHTML = '<strong>Incoming incident:</strong> ' + escapeHtml(scenario.incident);
       $('#aislePanel .notice').textContent = 'This is a fictional floor view. Inspect the simulated assets only—no physical switching, reset, bypass, or live operational action is part of this game.';
       $('#recoveryResult p').textContent = scenario.recoveryResult;
@@ -1339,6 +1783,7 @@
         plan.dataset.stage = String(state.stage);
         plan.classList.toggle('recovered', state.stage >= state.config.exitStage);
       }
+      syncThreeScene(state.scenario, current || '');
     }
     function showPanel(panel) {
       if (!state.started || state.finished) return;
@@ -1387,6 +1832,7 @@
       state.started = true;
       state.finished = false;
       $('#game').classList.remove('hidden');
+      requestAnimationFrame(resizeThreeScene);
       updateSessionControls();
       logEvent((state.scenario ? state.scenario.title : state.config.label) + ' shared timer started. NOC console unlocked.');
       updateHud();
@@ -1763,7 +2209,11 @@
     $('#playAgain').addEventListener('click', requestSessionReset);
     $('#hintButton').addEventListener('click', giveHint);
     $('#fullscreenButton').addEventListener('click', toggleFullscreen);
-    document.addEventListener('fullscreenchange', updateFullscreenButton);
+    $('#resetMapViewButton').addEventListener('click', resetThreeSceneView);
+    document.addEventListener('fullscreenchange', () => {
+      updateFullscreenButton();
+      requestAnimationFrame(resizeThreeScene);
+    });
     document.addEventListener('visibilitychange', () => { if (!document.hidden) refreshLobby(true); });
     $$('.difficulty-option').forEach(button => button.addEventListener('click', () => selectDifficulty(button.dataset.difficulty)));
     $$('.zone').forEach(button => button.addEventListener('click', () => showPanel(button.dataset.zone)));
@@ -1780,6 +2230,7 @@
     $$('.validation-check').forEach(button => button.addEventListener('click', () => inspectValidation(button.dataset.validation, button)));
     $$('.choice[data-summary]').forEach(button => button.addEventListener('click', () => selectSummary(button.dataset.summary, button)));
     $('#escapeButton').addEventListener('click', finishSuccess);
+    initThreeScene();
     resetGame();
   </script>
 </body>
