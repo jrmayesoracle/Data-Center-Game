@@ -462,8 +462,8 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    const SUPABASE_URL = 'https://dbaiwdatialqkywacxok.supabase.co';
-    const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_a2CkKxXlGpZhcaj8OCL-yg_2qAeEhvf';
+    const SUPABASE_URL = 'https://ajmlylmvtialzkrgijcs.supabase.co';
+    const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_22X8p2ulxSaGtzEKUwTQiA_GyqkrsgV';
     const TOTAL_SECONDS = 12 * 60;
     const panels = ['noc','diagnose','aisle','recovery','exit','win'];
     const zoneRequirements = { noc:0, diagnose:1, aisle:2, recovery:3, exit:4 };
@@ -564,8 +564,9 @@
         clearInterval(state.lobbyTimer);
         state.lobbyTimer = setInterval(() => refreshLobby(true), 12000);
       } catch (error) {
-        const setupMissing = /join_dc_escape_session|function|schema cache/i.test(error.message || '');
-        setLobbyStatus(setupMissing ? 'The game lobby setup is missing. Run the Data Center Escape team SQL file once, then refresh.' : 'Could not join: ' + (error.message || 'Unknown error'), 'bad');
+        const detail = error.message || 'Unknown error';
+        const setupMissing = /join_dc_escape_session|function|schema cache/i.test(detail);
+        setLobbyStatus(setupMissing ? 'The game lobby setup is missing. Run the Data Center Escape team SQL file once, then refresh. Details: ' + detail : 'Could not join: ' + detail, 'bad');
       } finally {
         button.disabled = false;
         button.textContent = original;
